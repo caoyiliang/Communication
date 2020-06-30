@@ -1,0 +1,24 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/.vs
+/Communication/bin
+/Communication/obj
+/Crow/bin
+/Crow/obj
+/MockTcpClient/bin
+/MockTcpClient/obj
+/packages
+/Parser/bin
+/Parser/obj
+/PigeonPortDemo/bin
+/PigeonPortDemo/obj
+/Test/bin
+/Test/obj
+/TestTcpServer/bin
+/TestTcpServer/obj
+/TopPortLib/bin
+/TopPortLib/obj
+/TopPortLibIntTest/bin
+/TopPortLibIntTest/obj
