@@ -102,8 +102,10 @@ namespace TopPortLib
             var bytes = req.ToBytes();
             try
             {
-                if (timeoutTask == await Task.WhenAny(timeoutTask, _topPort.SendAsync(bytes, _timeDelayAfterSending)))
+                var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
+                if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                     throw new TimeoutException($"timeout={to}");
+                await sendTask;
                 await RequestDataAsync(bytes);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"timeout={to}");
@@ -123,8 +125,10 @@ namespace TopPortLib
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var timeoutTask = Task.Delay(to);
             var bytes = req.ToBytes();
-            if (timeoutTask == await Task.WhenAny(timeoutTask, _topPort.SendAsync(bytes, _timeDelayAfterSending)))
+            var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
+            if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                 throw new TimeoutException($"timeout={to}");
+            await sendTask;
             await RequestDataAsync(bytes);
         }
         private async Task RequestDataAsync(byte[] data)
