@@ -16,6 +16,11 @@ namespace Communication.Interfaces
 
         Task SendDataAsync(byte[] data, CancellationToken cancellationToken);
 
-        Task<int> ReadDataAsync(byte[] data, int count, CancellationToken cancellationToken);
+        Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken);
+    }
+    public class ReadDataResult
+    {
+        public byte[] Data { get; set; }
+        public int Length { get; set; }
     }
 }

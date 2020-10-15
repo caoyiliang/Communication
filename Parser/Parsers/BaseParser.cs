@@ -62,6 +62,7 @@ namespace Parser.Parsers
 
         protected FindIndexRsp FindIndex(int startIndex, byte[] block)
         {
+            if (block.Length == 0) return new FindIndexRsp { Code = ErrorCode.Success, Index = startIndex };
             if (_bytes.Count - (startIndex - _bytes.StartIndex) < block.Length) return new FindIndexRsp() { Code = ErrorCode.LengthNotEnough, Index = -1 };
             for (int i = startIndex; i < _bytes.StartIndex + _bytes.Count; i++)
             {

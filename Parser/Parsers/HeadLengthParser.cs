@@ -28,6 +28,16 @@ namespace Parser.Parsers
             this.OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
         }
 
+        /// <summary>
+        ///  长度为包括表示长度的字节在内的所有数据的长度
+        /// </summary>
+        /// <param name="getDataLength"></param>
+        public HeadLengthParser(GetDataLengthEventHandler getDataLength)
+        {
+            this._head = new byte[0];
+            this.OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
+        }
+
         protected override async Task<bool> CanFindEndIndexAsync()
         {
             if (_bytes.Count - (_startIndex - _bytes.StartIndex) < _bytes.GetCurrentMessageLength()) return false;

@@ -97,12 +97,11 @@ namespace Communication.Bus
             {
                 while (!_closeCts.IsCancellationRequested)
                 {
-                    var buffer = new byte[BUFFER_SIZE];
-                    int count = await _physicalPort.ReadDataAsync(buffer, BUFFER_SIZE, _closeCts.Token);
-                    if (count <= 0) break;
+                    var result = await _physicalPort.ReadDataAsync(BUFFER_SIZE, _closeCts.Token);
+                    if (result.Length <= 0) break;
                     try
                     {
-                        await this.OnReceiveOriginalData?.Invoke(buffer, count);
+                        await this.OnReceiveOriginalData?.Invoke(result.Data, result.Length);
                     }
                     catch (Exception e)
                     {

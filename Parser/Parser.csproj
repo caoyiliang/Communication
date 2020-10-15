@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags></PackageTags>
     <Description>数据分帧解析器</Description>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Authors>CSoft</Authors>
     <PackageId>CSoft.Parser</PackageId>
     <PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>

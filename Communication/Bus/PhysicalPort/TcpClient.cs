@@ -68,9 +68,15 @@ namespace Communication.Bus.PhysicalPort
             }
         }
 
-        public async Task<int> ReadDataAsync(byte[] data, int count, CancellationToken cancellationToken)
+        public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            return await this._networkStream.ReadAsync(data, 0, count, cancellationToken);
+            var data = new byte[count];
+            int length = await this._networkStream.ReadAsync(data, 0, count, cancellationToken);
+            return new ReadDataResult
+            {
+                Length = length,
+                Data = data
+            };
         }
 
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)
