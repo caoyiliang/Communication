@@ -62,7 +62,10 @@ namespace Communication.Bus
             _closeCts.Cancel();
             if (IsOpen)
                 await _physicalPort.CloseAsync();
-            await _closeTcs.Task;
+            if (await Task.WhenAny(_closeTcs.Task, Task.Delay(2000)) != _closeTcs.Task)
+            {
+                throw new TimeoutException("Waited too long to Close. timeout = 2000");
+            }
         }
 
         public async Task SendAsync(byte[] data, int timeInterval = 0)
@@ -115,7 +118,7 @@ namespace Communication.Bus
             finally
             {
                 _closeCts.Cancel();
-                _closeTcs.SetResult(true);
+                _closeTcs.TrySetResult(true);
             }
         }
 

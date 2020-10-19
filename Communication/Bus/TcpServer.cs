@@ -119,7 +119,7 @@ namespace Communication.Bus
                         {
                             _logger.Error(e, "Handle client connect error");
                         }
-                        Task.Run(async () => await HandleClientAsync(client, clientId));
+                        _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                     }
                 }
                 catch (Exception e)
@@ -143,7 +143,7 @@ namespace Communication.Bus
                         c.Close();
                     }
                     _dicClients.Clear();
-                    _stopTcs.SetResult(true);
+                    _stopTcs.TrySetResult(true);
                     this.IsActive = false;
                 }
             });
