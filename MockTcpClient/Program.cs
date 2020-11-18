@@ -20,15 +20,15 @@ namespace ConsoleApp1
         private static async Task Startasync()
         {
             var task = Task.Run(async () =>
-              {
-                  while (!cts.IsCancellationRequested)
-                  {
-                      IPhysicalPort port = new TcpClient("127.0.0.1", 7779);
-                      await port.OpenAsync();
-                      await SendDataAsync(port, "hello", cts.Token);
-                      await Task.Delay(100);
-                  }
-              });
+            {
+                while (!cts.IsCancellationRequested)
+                {
+                    IPhysicalPort port = new TcpClient("127.0.0.1", 7779);
+                    await port.OpenAsync();
+                    await SendDataAsync(port, "hello", cts.Token);
+                    await Task.Delay(100);
+                }
+            });
         }
 
         private static async Task SendDataAsync(IPhysicalPort port, string msg, CancellationToken cancellationToken)
