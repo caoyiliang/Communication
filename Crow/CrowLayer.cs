@@ -31,8 +31,8 @@ namespace Crow
 
         }
 
-        public event RequestedDataEventHandler<TReq> OnRequestedData;
-        public event RespondedDataEventHandler<TRsp> OnRespondedData;
+        public event SentDataEventHandler<TReq> OnSentData;
+        public event ReceivedDataEventHandler<TRsp> OnReceivedData;
 
         public void Dispose()
         {
@@ -94,11 +94,11 @@ namespace Crow
                     try
                     {
                         await _port.SendAsync(data.Req);
-                        if (!(OnRequestedData is null))
+                        if (!(OnSentData is null))
                         {
                             try
                             {
-                                await OnRequestedData(data.Req);
+                                await OnSentData(data.Req);
                             }
                             catch { }
                         }
@@ -119,11 +119,11 @@ namespace Crow
                         {
                             var rsp = await _rsp.Task;
                             data.Rsp.TrySetResult(rsp);
-                            if (!(OnRespondedData is null))
+                            if (!(OnReceivedData is null))
                             {
                                 try
                                 {
-                                    await OnRespondedData(rsp);
+                                    await OnReceivedData(rsp);
                                 }
                                 catch { }
                             }

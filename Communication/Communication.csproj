@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>通讯物理口封装</PackageReleaseNotes>
     <PackageTags></PackageTags>
-    <AssemblyVersion>5.0.2.0</AssemblyVersion>
-    <FileVersion>5.0.2.0</FileVersion>
+    <AssemblyVersion>5.0.3.0</AssemblyVersion>
+    <FileVersion>5.0.3.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>
     <Authors>CSoft</Authors>
@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Communication.xml</DocumentationFile>
+    <DocumentationFile>bin\Communication.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

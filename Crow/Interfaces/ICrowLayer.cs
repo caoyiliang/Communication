@@ -13,9 +13,9 @@ namespace Crow.Interfaces
     /// <typeparam name="TRsp"></typeparam>
     public interface ICrowLayer<TReq, TRsp>
     {
-        event RequestedDataEventHandler<TReq> OnRequestedData;
+        event SentDataEventHandler<TReq> OnSentData;
 
-        event RespondedDataEventHandler<TRsp> OnRespondedData;
+        event ReceivedDataEventHandler<TRsp> OnReceivedData;
         Task StartAsync();
 
         Task StopAsync();

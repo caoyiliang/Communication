@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Crow
 {
-    public delegate Task RequestedDataEventHandler<T>(T data);
+    public delegate Task SentDataEventHandler<T>(T data);
 
-    public delegate Task RespondedDataEventHandler<T>(T data);
+    public delegate Task ReceivedDataEventHandler<T>(T data);
 }

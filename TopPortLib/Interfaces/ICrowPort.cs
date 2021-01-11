@@ -12,9 +12,9 @@ namespace TopPortLib.Interfaces
     {
         IPhysicalPort PhysicalPort { get; set; }
 
-        event RequestedDataEventHandler<byte[]> OnRequestedData;
+        event SentDataEventHandler<byte[]> OnRequestedData;
 
-        event RespondedDataEventHandler<byte[]> OnRespondedData;
+        event ReceivedDataEventHandler<byte[]> OnRespondedData;
         /// <summary>
         /// 
         /// </summary>

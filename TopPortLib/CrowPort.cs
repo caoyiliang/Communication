@@ -19,8 +19,8 @@ namespace TopPortLib
         private ITilesLayer<byte[], byte[]> _tilesLayer;
         private ITopPort _topPort;
 
-        public event RequestedDataEventHandler<byte[]> OnRequestedData;
-        public event RespondedDataEventHandler<byte[]> OnRespondedData;
+        public event SentDataEventHandler<byte[]> OnRequestedData;
+        public event ReceivedDataEventHandler<byte[]> OnRespondedData;
 
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
         /// <summary>
@@ -34,14 +34,14 @@ namespace TopPortLib
             _topPort = topPort;
             _tilesLayer = new TilesLayer(_topPort);
             _crowLayer = new CrowLayer<byte[], byte[]>(_tilesLayer, defaultTimeout, timeDelayAfterSending);
-            _crowLayer.OnRequestedData += async data =>
+            _crowLayer.OnSentData += async data =>
              {
                  if (!(OnRequestedData is null))
                  {
                      await OnRequestedData(data);
                  }
              };
-            _crowLayer.OnRespondedData += async data =>
+            _crowLayer.OnReceivedData += async data =>
             {
                 if (!(OnRespondedData is null))
                 {
