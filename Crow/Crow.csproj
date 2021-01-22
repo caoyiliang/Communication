@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.1</Version>
+    <Version>5.0.2</Version>
     <Description>数据收发队列</Description>
     <PackageId>CSoft.Crow</PackageId>
     <Authors>CSoft</Authors>
@@ -11,13 +11,19 @@
     <PackageReleaseNotes>数据收发队列</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
     <RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-    <AssemblyVersion>5.0.1.0</AssemblyVersion>
-    <FileVersion>5.0.1.0</FileVersion>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Crow.xml</DocumentationFile>
     <OutputPath></OutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

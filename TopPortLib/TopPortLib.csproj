@@ -2,18 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>5.0.4</Version>
+    <Version>5.0.5</Version>
     <Description>通讯口使用类库</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>通讯口使用类库</PackageReleaseNotes>
     <PackageTags></PackageTags>
-    <AssemblyVersion>5.0.4.0</AssemblyVersion>
     <PackageId>CSoft.TopPortLib</PackageId>
     <Authors>CSoft</Authors>
     <Company>CSoft</Company>
     <PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
     <RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-    <FileVersion>5.0.4.0</FileVersion>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -27,6 +26,10 @@
     <EmbeddedResource Remove="Timers\**" />
     <None Remove="Parsers\**" />
     <None Remove="Timers\**" />
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

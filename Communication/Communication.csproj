@@ -3,18 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>通讯物理口封装</PackageReleaseNotes>
     <PackageTags></PackageTags>
-    <AssemblyVersion>5.0.3.0</AssemblyVersion>
-    <FileVersion>5.0.3.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>
     <Authors>CSoft</Authors>
     <Company>CSoft</Company>
     <PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
     <RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -22,9 +21,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSoft.LogInterface" Version="5.0.0" />
-    <PackageReference Include="CSoft.Utils" Version="5.0.0" />
+    <PackageReference Include="CSoft.LogInterface" Version="5.0.2" />
+    <PackageReference Include="CSoft.Utils" Version="5.0.1" />
     <PackageReference Include="System.IO.Ports" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

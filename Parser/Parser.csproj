@@ -5,12 +5,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags></PackageTags>
     <Description>数据分帧解析器</Description>
-    <Version>5.0.3</Version>
+    <Version>5.0.4</Version>
     <Authors>CSoft</Authors>
     <PackageId>CSoft.Parser</PackageId>
     <PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
     <RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -18,8 +19,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSoft.LogInterface" Version="5.0.0" />
-    <PackageReference Include="CSoft.Utils" Version="5.0.0" />
+    <PackageReference Include="CSoft.LogInterface" Version="5.0.2" />
+    <PackageReference Include="CSoft.Utils" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
