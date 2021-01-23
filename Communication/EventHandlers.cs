@@ -9,5 +9,7 @@ namespace Communication
 
     public delegate Task ClientConnectEventHandler(string hostName, int port, int clientId);
 
+    public delegate Task NamedPipeClientConnectEventHandler(int clientId);
+
     public delegate Task ClientDisconnectEventHandler(int clientId);
 }

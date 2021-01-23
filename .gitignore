@@ -22,3 +22,7 @@
 /TopPortLib/obj
 /TopPortLibIntTest/bin
 /TopPortLibIntTest/obj
+/TestNamedPipeClient/bin
+/TestNamedPipeClient/obj
+/TestNamedPipeServer/bin
+/TestNamedPipeServer/obj
