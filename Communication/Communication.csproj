@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.5</Version>
+    <Version>5.0.6</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>通讯物理口封装</PackageReleaseNotes>
     <PackageTags></PackageTags>
@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSoft.LogInterface" Version="5.0.2" />
-    <PackageReference Include="CSoft.Utils" Version="5.0.1" />
+    <PackageReference Include="CSoft.Utils" Version="5.0.2" />
     <PackageReference Include="System.IO.Ports" Version="5.0.0" />
   </ItemGroup>
 
