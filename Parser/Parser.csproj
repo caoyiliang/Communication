@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags></PackageTags>
     <Description>数据分帧解析器</Description>
-    <Version>5.0.5</Version>
+    <Version>5.0.6</Version>
     <Authors>CSoft</Authors>
     <PackageId>CSoft.Parser</PackageId>
     <PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>
@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSoft.LogInterface" Version="5.0.2" />
-    <PackageReference Include="CSoft.Utils" Version="5.0.2" />
+    <PackageReference Include="CSoft.Utils" Version="5.0.3" />
   </ItemGroup>
 
   <ItemGroup>
