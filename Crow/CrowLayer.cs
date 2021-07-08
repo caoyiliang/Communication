@@ -69,9 +69,9 @@ namespace Crow
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         /// <returns></returns>
-        public async Task<TRsp> RequestAsync(TReq req, int timeout = -1)
+        public async Task<TRsp> RequestAsync(TReq req, int timeout = -1, bool background = false)
         {
-            return await RequestAsync(req, true, timeout);
+            return await RequestAsync(req, true, timeout, background);
         }
         /// <summary>
         /// 
@@ -83,9 +83,9 @@ namespace Crow
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         /// <returns></returns>
-        public async Task SendAsync(TReq req, int timeout = -1)
+        public async Task SendAsync(TReq req, int timeout = -1, bool background = false)
         {
-            await RequestAsync(req, false, timeout);
+            await RequestAsync(req, false, timeout, background);
         }
 
         public async Task StartAsync()
@@ -106,8 +106,9 @@ namespace Crow
                         else
                             continue;
                     }
-                    if (data.Timeout.IsCompleted)
-                        continue;
+                    if (!data.Background)
+                        if (data.Timeout.IsCompleted)
+                            continue;
                     _rsp?.TrySetCanceled();
                     _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
                     try
@@ -129,6 +130,8 @@ namespace Crow
                     }
                     if (data.NeedRsp)
                     {
+                        if (data.Background)
+                            data.Timeout = Task.Delay(data.Time);
                         var task = await Task.WhenAny(data.Timeout, _rsp.Task, _startStop.Task);
                         if (task == _startStop.Task)
                         {
@@ -147,8 +150,13 @@ namespace Crow
                                 catch { }
                             }
                         }
+                        else if (data.Background && (task == data.Timeout))
+                        {
+                            data.Rsp.TrySetException(new TimeoutException($"background timeout"));
+                        }
                         else
                         {
+
                         }
                     }
                     else
@@ -172,16 +180,20 @@ namespace Crow
 
             await _completeStop.Task;
         }
-        private async Task<TRsp> RequestAsync(TReq req, bool needRsp, int timeout)
+        private async Task<TRsp> RequestAsync(TReq req, bool needRsp, int timeout, bool background)
         {
             if (!_isActive) throw new CrowStopWorkingException();
             if (_queue.Count > 10) throw new CrowBusyException();
             var rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
             var tm = timeout == -1 ? _defaultTimeout : timeout;
-            var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Timeout = Task.Delay(tm) };
+            var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm, Background = background };
             _queue.Enqueue(data);
-            if (await Task.WhenAny(rsp.Task, data.Timeout) == data.Timeout)
-                throw new TimeoutException($"timeout={tm}");
+            if (!background)
+            {
+                data.Timeout = Task.Delay(tm);
+                if (await Task.WhenAny(rsp.Task, data.Timeout) == data.Timeout)
+                    throw new TimeoutException($"timeout={tm}");
+            }
             return await rsp.Task;
         }
         class ReqInfo
@@ -190,7 +202,8 @@ namespace Crow
             public bool NeedRsp { get; set; }
             public TaskCompletionSource<TRsp> Rsp { get; set; }
             public Task Timeout { get; set; }
-
+            public int Time { get; set; }
+            public bool Background { get; set; }
         }
     }
 }

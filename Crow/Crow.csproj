@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.2</Version>
+    <Version>5.0.7</Version>
     <Description>数据收发队列</Description>
     <PackageId>CSoft.Crow</PackageId>
     <Authors>CSoft</Authors>
@@ -24,6 +24,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSoft.Utils" Version="5.0.3" />
   </ItemGroup>
 
 </Project>
