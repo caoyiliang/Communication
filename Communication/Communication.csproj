@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>5.0.7</Version>
+    <Version>5.0.8</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>通讯物理口封装</PackageReleaseNotes>
     <PackageTags></PackageTags>
@@ -21,8 +21,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSoft.LogInterface" Version="5.0.2" />
-    <PackageReference Include="CSoft.Utils" Version="5.0.3" />
+    <PackageReference Include="CSoft.LogInterface" Version="5.0.3" />
+    <PackageReference Include="CSoft.Utils" Version="5.0.4" />
     <PackageReference Include="System.IO.Ports" Version="5.0.1" />
   </ItemGroup>
 
