@@ -3,13 +3,11 @@
  * * 说明：ICrowPort.cs
 ********************************************************************/
 
-using Communication.Interfaces;
-using System;
-using Crow.Exceptions;
-using System.Threading.Tasks;
-using TopPortLib.Exceptions;
 using Communication.Exceptions;
+using Communication.Interfaces;
 using Crow;
+using Crow.Exceptions;
+using TopPortLib.Exceptions;
 
 namespace TopPortLib.Interfaces
 {

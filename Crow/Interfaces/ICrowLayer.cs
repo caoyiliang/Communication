@@ -3,10 +3,6 @@
  * * 说明：ICrowLayer.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Crow.Exceptions;
 
 namespace Crow.Interfaces

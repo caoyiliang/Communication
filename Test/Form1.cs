@@ -3,23 +3,13 @@
  * * 说明：Form1.cs
 ********************************************************************/
 
-using TopPortLib.Interfaces;
-using Communication.Bus;
 using Communication.Bus.PhysicalPort;
 using Communication.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Threading;
-using System.Threading.Tasks;
-using Parser.Parsers;
 using Parser;
+using Parser.Parsers;
+using System.Text;
 using TopPortLib;
+using TopPortLib.Interfaces;
 
 namespace Test
 {

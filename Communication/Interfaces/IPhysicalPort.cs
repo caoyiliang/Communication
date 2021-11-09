@@ -3,12 +3,6 @@
  * * 说明：IPhysicalPort.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Communication.Interfaces
 {
     public interface IPhysicalPort : IDisposable

@@ -7,12 +7,6 @@ using Communication.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parser;
 using Parser.Parsers;
-using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using TopPortLib;
 using TopPortLib.Interfaces;
 

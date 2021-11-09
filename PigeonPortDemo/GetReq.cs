@@ -3,11 +3,6 @@
  * * 说明：GetReq.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TopPortLib.Interfaces;
 
 namespace PigeonPortDemo

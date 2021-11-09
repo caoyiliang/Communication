@@ -3,10 +3,6 @@
  * * 说明：PlayerRsp.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace TopPortLibIntTest.Response
 {
     class PlayerRsp

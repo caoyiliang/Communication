@@ -3,11 +3,6 @@
  * * 说明：CrowPort.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Communication.Exceptions;
 using Communication.Interfaces;
 using Crow;

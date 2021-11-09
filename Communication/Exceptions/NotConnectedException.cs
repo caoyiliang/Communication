@@ -3,10 +3,6 @@
  * * 说明：NotConnectedException.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Communication.Exceptions
 {
     public class NotConnectedException : Exception

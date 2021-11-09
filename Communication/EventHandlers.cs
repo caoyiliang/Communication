@@ -3,9 +3,6 @@
  * * 说明：EventHandlers.cs
 ********************************************************************/
 
-using System;
-using System.Threading.Tasks;
-
 namespace Communication
 {
     public delegate Task ReceiveOriginalDataEventHandler(byte[] data, int size);

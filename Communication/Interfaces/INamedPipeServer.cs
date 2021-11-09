@@ -3,11 +3,6 @@
  * * 说明：INamedPipeServer.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Communication.Interfaces
 {
     public interface INamedPipeServer

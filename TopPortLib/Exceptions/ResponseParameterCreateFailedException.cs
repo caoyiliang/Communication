@@ -3,7 +3,6 @@
  * * 说明：ResponseParameterCreateFailedException.cs
 ********************************************************************/
 
-using System;
 using System.Runtime.Serialization;
 
 namespace TopPortLib.Exceptions

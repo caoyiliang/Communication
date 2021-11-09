@@ -3,11 +3,6 @@
  * * 说明：NormalTimer.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-
 namespace Parser.Timers
 {
     internal class NormalTimer : ITimer

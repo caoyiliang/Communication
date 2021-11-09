@@ -3,10 +3,6 @@
  * * 说明：FootParser.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Parser.Parsers
 {
     public class FootParser : BaseParser

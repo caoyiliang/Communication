@@ -3,10 +3,6 @@
  * * 说明：ITimer.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Parser.Timers
 {
     internal interface ITimer

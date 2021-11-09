@@ -3,10 +3,6 @@
  * * 说明：TilesSendException.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Crow.Exceptions
 {
     /// <summary>

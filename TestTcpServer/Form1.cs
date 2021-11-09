@@ -4,16 +4,7 @@
 ********************************************************************/
 
 using Communication.Bus;
-using Communication.Bus.PhysicalPort;
 using Communication.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace TestTcpServer
 {
@@ -45,7 +36,7 @@ namespace TestTcpServer
         private async Task TcpServer_ReceiveOriginalDataFromTcpClient(byte[] data, int size, int clientId)
         {
             var tmp = new byte[size];
-            Array.Copy(data,0,tmp,0,size);
+            Array.Copy(data, 0, tmp, 0, size);
             await tcpServer.SendDataAsync(clientId, tmp);
             if (data[0] == 0x89)
             {

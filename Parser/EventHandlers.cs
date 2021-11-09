@@ -3,9 +3,6 @@
  * * 说明：EventHandlers.cs
 ********************************************************************/
 
-using System;
-using System.Threading.Tasks;
-
 namespace Parser
 {
     public delegate Task ReceiveParsedDataEventHandler(byte[] data);

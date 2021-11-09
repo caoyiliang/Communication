@@ -3,11 +3,6 @@
  * * 说明：IParser.cs
 ********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Parser.Interfaces
 {
     public interface IParser
