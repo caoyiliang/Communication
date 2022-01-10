@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：SerialPort.cs
-********************************************************************/
-
-using Communication.Interfaces;
+﻿using Communication.Interfaces;
 using System.ComponentModel;
 using System.IO.Ports;
 

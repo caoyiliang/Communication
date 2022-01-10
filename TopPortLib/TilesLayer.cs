@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：TilesLayer.cs
-********************************************************************/
-
-using Crow.Interfaces;
+﻿using Crow.Interfaces;
 using TopPortLib.Interfaces;
 
 namespace TopPortLib

@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：Player.cs
-********************************************************************/
-
-using TopPortLib.Interfaces;
+﻿using TopPortLib.Interfaces;
 using TopPortLibIntTest.Interfaces;
 using TopPortLibIntTest.Request;
 using TopPortLibIntTest.Response;

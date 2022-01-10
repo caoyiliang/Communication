@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：NormalTimer.cs
-********************************************************************/
-
-namespace Parser.Timers
+﻿namespace Parser.Timers
 {
     internal class NormalTimer : ITimer
     {

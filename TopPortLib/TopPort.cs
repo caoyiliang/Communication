@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：TopPort.cs
-********************************************************************/
-
-using Communication.Bus;
+﻿using Communication.Bus;
 using Communication.Exceptions;
 using Communication.Interfaces;
 using Parser;

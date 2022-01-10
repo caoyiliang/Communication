@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：EventHandlers.cs
-********************************************************************/
-
-namespace Communication
+﻿namespace Communication
 {
     public delegate Task ReceiveOriginalDataEventHandler(byte[] data, int size);
 

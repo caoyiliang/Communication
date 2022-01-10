@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：Form1.cs
-********************************************************************/
-
-using Communication.Bus.PhysicalPort;
+﻿using Communication.Bus.PhysicalPort;
 using Communication.Interfaces;
 using Parser;
 using Parser.Parsers;
@@ -64,7 +59,7 @@ namespace Test
             await parsedPort.CloseAsync();
             if (comboBox1.SelectedIndex == 0)
             {
-                parsedPort = new TopPort(physicalPorts[comboBox2.SelectedIndex], new TimeParser(200));
+                parsedPort = new TopPort(physicalPorts[comboBox2.SelectedIndex], new TimeParser(5));
                 parsedPort.OnReceiveParsedData += ReceiverDataEventAsync;
             }
             else if (comboBox1.SelectedIndex == 1)

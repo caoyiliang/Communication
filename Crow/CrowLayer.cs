@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：CrowLayer.cs
-********************************************************************/
-
-using Crow.Exceptions;
+﻿using Crow.Exceptions;
 using Crow.Interfaces;
 using System.Collections.Concurrent;
 

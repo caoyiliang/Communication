@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：HeadFootParser.cs
-********************************************************************/
-
-using Parser.Interfaces;
+﻿using Parser.Interfaces;
 
 namespace Parser.Parsers
 {

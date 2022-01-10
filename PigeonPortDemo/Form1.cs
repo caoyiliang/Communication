@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：Form1.cs
-********************************************************************/
-
-using Parser.Parsers;
+﻿using Parser.Parsers;
 using System.IO.Ports;
 using TopPortLib;
 using TopPortLib.Interfaces;

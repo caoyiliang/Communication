@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：TimeParser.cs
-********************************************************************/
-
-using LogInterface;
+﻿using LogInterface;
 using Parser.Interfaces;
 using Parser.Timers;
 using Utils;
@@ -26,7 +21,7 @@ namespace Parser.Parsers
         public TimeParser(int timeInterval = 20)
         {
             TimeInterval = timeInterval;
-            _timer = new NormalTimer();
+            _timer = new WinApiTimer();
             _bytes = new RemainBytes();
             Task.Run(async () => await HandleDataAsync());
         }

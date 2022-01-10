@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：TcpClient.cs
-********************************************************************/
-
-using Communication.Exceptions;
+﻿using Communication.Exceptions;
 using Communication.Interfaces;
 using System.Net.Sockets;
 

@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：PlayerReq.cs
-********************************************************************/
-
-using System.Text;
+﻿using System.Text;
 using TopPortLib.Interfaces;
 
 namespace TopPortLibIntTest.Request

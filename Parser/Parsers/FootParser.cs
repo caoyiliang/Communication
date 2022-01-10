@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：FootParser.cs
-********************************************************************/
-
-namespace Parser.Parsers
+﻿namespace Parser.Parsers
 {
     public class FootParser : BaseParser
     {

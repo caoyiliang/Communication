@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：PigeonPort.cs
-********************************************************************/
-
-using Communication.Interfaces;
+﻿using Communication.Interfaces;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
 
@@ -69,7 +64,7 @@ namespace TopPortLib
             if (reqInfo != null)
             {
                 reqInfo.TaskCompletionSource.TrySetResult(rsp);
-                return;
+                //return;
             }
             if (this.OnReceiveResponseData != null)
             {

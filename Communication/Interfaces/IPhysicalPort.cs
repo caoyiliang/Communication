@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：IPhysicalPort.cs
-********************************************************************/
-
-namespace Communication.Interfaces
+﻿namespace Communication.Interfaces
 {
     public interface IPhysicalPort : IDisposable
     {

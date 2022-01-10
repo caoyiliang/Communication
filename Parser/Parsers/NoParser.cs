@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：NoParser.cs
-********************************************************************/
-
-using LogInterface;
+﻿using LogInterface;
 using Parser.Interfaces;
 
 namespace Parser.Parsers

@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：Program.cs
-********************************************************************/
-
-namespace TestNamedPipeServer
+﻿namespace TestNamedPipeServer
 {
     static class Program
     {

@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：ExtensionMethods.cs
-********************************************************************/
-
-namespace Test
+﻿namespace Test
 {
     public static class ExtensionMethods
     {

@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：EventHandlers.cs
-********************************************************************/
-
-namespace Parser
+﻿namespace Parser
 {
     public delegate Task ReceiveParsedDataEventHandler(byte[] data);
 

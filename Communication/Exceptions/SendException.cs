@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：SendException.cs
-********************************************************************/
-
-namespace Communication.Exceptions
+﻿namespace Communication.Exceptions
 {
     public class SendException : Exception
     {

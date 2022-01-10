@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：ICrowPort.cs
-********************************************************************/
-
-using Communication.Exceptions;
+﻿using Communication.Exceptions;
 using Communication.Interfaces;
 using Crow;
 using Crow.Exceptions;

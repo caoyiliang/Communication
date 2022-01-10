@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：Form1.cs
-********************************************************************/
-
-using Communication.Bus.PhysicalPort;
+﻿using Communication.Bus.PhysicalPort;
 using Parser.Parsers;
 using System.Text;
 using TopPortLib;

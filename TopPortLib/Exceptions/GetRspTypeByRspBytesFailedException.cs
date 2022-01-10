@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：GetRspTypeByRspBytesFailedException.cs
-********************************************************************/
-
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace TopPortLib.Exceptions
 {

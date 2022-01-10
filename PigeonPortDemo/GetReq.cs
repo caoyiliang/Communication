@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：GetReq.cs
-********************************************************************/
-
-using TopPortLib.Interfaces;
+﻿using TopPortLib.Interfaces;
 
 namespace PigeonPortDemo
 {

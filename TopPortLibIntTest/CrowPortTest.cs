@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：CrowPortTest.cs
-********************************************************************/
-
-using Communication.Bus.PhysicalPort;
+﻿using Communication.Bus.PhysicalPort;
 using Crow.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parser.Parsers;

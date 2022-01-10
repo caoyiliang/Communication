@@ -1,9 +1,4 @@
-﻿/********************************************************************
- * * 作者： 曹一梁 周俊峰
- * * 说明：TcpServer.cs
-********************************************************************/
-
-using Communication.Interfaces;
+﻿using Communication.Interfaces;
 using LogInterface;
 using System.Collections.Concurrent;
 using System.Net;
