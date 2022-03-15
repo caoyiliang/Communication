@@ -5,7 +5,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageTags></PackageTags>
 		<Description>数据分帧解析器</Description>
-		<Version>6.0.2</Version>
+		<Version>6.0.3</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>
@@ -13,38 +13,12 @@
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<LangVersion>default</LangVersion>
 		<DocumentationFile>bin\Parser.xml</DocumentationFile>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
-	  <LangVersion>default</LangVersion>
-	</PropertyGroup>
-
 	<ItemGroup>
-		<PackageReference Include="CSoft.LogInterface" Version="6.0.0" />
+		<PackageReference Include="CSoft.LogInterface" Version="6.0.1" />
 		<PackageReference Include="CSoft.Utils" Version="6.0.1" />
 	</ItemGroup>
 
