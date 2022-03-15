@@ -33,7 +33,7 @@ namespace Communication.Bus
             _stopCts = new CancellationTokenSource();
             _stopTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             IsActive = true;
-            this.AcceptClientAsync();
+            await AcceptClientAsync();
         }
 
         public async Task StopAsync()
@@ -60,6 +60,7 @@ namespace Communication.Bus
             {
                 _logger.Error(e, "Send data");
             }
+            await Task.CompletedTask;
         }
 
         public async Task DisconnectClientAsync(int clientId)
@@ -78,7 +79,7 @@ namespace Communication.Bus
 
         private async Task AcceptClientAsync()
         {
-            await Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 var clientCounter = 0;
                 try
@@ -129,6 +130,7 @@ namespace Communication.Bus
                     this.IsActive = false;
                 }
             });
+            await Task.CompletedTask;
         }
 
         private async Task HandleClientAsync(NamedPipeServerStream client, int clientId)

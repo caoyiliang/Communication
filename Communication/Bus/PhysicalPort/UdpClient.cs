@@ -18,6 +18,7 @@ namespace Communication.Bus.PhysicalPort
         {
             this._client?.Close();
             this.IsOpen = false;
+            await Task.CompletedTask;
         }
 
         public void Dispose()
@@ -36,6 +37,7 @@ namespace Communication.Bus.PhysicalPort
             {
                 throw new ConnectFailedException($"建立UDP连接失败:{this._hostName}:{ this._port}", e);
             }
+            await Task.CompletedTask;
         }
 
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)

@@ -148,6 +148,7 @@ namespace Crow
                 }
                 _completeStop.TrySetResult(true);
             });
+            await Task.CompletedTask;
         }
 
         public async Task StopAsync()

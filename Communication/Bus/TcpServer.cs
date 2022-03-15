@@ -67,6 +67,7 @@ namespace Communication.Bus
             {
                 _logger.Error(e, "Send data");
             }
+            await Task.CompletedTask;
         }
 
         public async Task DisconnectClientAsync(int clientId)

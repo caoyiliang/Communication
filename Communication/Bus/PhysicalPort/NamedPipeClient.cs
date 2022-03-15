@@ -19,6 +19,7 @@ namespace Communication.Bus.PhysicalPort
         public async Task CloseAsync()
         {
             this._client?.Close();
+            await Task.CompletedTask;
         }
 
         public void Dispose()

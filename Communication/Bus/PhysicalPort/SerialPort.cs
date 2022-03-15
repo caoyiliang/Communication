@@ -39,11 +39,11 @@ namespace Communication.Bus.PhysicalPort
         {
             var data = new byte[count];
             int length = base.Read(data, 0, count);
-            return new ReadDataResult
+            return await Task.FromResult(new ReadDataResult
             {
                 Length = length,
                 Data = data
-            };
+            });
         }
 
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)

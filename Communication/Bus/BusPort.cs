@@ -41,13 +41,13 @@ namespace Communication.Bus
                 throw;
             }
             _ = Task.Run(async () =>
-              {
-                  while (!_isActiveClose)
-                  {
-                      await OpenAsync_();
-                      await ReadBusAsync();
-                  }
-              });
+            {
+                while (!_isActiveClose)
+                {
+                    await OpenAsync_();
+                    await ReadBusAsync();
+                }
+            });
         }
 
         public async Task CloseAsync()
