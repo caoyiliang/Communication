@@ -10,10 +10,10 @@ namespace Test
 {
     public partial class Form1 : Form
     {
-        private Dictionary<int, IPhysicalPort> physicalPorts = new Dictionary<int, IPhysicalPort>();
+        private readonly Dictionary<int, IPhysicalPort> physicalPorts = new();
         private ITopPort parsedPort;
-        private byte[] head = new byte[] { 0x7B };
-        private byte[] foot = new byte[] { 0x04, 0x06 };
+        private readonly byte[] head = new byte[] { 0x7B };
+        private readonly byte[] foot = new byte[] { 0x04, 0x06 };
         public Form1()
         {
             InitializeComponent();
@@ -44,7 +44,7 @@ namespace Test
             catch { }
         }
 
-        private async void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private async void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox2.SelectedIndex == -1) return;
             await parsedPort.CloseAsync();
@@ -53,7 +53,7 @@ namespace Test
             comboBox1.Enabled = true;
         }
 
-        private async void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedIndex == -1) return;
             await parsedPort.CloseAsync();
@@ -71,8 +71,8 @@ namespace Test
             {
                 parsedPort = new TopPort(physicalPorts[comboBox2.SelectedIndex], new HeadLengthParser(head, async data =>
                  {
-                     if (data.Length < 2) return new GetDataLengthRsp() { ErrorCode = Parser.ErrorCode.LengthNotEnough };
-                     return await Task.FromResult(new GetDataLengthRsp() { Length = data[1], ErrorCode = Parser.ErrorCode.Success });
+                     if (data.Length < 2) return new GetDataLengthRsp() { StateCode = Parser.StateCode.LengthNotEnough };
+                     return await Task.FromResult(new GetDataLengthRsp() { Length = data[1], StateCode = Parser.StateCode.Success });
                  }));
                 parsedPort.OnReceiveParsedData += ReceiverDataEventAsync;
             }

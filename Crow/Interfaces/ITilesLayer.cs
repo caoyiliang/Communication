@@ -1,13 +1,20 @@
 ﻿namespace Crow.Interfaces
 {
     /// <summary>
-    /// 瓦片层
+    /// 队列连接层
     /// </summary>
-    /// <typeparam name="TReq"></typeparam>
-    /// <typeparam name="TRsp"></typeparam>
+    /// <typeparam name="TReq">请求处理</typeparam>
+    /// <typeparam name="TRsp">接收处理</typeparam>
     public interface ITilesLayer<TReq, TRsp>
     {
+        /// <summary>
+        /// 接收数据
+        /// </summary>
         event Action<TRsp> OnReceiveData;
+        /// <summary>
+        /// 发送请求
+        /// </summary>
+        /// <param name="data">请求处理</param>
         Task SendAsync(TReq data);
     }
 }

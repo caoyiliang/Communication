@@ -2,37 +2,18 @@
 using Communication.Interfaces;
 using System.Text;
 
-namespace ConsoleApp1
+var cts = new CancellationTokenSource();
+IPhysicalPort port = new TcpClient("127.0.0.1", 7779);
+await port.OpenAsync();
+_ = Task.Run(async () =>
 {
-    class Program
+    while (!cts.IsCancellationRequested)
     {
-        private static CancellationTokenSource cts = new CancellationTokenSource();
-        static void Main(string[] args)
+        var task = Task.Run(async () =>
         {
-            Startasync();
-            Console.ReadLine();
-        }
-        private static async Task Startasync()
-        {
-            var task = Task.Run(async () =>
-            {
-                while (!cts.IsCancellationRequested)
-                {
-                    IPhysicalPort port = new TcpClient("127.0.0.1", 7779);
-                    await port.OpenAsync();
-                    await SendDataAsync(port, "hello", cts.Token);
-                    await Task.Delay(100);
-                }
-            });
-        }
-
-        private static async Task SendDataAsync(IPhysicalPort port, string msg, CancellationToken cancellationToken)
-        {
-            var task = Task.Run(async () =>
-            {
-                await port.SendDataAsync(Encoding.ASCII.GetBytes("Hello"), cts.Token);
-                await Task.Delay(100);
-            });
-        }
+            await port.SendDataAsync(Encoding.ASCII.GetBytes("Hello"), cts.Token);
+        });
+        await Task.Delay(100);
     }
-}
+});
+Console.ReadKey();

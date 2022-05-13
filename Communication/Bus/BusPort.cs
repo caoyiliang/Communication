@@ -4,29 +4,36 @@ using LogInterface;
 
 namespace Communication.Bus
 {
+    /// <summary>
+    /// 处理总线
+    /// </summary>
     public class BusPort : IBusPort
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<BusPort>();
         private const int BUFFER_SIZE = 8192;
-        private CancellationTokenSource _closeCts;
-        private TaskCompletionSource<bool> _closeTcs;
+        private CancellationTokenSource? _closeCts;
+        private TaskCompletionSource<bool>? _closeTcs;
         private volatile bool _isActiveClose = true;//是否主动断开
-        private SemaphoreSlim _semaphore4Write = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _semaphore4Write = new(1, 1);
         private IPhysicalPort _physicalPort;
         private bool IsOpen { get => _physicalPort.IsOpen; }
+
+        /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _physicalPort; set { _physicalPort?.CloseAsync().Wait(); _physicalPort = value; } }
+        /// <inheritdoc/>
+        public event ReceiveOriginalDataEventHandler? OnReceiveOriginalData;
 
-        public event ReceiveOriginalDataEventHandler OnReceiveOriginalData;
-
+        /// <summary>
+        /// 处理总线
+        /// </summary>
+        /// <param name="physicalPort">物理口</param>
+        /// <exception cref="NullReferenceException"></exception>
         public BusPort(IPhysicalPort physicalPort)
         {
             this._physicalPort = physicalPort ?? throw new NullReferenceException("physicalPort is null");
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <exception cref="ConnectFailedException"></exception>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public async Task OpenAsync()
         {
             if (!_isActiveClose) return;
@@ -50,19 +57,22 @@ namespace Communication.Bus
             });
         }
 
+        /// <inheritdoc/>
         public async Task CloseAsync()
         {
             if (_isActiveClose) return;
             _isActiveClose = true;
-            _closeCts.Cancel();
+            _closeCts?.Cancel();
             if (IsOpen)
                 await _physicalPort.CloseAsync();
-            if (await Task.WhenAny(_closeTcs.Task, Task.Delay(2000)) != _closeTcs.Task)
-            {
-                throw new TimeoutException("Waited too long to Close. timeout = 2000");
-            }
+            if (_closeTcs is not null)
+                if (await Task.WhenAny(_closeTcs.Task, Task.Delay(2000)) != _closeTcs.Task)
+                {
+                    throw new TimeoutException("Waited too long to Close. timeout = 2000");
+                }
         }
 
+        /// <inheritdoc/>
         public async Task SendAsync(byte[] data, int timeInterval = 0)
         {
             if (!IsOpen)
@@ -74,7 +84,7 @@ namespace Communication.Bus
                 try
                 {
                     await _semaphore4Write.WaitAsync();
-                    await _physicalPort.SendDataAsync(data, _closeCts.Token);
+                    await _physicalPort.SendDataAsync(data, _closeCts!.Token);
                     if (timeInterval > 0)
                         await Task.Delay(timeInterval);
                 }
@@ -93,13 +103,16 @@ namespace Communication.Bus
         {
             try
             {
-                while (!_closeCts.IsCancellationRequested)
+                while (!_closeCts!.IsCancellationRequested)
                 {
                     var result = await _physicalPort.ReadDataAsync(BUFFER_SIZE, _closeCts.Token);
                     if (result.Length <= 0) break;
                     try
                     {
-                        await this.OnReceiveOriginalData?.Invoke(result.Data, result.Length);
+                        if (OnReceiveOriginalData is not null)
+                        {
+                            await OnReceiveOriginalData.Invoke(result.Data, result.Length);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -112,8 +125,8 @@ namespace Communication.Bus
             }
             finally
             {
-                _closeCts.Cancel();
-                _closeTcs.TrySetResult(true);
+                _closeCts?.Cancel();
+                _closeTcs?.TrySetResult(true);
             }
         }
 
@@ -137,6 +150,7 @@ namespace Communication.Bus
             }
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             var task = this.CloseAsync();

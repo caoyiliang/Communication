@@ -9,8 +9,10 @@ namespace Parser.Parsers
     public class NoParser : IParser
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<NoParser>();
-        public event ReceiveParsedDataEventHandler OnReceiveParsedData;
+        /// <inheritdoc/>
+        public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
 
+        /// <inheritdoc/>
         public async Task ReceiveOriginalDataAsync(byte[] data, int size)
         {
             var bytes = new byte[size];

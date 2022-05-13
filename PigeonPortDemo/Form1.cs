@@ -7,7 +7,7 @@ namespace PigeonPortDemo
 {
     public partial class Form1 : Form
     {
-        private IPigeonPort pigeonPort;
+        private IPigeonPort? pigeonPort;
         public Form1()
         {
             InitializeComponent();
@@ -18,7 +18,7 @@ namespace PigeonPortDemo
             this.comboBox1.DataSource = SerialPort.GetPortNames();
         }
 
-        private async void button1_Click(object sender, EventArgs e)
+        private async void Button1_Click(object sender, EventArgs e)
         {
             button1.Enabled = false;
             pigeonPort = new PigeonPort(new TopPort(new Communication.Bus.PhysicalPort.SerialPort(comboBox1.Text), new TimeParser(200)), GetRspTypeByRspBytes);
@@ -38,6 +38,7 @@ namespace PigeonPortDemo
                 var pushMsg = data as PushMsg;
                 MessageBox.Show("获得对方主动的推送，类型为PushMsg");
             }
+            await Task.CompletedTask;
         }
 
         private Type GetRspTypeByRspBytes(byte[] data)
@@ -46,9 +47,10 @@ namespace PigeonPortDemo
             return typeof(PushMsg);
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private async void Button2_Click(object sender, EventArgs e)
         {
-            GetRsp rsp = null;
+            if (pigeonPort is null) return;
+            GetRsp? rsp;
             try
             {
                 rsp = await pigeonPort.RequestAsync<GetReq, GetRsp>(new GetReq(), 10000);

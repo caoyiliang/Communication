@@ -2,6 +2,9 @@
 
 namespace Parser.Parsers
 {
+    /// <summary>
+    /// 以特定字节数组为数据包头，数特定长度分包
+    /// </summary>
     public class HeadLengthParser : BaseParser
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<HeadLengthParser>();
@@ -10,8 +13,8 @@ namespace Parser.Parsers
         /// <summary>
         /// 帧头
         /// </summary>
-        private byte[] _head;
-        private GetDataLengthEventHandler OnGetDataLength;
+        private readonly byte[] _head;
+        private readonly GetDataLengthEventHandler OnGetDataLength;
         /// <summary>
         /// 长度为除了帧头之外的所有数据的长度
         /// </summary>
@@ -25,15 +28,16 @@ namespace Parser.Parsers
         }
 
         /// <summary>
-        ///  长度为包括表示长度的字节在内的所有数据的长度
+        ///  以特定字节数组为数据包头，数特定长度分包
         /// </summary>
-        /// <param name="getDataLength"></param>
+        /// <param name="getDataLength">获取数据包长度</param>
         public HeadLengthParser(GetDataLengthEventHandler getDataLength)
         {
             this._head = new byte[0];
             this.OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
         }
 
+        /// <inheritdoc/>
         protected override async Task<bool> CanFindEndIndexAsync()
         {
             if (_bytes.Count - (_startIndex - _bytes.StartIndex) < _bytes.GetCurrentMessageLength()) return false;
@@ -44,7 +48,7 @@ namespace Parser.Parsers
                 try
                 {
                     var rsp = await OnGetDataLength(temp);
-                    if (rsp.ErrorCode != Parser.ErrorCode.Success)
+                    if (rsp.StateCode != Parser.StateCode.Success)
                     {
                         return false;
                     }
@@ -66,17 +70,18 @@ namespace Parser.Parsers
             return true;
         }
 
+        /// <inheritdoc/>
         protected override int FindStartIndex()
         {
             if (_startIndex == -1)
             {
                 var rsp = FindIndex(_bytes.StartIndex, _head);
                 //为了避免存储太多的垃圾数据，要清除垃圾
-                if (rsp.Code == ErrorCode.NotFound)
+                if (rsp.Code == StateCode.NotFound)
                 {
                     _bytes.RemoveHeader(_bytes.Count - _head.Length);
                 }
-                else if (rsp.Code == ErrorCode.Success)
+                else if (rsp.Code == StateCode.Success)
                 {
                     _startIndex = rsp.Index;
                 }
@@ -84,17 +89,20 @@ namespace Parser.Parsers
             return _startIndex;
         }
 
+        /// <inheritdoc/>
         protected override int FindEndIndex()
         {
             return _startIndex + _head.Length + _length;
         }
 
+        /// <inheritdoc/>
         protected override void ResetSatrtIndex(int bytesOldIndex)
         {
             if (_startIndex != -1)
                 _startIndex -= bytesOldIndex;
         }
 
+        /// <inheritdoc/>
         protected override async Task<bool> ReceiveOneFrameAsync()
         {
             if (await base.ReceiveOneFrameAsync())

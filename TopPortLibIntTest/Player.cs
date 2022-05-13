@@ -7,7 +7,7 @@ namespace TopPortLibIntTest
 {
     class Player : IPlayer
     {
-        private ICrowPort _crowPort;
+        private readonly ICrowPort _crowPort;
         public Player(ICrowPort crowPort)
         {
             _crowPort = crowPort;

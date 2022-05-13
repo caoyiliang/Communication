@@ -6,29 +6,44 @@ using System.Net.Sockets;
 
 namespace Communication.Bus
 {
-    public class TcpServer : ITcpServer
+    /// <summary>
+    /// TCP服务端
+    /// </summary>
+    public class TcpServer : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
-        private string _hostName;
-        private int _port;
-        private int _bufferSize;
-        private TcpListener _listener;
-        private CancellationTokenSource _stopCts;
-        private TaskCompletionSource<bool> _stopTcs;
-        private ConcurrentDictionary<int, TcpClient> _dicClients = new ConcurrentDictionary<int, TcpClient>();
+        private readonly ConcurrentDictionary<int, TcpClient> _dicClients = new();
+        private readonly string _hostName;
+        private readonly int _port;
+        private readonly int _bufferSize;
+        private TcpListener? _listener;
+        private CancellationTokenSource? _stopCts;
+        private TaskCompletionSource<bool>? _stopTcs;
+
+        /// <inheritdoc/>
         public bool IsActive { get; private set; }
 
-        public event ReceiveOriginalDataFromTcpClientEventHandler OnReceiveOriginalDataFromTcpClient;
-        public event ClientConnectEventHandler OnClientConnect;
-        public event ClientDisconnectEventHandler OnClientDisconnect;
+        /// <inheritdoc/>
+        public event ReceiveOriginalDataFromClientEventHandler? OnReceiveOriginalDataFromClient;
+        /// <inheritdoc/>
+        public event ClientConnectEventHandler? OnClientConnect;
+        /// <inheritdoc/>
+        public event ClientDisconnectEventHandler? OnClientDisconnect;
 
+        /// <summary>
+        /// TCP服务端
+        /// </summary>
+        /// <param name="hostName"></param>
+        /// <param name="port"></param>
+        /// <param name="bufferSize"></param>
         public TcpServer(string hostName, int port, int bufferSize = 8192)
         {
-            this._hostName = hostName;
-            this._port = port;
-            this._bufferSize = bufferSize;
+            _hostName = hostName;
+            _port = port;
+            _bufferSize = bufferSize;
         }
 
+        /// <inheritdoc/>
         public async Task StartAsync()
         {
             if (this.IsActive) return;
@@ -41,22 +56,27 @@ namespace Communication.Bus
             await AcceptClientAsync();
         }
 
+        /// <inheritdoc/>
         public async Task StopAsync()
         {
             if (!this.IsActive) return;
-            this._stopCts.Cancel();
-            this._listener.Stop();
-            if (await Task.WhenAny(_stopTcs.Task, Task.Delay(2000)) != _stopTcs.Task)
+            _stopCts?.Cancel();
+            _listener?.Stop();
+            if (_stopTcs is not null)
             {
-                throw new TimeoutException("Waited too long to Close. timeout = 2000");
+                if (await Task.WhenAny(_stopTcs.Task, Task.Delay(2000)) != _stopTcs.Task)
+                {
+                    throw new TimeoutException("Waited too long to Close. timeout = 2000");
+                }
             }
         }
 
+        /// <inheritdoc/>
         public async Task SendDataAsync(int clientId, byte[] data)
         {
             try
             {
-                if (!_dicClients.TryGetValue(clientId, out TcpClient client)) return;
+                if (!_dicClients.TryGetValue(clientId, out var client)) return;
                 var stream = client.GetStream();
                 lock (stream)
                 {
@@ -70,9 +90,45 @@ namespace Communication.Bus
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 获取客户端信息
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
+        /// <returns>(IP,端口)</returns>
+        public async Task<(string IPAddress, int Port)?> GetClientInfo(int clientId)
+        {
+            if (!_dicClients.TryGetValue(clientId, out var client)) return null;
+            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+            return await Task.FromResult((remoteEndPoint!.Address.ToString(), remoteEndPoint.Port));
+        }
+
+        /// <summary>
+        /// 获取客户端ID
+        /// </summary>
+        /// <param name="ip">ip</param>
+        /// <param name="port">端口</param>
+        /// <returns>客户端ID</returns>
+        public async Task<int?> GetClientId(string ip, int port)
+        {
+            try
+            {
+                var pair = _dicClients.Single(_ =>
+                {
+                    var remoteEndPoint = _.Value.Client.RemoteEndPoint as IPEndPoint;
+                    return (remoteEndPoint!.Address.ToString() == ip) && (remoteEndPoint.Port == port);
+                });
+                return await Task.FromResult(pair.Key);
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task DisconnectClientAsync(int clientId)
         {
-            if (!_dicClients.TryGetValue(clientId, out TcpClient client)) return;
+            if (!_dicClients.TryGetValue(clientId, out var client)) return;
             try
             {
                 client.Close();
@@ -91,12 +147,12 @@ namespace Communication.Bus
                 var clientCounter = 0;
                 try
                 {
-                    while (!_stopCts.IsCancellationRequested)
+                    while (!_stopCts!.IsCancellationRequested)
                     {
                         TcpClient client;
                         try
                         {
-                            client = await _listener.AcceptTcpClientAsync();
+                            client = await _listener!.AcceptTcpClientAsync();
                         }
                         catch (SocketException)
                         {
@@ -105,10 +161,12 @@ namespace Communication.Bus
                         int clientId = clientCounter;
                         clientCounter++;
                         _dicClients.TryAdd(clientId, client);
-                        var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
                         try
                         {
-                            await this.OnClientConnect?.Invoke(remoteEndPoint.Address.ToString(), remoteEndPoint.Port, clientId);
+                            if (OnClientConnect is not null)
+                            {
+                                await OnClientConnect.Invoke(clientId);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -123,11 +181,11 @@ namespace Communication.Bus
                 }
                 finally
                 {
-                    _stopCts.Cancel();
+                    _stopCts?.Cancel();
                     try
                     {
-                        _listener.Stop();
-                        _listener.Server.Close();
+                        _listener?.Stop();
+                        _listener?.Server.Close();
                     }
                     catch (Exception ex)
                     {
@@ -138,7 +196,7 @@ namespace Communication.Bus
                         c.Close();
                     }
                     _dicClients.Clear();
-                    _stopTcs.TrySetResult(true);
+                    _stopTcs?.TrySetResult(true);
                     this.IsActive = false;
                 }
             });
@@ -149,19 +207,22 @@ namespace Communication.Bus
         {
             try
             {
-                using (var clientStream = client.GetStream())
+                using var clientStream = client.GetStream();
                 using (client)
                 {
                     var amountRead = 0;
                     var buf = new byte[this._bufferSize];
-                    while (!this._stopCts.IsCancellationRequested && client.Connected)
+                    while (!_stopCts!.IsCancellationRequested && client.Connected)
                     {
                         amountRead = await clientStream.ReadAsync(buf, 0, buf.Length, _stopCts.Token);
                         if (amountRead <= 0)
                             break;
                         try
                         {
-                            await OnReceiveOriginalDataFromTcpClient?.Invoke(buf, amountRead, clientId);
+                            if (OnReceiveOriginalDataFromClient is not null)
+                            {
+                                await OnReceiveOriginalDataFromClient.Invoke(buf, amountRead, clientId);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -175,10 +236,13 @@ namespace Communication.Bus
             }
             finally
             {
-                _dicClients.TryRemove(clientId, out TcpClient value);
+                _dicClients.TryRemove(clientId, out var value);
                 try
                 {
-                    await this.OnClientDisconnect?.Invoke(clientId);
+                    if (OnClientDisconnect is not null)
+                    {
+                        await OnClientDisconnect.Invoke(clientId);
+                    }
                 }
                 catch (Exception e)
                 {

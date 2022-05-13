@@ -17,9 +17,9 @@ namespace Parser.Timers
         /// <summary>
         ///作为fptc参数的函数指针
         /// </summary>
-        private TimerExtCallback timerExtCallback;
+        private readonly TimerExtCallback timerExtCallback;
 
-        TaskCompletionSource<bool> taskCompletionSource;
+        TaskCompletionSource<bool>? taskCompletionSource;
         uint result;
         uint timeout;
 
@@ -71,7 +71,7 @@ namespace Parser.Timers
         /// <summary>
         /// 此功能取消指定的计时器事件。
         /// </summary>
-        /// <param name="id">要取消的计时器事件的标识符。此标识符由timeSetEvent函数返回，该函数启动指定的计时器事件。</param>
+        /// <param name="uTimerID">要取消的计时器事件的标识符。此标识符由timeSetEvent函数返回，该函数启动指定的计时器事件。</param>
         /// <returns></returns>
         [DllImport("winmm.dll")]
         private static extern uint timeKillEvent(uint uTimerID);
@@ -96,10 +96,7 @@ namespace Parser.Timers
             }
         }
 
-        public WinApiTimer()
-        {
-            this.timerExtCallback = new TimerExtCallback(this.TimerExtCallbackFun);
-        }
+        public WinApiTimer() => this.timerExtCallback = new TimerExtCallback(this.TimerExtCallbackFun);
 
         public void Release()
         {

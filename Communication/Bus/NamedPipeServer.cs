@@ -5,21 +5,33 @@ using System.IO.Pipes;
 
 namespace Communication.Bus
 {
-    public class NamedPipeServer : INamedPipeServer
+    /// <summary>
+    /// 命名管道服务端
+    /// </summary>
+    public class NamedPipeServer : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
-        private int _bufferSize;
-        private string _pipeName;
-        private int _maxNumberOfServerInstances;
-        private CancellationTokenSource _stopCts;
-        private TaskCompletionSource<bool> _stopTcs;
-        private ConcurrentDictionary<int, NamedPipeServerStream> _dicClients = new ConcurrentDictionary<int, NamedPipeServerStream>();
+        private readonly ConcurrentDictionary<int, NamedPipeServerStream> _dicClients = new();
+        private readonly int _bufferSize;
+        private readonly string _pipeName;
+        private readonly int _maxNumberOfServerInstances;
+        private CancellationTokenSource? _stopCts;
+        private TaskCompletionSource<bool>? _stopTcs;
+        /// <inheritdoc/>
         public bool IsActive { get; private set; }
+        /// <inheritdoc/>
+        public event ReceiveOriginalDataFromClientEventHandler? OnReceiveOriginalDataFromClient;
+        /// <inheritdoc/>
+        public event ClientConnectEventHandler? OnClientConnect;
+        /// <inheritdoc/>
+        public event ClientDisconnectEventHandler? OnClientDisconnect;
 
-        public event ReceiveOriginalDataFromTcpClientEventHandler OnReceiveOriginalDataFromTcpClient;
-        public event NamedPipeClientConnectEventHandler OnClientConnect;
-        public event ClientDisconnectEventHandler OnClientDisconnect;
-
+        /// <summary>
+        /// 命名管道服务端
+        /// </summary>
+        /// <param name="pipeName">名称</param>
+        /// <param name="maxNumberOfServerInstances">最大服务数</param>
+        /// <param name="bufferSize">读缓存</param>
         public NamedPipeServer(string pipeName, int maxNumberOfServerInstances = 100, int bufferSize = 8192)
         {
             this._pipeName = pipeName;
@@ -27,6 +39,7 @@ namespace Communication.Bus
             this._bufferSize = bufferSize;
         }
 
+        /// <inheritdoc/>
         public async Task StartAsync()
         {
             if (this.IsActive) return;
@@ -36,21 +49,24 @@ namespace Communication.Bus
             await AcceptClientAsync();
         }
 
+        /// <inheritdoc/>
         public async Task StopAsync()
         {
             if (!this.IsActive) return;
-            this._stopCts.Cancel();
-            if (await Task.WhenAny(_stopTcs.Task, Task.Delay(2000)) != _stopTcs.Task)
-            {
-                throw new TimeoutException("Waited too long to Close. timeout = 2000");
-            }
+            _stopCts?.Cancel();
+            if (_stopTcs is not null)
+                if (await Task.WhenAny(_stopTcs.Task, Task.Delay(2000)) != _stopTcs.Task)
+                {
+                    throw new TimeoutException("Waited too long to Close. timeout = 2000");
+                }
         }
 
+        /// <inheritdoc/>
         public async Task SendDataAsync(int clientId, byte[] data)
         {
             try
             {
-                if (!_dicClients.TryGetValue(clientId, out NamedPipeServerStream client)) return;
+                if (!_dicClients.TryGetValue(clientId, out var client)) return;
                 lock (client)
                 {
                     client.Write(data, 0, data.Length);
@@ -63,9 +79,10 @@ namespace Communication.Bus
             await Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public async Task DisconnectClientAsync(int clientId)
         {
-            if (!_dicClients.TryGetValue(clientId, out NamedPipeServerStream client)) return;
+            if (!_dicClients.TryGetValue(clientId, out var client)) return;
             try
             {
                 client.Close();
@@ -84,7 +101,7 @@ namespace Communication.Bus
                 var clientCounter = 0;
                 try
                 {
-                    while (!_stopCts.IsCancellationRequested)
+                    while (!_stopCts!.IsCancellationRequested)
                     {
                         if (clientCounter >= _maxNumberOfServerInstances)
                         {
@@ -105,7 +122,10 @@ namespace Communication.Bus
                         _dicClients.TryAdd(clientId, client);
                         try
                         {
-                            await this.OnClientConnect?.Invoke(clientId);
+                            if (OnClientConnect is not null)
+                            {
+                                await OnClientConnect.Invoke(clientId);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -120,13 +140,13 @@ namespace Communication.Bus
                 }
                 finally
                 {
-                    _stopCts.Cancel();
+                    _stopCts?.Cancel();
                     foreach (var c in _dicClients.Values)
                     {
                         c.Close();
                     }
                     _dicClients.Clear();
-                    _stopTcs.TrySetResult(true);
+                    _stopTcs?.TrySetResult(true);
                     this.IsActive = false;
                 }
             });
@@ -141,14 +161,17 @@ namespace Communication.Bus
                 {
                     var amountRead = 0;
                     var buf = new byte[this._bufferSize];
-                    while (!this._stopCts.IsCancellationRequested && client.IsConnected)
+                    while (!_stopCts!.IsCancellationRequested && client.IsConnected)
                     {
                         amountRead = await client.ReadAsync(buf, 0, buf.Length, _stopCts.Token);
                         if (amountRead <= 0)
                             break;
                         try
                         {
-                            await OnReceiveOriginalDataFromTcpClient?.Invoke(buf, amountRead, clientId);
+                            if (OnReceiveOriginalDataFromClient is not null)
+                            {
+                                await OnReceiveOriginalDataFromClient.Invoke(buf, amountRead, clientId);
+                            }
                         }
                         catch (Exception e)
                         {
@@ -162,10 +185,13 @@ namespace Communication.Bus
             }
             finally
             {
-                _dicClients.TryRemove(clientId, out NamedPipeServerStream value);
+                _dicClients.TryRemove(clientId, out var value);
                 try
                 {
-                    await this.OnClientDisconnect?.Invoke(clientId);
+                    if (OnClientDisconnect is not null)
+                    {
+                        await OnClientDisconnect.Invoke(clientId);
+                    }
                 }
                 catch (Exception e)
                 {

@@ -4,69 +4,63 @@ using System.Collections.Concurrent;
 
 namespace Crow
 {
+    /// <summary>
+    /// 通讯队列
+    /// </summary>
+    /// <typeparam name="TReq">请求处理</typeparam>
+    /// <typeparam name="TRsp">接收处理</typeparam>
     public class CrowLayer<TReq, TRsp> : ICrowLayer<TReq, TRsp>, IDisposable
     {
-        private ITilesLayer<TReq, TRsp> _port;
-        private int _defaultTimeout;
-        private int _timeDelayAfterSending;
-        private TaskCompletionSource<bool> _startStop;
-        private TaskCompletionSource<bool> _completeStop;
-        private TaskCompletionSource<TRsp> _rsp;
-        private ConcurrentQueue<ReqInfo> _queue;
+        private readonly ITilesLayer<TReq, TRsp> _port;
+        private readonly int _defaultTimeout;
+        private readonly int _timeDelayAfterSending;
+        private TaskCompletionSource<bool>? _startStop;
+        private TaskCompletionSource<bool>? _completeStop;
+        private TaskCompletionSource<TRsp>? _rsp;
+        private ConcurrentQueue<ReqInfo>? _queue;
         private volatile bool _isActive = false;
+        /// <inheritdoc/>
+        public event SentDataEventHandler<TReq>? OnSentData;
+        /// <inheritdoc/>
+        public event ReceivedDataEventHandler<TRsp>? OnReceivedData;
+
         /// <summary>
-        /// 
+        /// 通讯队列
         /// </summary>
-        /// <param name="port"></param>
+        /// <param name="port">通讯队列和通讯口之间的联系层</param>
         /// <param name="defaultTimeout">默认的超时时间</param>
         /// <param name="timeDelayAfterSending">当调用SendAsync时，防止数据黏在一起，要设置一个发送时间间隔</param>
         public CrowLayer(ITilesLayer<TReq, TRsp> port, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
         {
             _port = port;
-            _port.OnReceiveData += async data => _rsp?.TrySetResult(data);
+            _port.OnReceiveData += async data => { _rsp?.TrySetResult(data); await Task.CompletedTask; };
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
 
         }
 
-        public event SentDataEventHandler<TReq> OnSentData;
-        public event ReceivedDataEventHandler<TRsp> OnReceivedData;
-
+        /// <inheritdoc/>
         public void Dispose()
         {
-            var task = this.StopAsync();
+            var task = StopAsync();
             task.ConfigureAwait(false);
             task.Wait();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="req"></param>
-        /// <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
-        /// <exception cref="CrowStopWorkingException">乌鸦停止工作异常</exception>
-        /// <exception cref="CrowBusyException">乌鸦正忙异常</exception>
-        /// <exception cref="TilesSendException">瓦片发送异常</exception>
-        /// <exception cref="TimeoutException">超时异常</exception>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public async Task<TRsp> RequestAsync(TReq req, int timeout = -1, bool background = false)
         {
-            return await RequestAsync(req, true, timeout, background);
+            var rsp = await RequestAsync(req, true, timeout, background);
+            return rsp!;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="req"></param>
-        /// <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
-        /// <exception cref="CrowStopWorkingException">乌鸦停止工作异常</exception>
-        /// <exception cref="CrowBusyException">乌鸦正忙异常</exception>
-        /// <exception cref="TilesSendException">瓦片发送异常</exception>
-        /// <exception cref="TimeoutException">超时异常</exception>
-        /// <returns></returns>
+
+        /// <inheritdoc/>
         public async Task SendAsync(TReq req, int timeout = -1, bool background = false)
         {
             await RequestAsync(req, false, timeout, background);
         }
 
+        /// <inheritdoc/>
         public async Task StartAsync()
         {
             if (_isActive) return;
@@ -78,7 +72,7 @@ namespace Crow
             {
                 while (true)
                 {
-                    if (!_queue.TryDequeue(out ReqInfo data))
+                    if (!_queue.TryDequeue(out var data))
                     {
                         if (await Task.WhenAny(Task.Delay(100), _startStop.Task) == _startStop.Task)
                             break;
@@ -86,14 +80,14 @@ namespace Crow
                             continue;
                     }
                     if (!data.Background)
-                        if (data.Timeout.IsCompleted)
+                        if (data.Timeout!.IsCompleted)
                             continue;
                     _rsp?.TrySetCanceled();
                     _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
                     try
                     {
                         await _port.SendAsync(data.Req);
-                        if (!(OnSentData is null))
+                        if (OnSentData is not null)
                         {
                             try
                             {
@@ -109,9 +103,13 @@ namespace Crow
                     }
                     if (data.NeedRsp)
                     {
+                        var tasks = new List<Task>() { _rsp.Task, _startStop.Task };
                         if (data.Background)
+                        {
                             data.Timeout = Task.Delay(data.Time);
-                        var task = await Task.WhenAny(data.Timeout, _rsp.Task, _startStop.Task);
+                            tasks.Add(data.Timeout);
+                        }
+                        var task = await Task.WhenAny(tasks);
                         if (task == _startStop.Task)
                         {
                             data.Rsp.TrySetException(new CrowStopWorkingException());
@@ -120,7 +118,7 @@ namespace Crow
                         {
                             var rsp = await _rsp.Task;
                             data.Rsp.TrySetResult(rsp);
-                            if (!(OnReceivedData is null))
+                            if (OnReceivedData is not null)
                             {
                                 try
                                 {
@@ -146,25 +144,26 @@ namespace Crow
                         await Task.Delay(_timeDelayAfterSending);
                     }
                 }
-                _completeStop.TrySetResult(true);
+                _completeStop?.TrySetResult(true);
             });
             await Task.CompletedTask;
         }
 
+        /// <inheritdoc/>
         public async Task StopAsync()
         {
             if (!_isActive) return;
-            _isActive = false;
             _completeStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _startStop.TrySetResult(true);
-
+            _startStop?.TrySetResult(true);
             await _completeStop.Task;
+            _isActive = false;
         }
-        private async Task<TRsp> RequestAsync(TReq req, bool needRsp, int timeout, bool background)
+
+        private async Task<TRsp?> RequestAsync(TReq req, bool needRsp, int timeout, bool background)
         {
             if (!_isActive) throw new CrowStopWorkingException();
-            if (_queue.Count > 10) throw new CrowBusyException();
-            var rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
+            if (_queue!.Count > 10) throw new CrowBusyException();
+            var rsp = new TaskCompletionSource<TRsp?>(TaskCreationOptions.RunContinuationsAsynchronously);
             var tm = timeout == -1 ? _defaultTimeout : timeout;
             var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm, Background = background };
             _queue.Enqueue(data);
@@ -178,10 +177,10 @@ namespace Crow
         }
         class ReqInfo
         {
-            public TReq Req { get; set; }
+            public TReq Req { get; set; } = default!;
             public bool NeedRsp { get; set; }
-            public TaskCompletionSource<TRsp> Rsp { get; set; }
-            public Task Timeout { get; set; }
+            public TaskCompletionSource<TRsp?> Rsp { get; set; } = null!;
+            public Task? Timeout { get; set; }
             public int Time { get; set; }
             public bool Background { get; set; }
         }

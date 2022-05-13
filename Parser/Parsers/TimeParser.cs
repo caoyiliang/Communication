@@ -5,6 +5,9 @@ using Utils;
 
 namespace Parser.Parsers
 {
+    /// <summary>
+    /// 以时间来分割数据包
+    /// </summary>
     public class TimeParser : IParser, IDisposable
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TimeParser>();
@@ -16,8 +19,12 @@ namespace Parser.Parsers
         /// 时间间隔
         /// </summary>
         public int TimeInterval { get; set; }
-        public event ReceiveParsedDataEventHandler OnReceiveParsedData;
-
+        /// <inheritdoc/>
+        public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
+        /// <summary>
+        /// 以时间来分割数据包
+        /// </summary>
+        /// <param name="timeInterval">时间间隔，默认20ms</param>
         public TimeParser(int timeInterval = 20)
         {
             TimeInterval = timeInterval;
@@ -26,6 +33,7 @@ namespace Parser.Parsers
             Task.Run(async () => await HandleDataAsync());
         }
 
+        /// <inheritdoc/>
         public async Task ReceiveOriginalDataAsync(byte[] data, int size)
         {
             try
@@ -40,6 +48,7 @@ namespace Parser.Parsers
             _timer.Release();
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             this._isDisposeRequested = true;
@@ -61,7 +70,10 @@ namespace Parser.Parsers
                             _bytes.RemoveHeader(_bytes.Count);
                             try
                             {
-                                await this.OnReceiveParsedData?.Invoke(data);
+                                if (OnReceiveParsedData is not null)
+                                {
+                                    await OnReceiveParsedData.Invoke(data);
+                                }
                             }
                             catch (Exception ex)
                             {

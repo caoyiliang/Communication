@@ -5,7 +5,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageTags></PackageTags>
 		<Description>数据分帧解析器</Description>
-		<Version>6.0.3</Version>
+		<Version>6.0.4</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>
@@ -15,11 +15,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>default</LangVersion>
 		<DocumentationFile>bin\Parser.xml</DocumentationFile>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CSoft.LogInterface" Version="6.0.1" />
-		<PackageReference Include="CSoft.Utils" Version="6.0.1" />
+		<PackageReference Include="CSoft.LogInterface" Version="6.0.2" />
+		<PackageReference Include="CSoft.Utils" Version="6.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>

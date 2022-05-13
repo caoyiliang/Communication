@@ -4,28 +4,41 @@ using TopPortLib.Interfaces;
 
 namespace TopPortLib
 {
+    /// <summary>
+    /// 队列通讯口
+    /// </summary>
     public class PigeonPort : IPigeonPort
     {
-        private ITopPort _topPort;
-        private int _defaultTimeout;
-        private int _timeDelayAfterSending;
-        private Func<byte[], Type> _getRspTypeByRspBytes;
-        private List<ReqInfo> _reqInfos = new List<ReqInfo>();
-        public event RequestedDataEventHandler OnRequestedData;
-        public event RespondedDataEventHandler OnRespondedData;
-        public event ReceiveResponseDataEventHandler OnReceiveResponseData;
-
+        private readonly ITopPort _topPort;
+        private readonly int _defaultTimeout;
+        private readonly int _timeDelayAfterSending;
+        private readonly Func<byte[], Type> _getRspTypeByRspBytes;
+        private readonly List<ReqInfo> _reqInfos = new();
+        /// <inheritdoc/>
+        public event RequestedDataEventHandler? OnRequestedData;
+        /// <inheritdoc/>
+        public event RespondedDataEventHandler? OnRespondedData;
+        /// <inheritdoc/>
+        public event ReceiveResponseDataEventHandler? OnReceiveResponseData;
+        /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
+        /// <summary>
+        /// 队列通讯口
+        /// </summary>
+        /// <param name="topPort">通讯口</param>
+        /// <param name="getRspTypeByRspBytes">根据返回命令获取返回类型</param>
+        /// <param name="defaultTimeout">超时时间，默认5秒</param>
+        /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
         public PigeonPort(ITopPort topPort, Func<byte[], Type> getRspTypeByRspBytes, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
         {
             _topPort = topPort;
-            _topPort.OnReceiveParsedData += _topPort_OnReceiveParsedData;
+            _topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _getRspTypeByRspBytes = getRspTypeByRspBytes;
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
         }
 
-        private async Task _topPort_OnReceiveParsedData(byte[] data)
+        private async Task TopPort_OnReceiveParsedData(byte[] data)
         {
             await RespondedDataAsync(data);
             Type rspType;
@@ -37,7 +50,7 @@ namespace TopPortLib
             {
                 throw new GetRspTypeByRspBytesFailedException("通过响应的字节来获取响应类型失败", ex);
             }
-            object rsp = null;
+            object? rsp = null;
             try
             {
                 var constructors = rspType.GetConstructors();
@@ -56,7 +69,7 @@ namespace TopPortLib
             {
                 throw new ResponseParameterCreateFailedException("ResponseParameterCreateFailedException", ex);
             }
-            ReqInfo reqInfo;
+            ReqInfo? reqInfo;
             lock (_reqInfos)
             {
                 reqInfo = _reqInfos.Find(ri => ri.RspType == rspType);
@@ -64,7 +77,6 @@ namespace TopPortLib
             if (reqInfo != null)
             {
                 reqInfo.TaskCompletionSource.TrySetResult(rsp);
-                //return;
             }
             if (this.OnReceiveResponseData != null)
             {
@@ -78,6 +90,7 @@ namespace TopPortLib
             }
         }
 
+        /// <inheritdoc/>
         public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
@@ -113,6 +126,7 @@ namespace TopPortLib
             }
         }
 
+        /// <inheritdoc/>
         public async Task SendAsync<TReq>(TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
@@ -124,9 +138,10 @@ namespace TopPortLib
             await sendTask;
             await RequestDataAsync(bytes);
         }
+
         private async Task RequestDataAsync(byte[] data)
         {
-            if (this.OnRequestedData != null)
+            if (OnRequestedData is not null)
             {
                 try
                 {
@@ -137,6 +152,7 @@ namespace TopPortLib
                 }
             }
         }
+
         private async Task RespondedDataAsync(byte[] data)
         {
             if (this.OnRespondedData != null)
@@ -150,11 +166,14 @@ namespace TopPortLib
                 }
             }
         }
+
+        /// <inheritdoc/>
         public async Task StartAsync()
         {
             await _topPort.OpenAsync();
         }
 
+        /// <inheritdoc/>
         public async Task StopAsync()
         {
             await _topPort.CloseAsync();
@@ -163,10 +182,11 @@ namespace TopPortLib
                 _reqInfos.Clear();
             }
         }
+
         class ReqInfo
         {
-            public Type RspType { get; set; }
-            public TaskCompletionSource<object> TaskCompletionSource { get; set; }
+            public Type RspType { get; set; } = null!;
+            public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
         }
     }
 }

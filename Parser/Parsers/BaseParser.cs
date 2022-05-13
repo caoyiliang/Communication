@@ -4,13 +4,20 @@ using Utils;
 
 namespace Parser.Parsers
 {
+    /// <summary>
+    /// 解析器基类
+    /// </summary>
     public abstract class BaseParser : IParser
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger("BaseParser");
-        protected RemainBytes _bytes = new RemainBytes();
+        /// <summary>
+        /// 解析器中的数据
+        /// </summary>
+        protected RemainBytes _bytes = new();
+        /// <inheritdoc/>
+        public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
 
-        public event ReceiveParsedDataEventHandler OnReceiveParsedData;
-
+        /// <inheritdoc/>
         public async Task ReceiveOriginalDataAsync(byte[] data, int size)
         {
             var bytesOldIndex = _bytes.StartIndex;
@@ -21,10 +28,23 @@ namespace Parser.Parsers
             }
             while (await ReceiveOneFrameAsync()) ;
         }
+
+        /// <summary>
+        /// 设置新的起始位置
+        /// </summary>
+        /// <param name="bytesOldIndex">旧位置</param>
         protected virtual void ResetSatrtIndex(int bytesOldIndex) { }
 
+        /// <summary>
+        /// 能否找新的结束位置
+        /// </summary>
+        /// <returns></returns>
         protected virtual async Task<bool> CanFindEndIndexAsync() => await Task.FromResult(true);
 
+        /// <summary>
+        /// 返回解析完成的包
+        /// </summary>
+        /// <returns>是否有解析成功的包</returns>
         protected async virtual Task<bool> ReceiveOneFrameAsync()
         {
             int startIndex = FindStartIndex();
@@ -43,7 +63,10 @@ namespace Parser.Parsers
             _bytes.RemoveHeader(endIndex - _bytes.StartIndex);
             try
             {
-                await this.OnReceiveParsedData?.Invoke(data);
+                if (OnReceiveParsedData is not null)
+                {
+                    await OnReceiveParsedData.Invoke(data);
+                }
             }
             catch (Exception ex)
             {
@@ -52,14 +75,28 @@ namespace Parser.Parsers
             return true;
         }
 
+        /// <summary>
+        /// 找起始位置
+        /// </summary>
+        /// <returns>起始位置</returns>
         protected abstract int FindStartIndex();
 
+        /// <summary>
+        /// 找结束位置
+        /// </summary>
+        /// <returns>结束位置</returns>
         protected abstract int FindEndIndex();
 
+        /// <summary>
+        /// 找指定数组所在位置
+        /// </summary>
+        /// <param name="startIndex">查找起点</param>
+        /// <param name="block">指定数组</param>
+        /// <returns>指定数组位置</returns>
         protected FindIndexRsp FindIndex(int startIndex, byte[] block)
         {
-            if (block.Length == 0) return new FindIndexRsp { Code = ErrorCode.Success, Index = startIndex };
-            if (_bytes.Count - (startIndex - _bytes.StartIndex) < block.Length) return new FindIndexRsp() { Code = ErrorCode.LengthNotEnough, Index = -1 };
+            if (block.Length == 0) return new FindIndexRsp { Code = StateCode.Success, Index = startIndex };
+            if (_bytes.Count - (startIndex - _bytes.StartIndex) < block.Length) return new FindIndexRsp() { Code = StateCode.LengthNotEnough, Index = -1 };
             for (int i = startIndex; i < _bytes.StartIndex + _bytes.Count; i++)
             {
                 if (_bytes.Bytes[i] == block[0])
@@ -78,25 +115,46 @@ namespace Parser.Parsers
                     }
                     if (find)
                     {
-                        return new FindIndexRsp() { Index = i, Code = ErrorCode.Success };
+                        return new FindIndexRsp() { Index = i, Code = StateCode.Success };
                     }
                 }
             }
-            return new FindIndexRsp() { Code = ErrorCode.NotFound, Index = -1 };
+            return new FindIndexRsp() { Code = StateCode.NotFound, Index = -1 };
         }
     }
 
+    /// <summary>
+    /// 查找位置结果
+    /// </summary>
     public class FindIndexRsp
     {
+        /// <summary>
+        /// 找到的位置信息
+        /// </summary>
         public int Index { get; set; }
 
-        public ErrorCode Code { get; set; }
+        /// <summary>
+        /// 查找结果
+        /// </summary>
+        public StateCode Code { get; set; }
     }
 
-    public enum ErrorCode
+    /// <summary>
+    /// 查找结果
+    /// </summary>
+    public enum StateCode
     {
+        /// <summary>
+        /// 找到位置
+        /// </summary>
         Success,
+        /// <summary>
+        /// 长度不足
+        /// </summary>
         LengthNotEnough,
+        /// <summary>
+        /// 没找到
+        /// </summary>
         NotFound
     }
 }

@@ -20,13 +20,13 @@ namespace TopPortLibIntTest
             IPlayer player = new Player(crowPort);
             try
             {
-                var rsp = await player.Play(new PlayerReq() { ID = 9527, Name = "����֮��" });
+                var rsp = await player.Play(new PlayerReq(9527, "1234"));
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
 
             }
-            catch (CrowBusyException ex)
+            catch (CrowBusyException)
             {
 
             }
