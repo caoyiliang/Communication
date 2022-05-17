@@ -1,19 +1,32 @@
-﻿namespace TopPortLib
+﻿using Parser.Interfaces;
+
+namespace TopPortLib
 {
     /// <summary>
-    /// 请求数据推送
+    /// 请求日志推送
     /// </summary>
     /// <param name="data">请求字节数组</param>
-    public delegate Task RequestedDataEventHandler(byte[] data);
+    public delegate Task RequestedLogEventHandler(byte[] data);
     /// <summary>
-    /// 接收数据推送
+    /// 接收日志推送
     /// </summary>
     /// <param name="data">接收字节数组</param>
-    public delegate Task RespondedDataEventHandler(byte[] data);
+    public delegate Task RespondedLogEventHandler(byte[] data);
     /// <summary>
     /// 接收有效数据推送
     /// </summary>
     /// <param name="type">接收数据类型</param>
     /// <param name="data">接收数据</param>
     public delegate Task ReceiveResponseDataEventHandler(Type type, object data);
+    /// <summary>
+    /// 设置解析器
+    /// </summary>
+    /// <returns>解析器</returns>
+    public delegate Task<IParser> GetParserEventHandler();
+    /// <summary>
+    /// 服务端解析数据推送
+    /// </summary>
+    /// <param name="clientId">客户端ID</param>
+    /// <param name="data">收到字节数组</param>
+    public delegate Task ReceiveParsedDataFromClientEventHandler(int clientId, byte[] data);
 }

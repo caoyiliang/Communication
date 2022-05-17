@@ -15,9 +15,9 @@ namespace TopPortLib
         private readonly Func<byte[], Type> _getRspTypeByRspBytes;
         private readonly List<ReqInfo> _reqInfos = new();
         /// <inheritdoc/>
-        public event RequestedDataEventHandler? OnRequestedData;
+        public event RequestedLogEventHandler? OnRequestedData;
         /// <inheritdoc/>
-        public event RespondedDataEventHandler? OnRespondedData;
+        public event RespondedLogEventHandler? OnRespondedData;
         /// <inheritdoc/>
         public event ReceiveResponseDataEventHandler? OnReceiveResponseData;
         /// <inheritdoc/>

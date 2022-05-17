@@ -23,7 +23,7 @@ namespace Communication.Bus.PhysicalPort
         public SerialPort(string portName, int baudRate, Parity parity, int dataBits) : base(portName, baudRate, parity, dataBits) { }
         /// <summary>物理串口</summary>
         public SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits) { }
-        
+
         /// <inheritdoc/>
         public async Task OpenAsync()
         {

@@ -15,12 +15,12 @@ namespace TopPortLib.Interfaces
         /// <summary>
         /// 请求数据
         /// </summary>
-        event RequestedDataEventHandler OnRequestedData;
+        event RequestedLogEventHandler OnRequestedData;
 
         /// <summary>
         /// 接收数据
         /// </summary>
-        event RespondedDataEventHandler OnRespondedData;
+        event RespondedLogEventHandler OnRespondedData;
 
         /// <summary>
         /// 接收有效数据

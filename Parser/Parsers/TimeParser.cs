@@ -12,9 +12,9 @@ namespace Parser.Parsers
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TimeParser>();
         private volatile bool _isDisposeRequested = false;
-        private RemainBytes _bytes;
-        private SemaphoreSlim _bytesSemaphore = new SemaphoreSlim(1, 1);
-        private ITimer _timer;
+        private readonly RemainBytes _bytes;
+        private readonly SemaphoreSlim _bytesSemaphore = new(1, 1);
+        private readonly ITimer _timer;
         /// <summary>
         /// 时间间隔
         /// </summary>
@@ -52,6 +52,7 @@ namespace Parser.Parsers
         public void Dispose()
         {
             this._isDisposeRequested = true;
+            GC.SuppressFinalize(this);
         }
 
         private async Task HandleDataAsync()

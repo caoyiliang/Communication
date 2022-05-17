@@ -18,6 +18,16 @@ namespace Communication.Interfaces
         event ReceiveOriginalDataEventHandler OnReceiveOriginalData;
 
         /// <summary>
+        /// 对端掉线
+        /// </summary>
+        event DisconnectEventHandler OnDisconnect;
+
+        /// <summary>
+        /// 对端连接成功
+        /// </summary>
+        event ConnectEventHandler? OnConnect;
+
+        /// <summary>
         /// 打开
         /// </summary>
         /// <exception cref="ConnectFailedException"></exception>

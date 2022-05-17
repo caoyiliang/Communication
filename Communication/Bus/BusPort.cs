@@ -22,6 +22,10 @@ namespace Communication.Bus
         public IPhysicalPort PhysicalPort { get => _physicalPort; set { _physicalPort?.CloseAsync().Wait(); _physicalPort = value; } }
         /// <inheritdoc/>
         public event ReceiveOriginalDataEventHandler? OnReceiveOriginalData;
+        /// <inheritdoc/>
+        public event DisconnectEventHandler? OnDisconnect;
+        /// <inheritdoc/>
+        public event ConnectEventHandler? OnConnect;
 
         /// <summary>
         /// 处理总线
@@ -52,6 +56,10 @@ namespace Communication.Bus
                 while (!_isActiveClose)
                 {
                     await OpenAsync_();
+                    if (OnConnect is not null)
+                    {
+                        await OnConnect.Invoke();
+                    }
                     await ReadBusAsync();
                 }
             });
@@ -122,6 +130,10 @@ namespace Communication.Bus
             }
             catch (Exception)
             {
+                if (OnDisconnect is not null)
+                {
+                    await OnDisconnect.Invoke();
+                }
             }
             finally
             {

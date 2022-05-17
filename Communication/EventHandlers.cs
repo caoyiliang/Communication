@@ -26,4 +26,14 @@
     /// </summary>
     /// <param name="clientId">客户端ID</param>
     public delegate Task ClientDisconnectEventHandler(int clientId);
+
+    /// <summary>
+    /// 对端断线
+    /// </summary>
+    public delegate Task DisconnectEventHandler();
+
+    /// <summary>
+    /// 对端连接成功
+    /// </summary>
+    public delegate Task ConnectEventHandler();
 }

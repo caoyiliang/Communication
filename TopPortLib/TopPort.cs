@@ -1,5 +1,5 @@
-﻿using Communication.Bus;
-using Communication.Exceptions;
+﻿using Communication;
+using Communication.Bus;
 using Communication.Interfaces;
 using Parser;
 using Parser.Interfaces;
@@ -19,6 +19,10 @@ namespace TopPortLib
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
         /// <inheritdoc/>
         public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
+        /// <inheritdoc/>
+        public event DisconnectEventHandler? OnDisconnect;
+        /// <inheritdoc/>
+        public event ConnectEventHandler? OnConnect;
 
         /// <summary>
         /// 顶层通讯口
@@ -37,7 +41,8 @@ namespace TopPortLib
             };
 
             this._port = new BusPort(physicalPort);
-
+            _port.OnDisconnect += OnDisconnect;
+            _port.OnConnect += OnConnect;
             _port.OnReceiveOriginalData += parser.ReceiveOriginalDataAsync;
         }
 
@@ -69,6 +74,7 @@ namespace TopPortLib
             var task = this.CloseAsync();
             task.ConfigureAwait(false);
             task.Wait();
+            GC.SuppressFinalize(this);
         }
     }
 }
