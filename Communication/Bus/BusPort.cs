@@ -61,6 +61,10 @@ namespace Communication.Bus
                         await OnConnect.Invoke();
                     }
                     await ReadBusAsync();
+                    if (OnDisconnect is not null)
+                    {
+                        await OnDisconnect.Invoke();
+                    }
                 }
             });
         }
@@ -130,10 +134,7 @@ namespace Communication.Bus
             }
             catch (Exception)
             {
-                if (OnDisconnect is not null)
-                {
-                    await OnDisconnect.Invoke();
-                }
+                
             }
             finally
             {

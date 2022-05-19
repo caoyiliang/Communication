@@ -18,11 +18,11 @@ namespace TopPortLib
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
         /// <inheritdoc/>
-        public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
+        public event ReceiveParsedDataEventHandler? OnReceiveParsedData { add => _parser.OnReceiveParsedData += value; remove => _parser.OnReceiveParsedData -= value; }
         /// <inheritdoc/>
-        public event DisconnectEventHandler? OnDisconnect;
+        public event DisconnectEventHandler? OnDisconnect { add => _port.OnDisconnect += value; remove => _port.OnDisconnect -= value; }
         /// <inheritdoc/>
-        public event ConnectEventHandler? OnConnect;
+        public event ConnectEventHandler? OnConnect { add => _port.OnConnect += value; remove => _port.OnConnect -= value; }
 
         /// <summary>
         /// 顶层通讯口
@@ -32,17 +32,8 @@ namespace TopPortLib
         public TopPort(IPhysicalPort physicalPort, IParser parser)
         {
             this._parser = parser;
-            parser.OnReceiveParsedData += async data =>
-            {
-                if (OnReceiveParsedData is not null)
-                {
-                    await OnReceiveParsedData.Invoke(data);
-                }
-            };
 
             this._port = new BusPort(physicalPort);
-            _port.OnDisconnect += OnDisconnect;
-            _port.OnConnect += OnConnect;
             _port.OnReceiveOriginalData += parser.ReceiveOriginalDataAsync;
         }
 
