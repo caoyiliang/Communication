@@ -28,7 +28,7 @@ namespace Parser.Parsers
         public TimeParser(int timeInterval = 20)
         {
             TimeInterval = timeInterval;
-            _timer = new WinApiTimer();
+            _timer = new NormalTimer();
             _bytes = new RemainBytes();
             Task.Run(async () => await HandleDataAsync());
         }
