@@ -77,7 +77,7 @@ namespace Communication.Bus
             _closeCts?.Cancel();
             if (IsOpen)
                 await _physicalPort.CloseAsync();
-            if (_closeTcs is not null)
+            if (_closeTcs is not null && _closeCts is not null && (!_closeCts.IsCancellationRequested))
                 if (await Task.WhenAny(_closeTcs.Task, Task.Delay(2000)) != _closeTcs.Task)
                 {
                     throw new TimeoutException("Waited too long to Close. timeout = 2000");
@@ -134,7 +134,7 @@ namespace Communication.Bus
             }
             catch (Exception)
             {
-                
+
             }
             finally
             {
