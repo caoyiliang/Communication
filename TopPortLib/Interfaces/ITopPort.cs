@@ -18,12 +18,12 @@ namespace TopPortLib.Interfaces
         /// <summary>
         /// 数据接收
         /// </summary>
-        event ReceiveParsedDataEventHandler OnReceiveParsedData;
+        event ReceiveParsedDataEventHandler? OnReceiveParsedData;
 
         /// <summary>
         /// 对端掉线
         /// </summary>
-        event DisconnectEventHandler OnDisconnect;
+        event DisconnectEventHandler? OnDisconnect;
 
         /// <summary>
         /// 对端连接成功

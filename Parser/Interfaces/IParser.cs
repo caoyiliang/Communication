@@ -8,7 +8,7 @@
         /// <summary>
         /// 推送解析结果
         /// </summary>
-        event ReceiveParsedDataEventHandler OnReceiveParsedData;
+        event ReceiveParsedDataEventHandler? OnReceiveParsedData;
 
         /// <summary>
         /// 将数据放入解析器

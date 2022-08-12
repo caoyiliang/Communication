@@ -17,17 +17,17 @@ namespace TopPortLib.Interfaces
         /// <summary>
         /// 推送解析数据
         /// </summary>
-        event ReceiveParsedDataFromClientEventHandler OnReceiveParsedData;
+        event ReceiveParsedDataFromClientEventHandler? OnReceiveParsedData;
 
         /// <summary>
         /// 服务端有新客户端连接
         /// </summary>
-        event ClientConnectEventHandler OnClientConnect;
+        event ClientConnectEventHandler? OnClientConnect;
 
         /// <summary>
         /// 服务端有客户端断线
         /// </summary>
-        event ClientDisconnectEventHandler OnClientDisconnect;
+        event ClientDisconnectEventHandler? OnClientDisconnect;
 
         /// <summary>
         /// 打开通讯口

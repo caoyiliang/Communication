@@ -11,11 +11,11 @@ namespace Parser.Parsers
         /// <summary>
         /// 帧头
         /// </summary>
-        private byte[] _head;
+        private readonly byte[] _head;
         /// <summary>
         /// 帧尾
         /// </summary>
-        private byte[] _foot;
+        private readonly byte[] _foot;
         /// <summary>
         /// 以特定字节数组的开头和结尾来分数据包
         /// </summary>

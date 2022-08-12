@@ -1,4 +1,5 @@
-﻿using Communication.Exceptions;
+﻿using Communication;
+using Communication.Exceptions;
 using Communication.Interfaces;
 using Crow;
 using Crow.Exceptions;
@@ -32,6 +33,14 @@ namespace TopPortLib.Interfaces
         /// 关闭
         /// </summary>
         Task CloseAsync();
+        /// <summary>
+        /// 对端掉线
+        /// </summary>
+        event DisconnectEventHandler? OnDisconnect;
+        /// <summary>
+        /// 对端连接成功
+        /// </summary>
+        event ConnectEventHandler? OnConnect;
         /// <summary>
         /// 队列请求接收
         /// </summary>

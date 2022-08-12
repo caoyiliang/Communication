@@ -15,12 +15,12 @@ namespace Communication.Interfaces
         /// <summary>
         /// 数据接收
         /// </summary>
-        event ReceiveOriginalDataEventHandler OnReceiveOriginalData;
+        event ReceiveOriginalDataEventHandler? OnReceiveOriginalData;
 
         /// <summary>
         /// 对端掉线
         /// </summary>
-        event DisconnectEventHandler OnDisconnect;
+        event DisconnectEventHandler? OnDisconnect;
 
         /// <summary>
         /// 对端连接成功

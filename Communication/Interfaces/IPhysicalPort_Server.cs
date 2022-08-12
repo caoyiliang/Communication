@@ -13,17 +13,17 @@
         /// <summary>
         /// 服务端接收数据推送
         /// </summary>
-        event ReceiveOriginalDataFromClientEventHandler OnReceiveOriginalDataFromClient;
+        event ReceiveOriginalDataFromClientEventHandler? OnReceiveOriginalDataFromClient;
 
         /// <summary>
         /// 服务端有新客户端连接
         /// </summary>
-        event ClientConnectEventHandler OnClientConnect;
+        event ClientConnectEventHandler? OnClientConnect;
 
         /// <summary>
         /// 服务端有客户端断线
         /// </summary>
-        event ClientDisconnectEventHandler OnClientDisconnect;
+        event ClientDisconnectEventHandler? OnClientDisconnect;
 
         /// <summary>
         /// 启动Server，以监听客户端的连接

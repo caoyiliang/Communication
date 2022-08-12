@@ -1,4 +1,5 @@
-﻿using Communication.Interfaces;
+﻿using Communication;
+using Communication.Interfaces;
 using Crow;
 using Crow.Interfaces;
 using Parser.Interfaces;
@@ -19,6 +20,10 @@ namespace TopPortLib
         public event SentDataEventHandler<byte[]>? OnSentData;
         /// <inheritdoc/>
         public event ReceivedDataEventHandler<byte[]>? OnReceivedData;
+        /// <inheritdoc/>
+        public event DisconnectEventHandler? OnDisconnect { add => _topPort.OnDisconnect += value; remove => _topPort.OnDisconnect -= value; }
+        /// <inheritdoc/>
+        public event ConnectEventHandler? OnConnect { add => _topPort.OnConnect += value; remove => _topPort.OnConnect -= value; }
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
         /// <summary>
