@@ -40,7 +40,7 @@ namespace Crow.Interfaces
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync(TReq req, int timeout = -1, bool background = false);
+        Task<TRsp> RequestAsync(TReq req, int timeout = -1, bool background = true);
 
         /// <summary>
         /// 队列只发不收
@@ -52,6 +52,6 @@ namespace Crow.Interfaces
         /// <exception cref="CrowBusyException">乌鸦正忙异常</exception>
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
-        Task SendAsync(TReq req, int timeout = -1, bool background = false);
+        Task SendAsync(TReq req, int timeout = -1, bool background = true);
     }
 }

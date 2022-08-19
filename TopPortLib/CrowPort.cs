@@ -79,7 +79,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream
         {
             byte[] reqBytes;
             try
@@ -102,7 +102,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task RequestAsync<TReq>(TReq req, int timeout = -1, bool background = false) where TReq : IByteStream
+        public async Task RequestAsync<TReq>(TReq req, int timeout = -1, bool background = true) where TReq : IByteStream
         {
             byte[] reqBytes;
             try
@@ -117,7 +117,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream
         {
             byte[] reqBytes;
             try
@@ -140,7 +140,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream
         {
             byte[] reqBytes;
             try

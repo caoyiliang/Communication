@@ -57,7 +57,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream;
+        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
         /// <summary>
         /// 队列请求接收
         /// </summary>
@@ -74,7 +74,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream;
+        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
         /// <summary>
         /// 队列请求接收
         /// </summary>
@@ -91,7 +91,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = false) where TReq : IByteStream;
+        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
         /// <summary>
         /// 队列只发不收
         /// </summary>
@@ -104,6 +104,6 @@ namespace TopPortLib.Interfaces
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
-        Task RequestAsync<TReq>(TReq req, int timeout = -1, bool background = false) where TReq : IByteStream;
+        Task RequestAsync<TReq>(TReq req, int timeout = -1, bool background = true) where TReq : IByteStream;
     }
 }
