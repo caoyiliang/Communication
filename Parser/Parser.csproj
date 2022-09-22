@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net5.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageTags></PackageTags>
 		<Description>数据分帧解析器</Description>
-		<Version>6.2.0</Version>
+		<Version>6.2.1</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>
@@ -20,7 +20,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CSoft.LogInterface" Version="6.0.2" />
-		<PackageReference Include="CSoft.Utils" Version="6.0.4" />
+		<PackageReference Include="CSoft.Utils" Version="6.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>
