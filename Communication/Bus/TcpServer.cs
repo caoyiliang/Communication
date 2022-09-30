@@ -3,6 +3,7 @@ using LogInterface;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace Communication.Bus
 {
@@ -172,6 +173,10 @@ namespace Communication.Bus
                         {
                             _logger.Error(e, "Handle client connect error");
                         }
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            _ = client.Client.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 100), null);
+                        }
                         _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                     }
                 }
@@ -201,6 +206,15 @@ namespace Communication.Bus
                 }
             });
             await Task.CompletedTask;
+        }
+
+        private byte[] KeepAlive(int onOff, int keepAliveTime, int keepAliveInterval)
+        {
+            byte[] buffer = new byte[12];
+            BitConverter.GetBytes(onOff).CopyTo(buffer, 0);
+            BitConverter.GetBytes(keepAliveTime).CopyTo(buffer, 4);
+            BitConverter.GetBytes(keepAliveInterval).CopyTo(buffer, 8);
+            return buffer;
         }
 
         private async Task HandleClientAsync(TcpClient client, int clientId)
