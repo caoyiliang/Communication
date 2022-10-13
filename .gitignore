@@ -26,3 +26,5 @@
 /TestNamedPipeClient/obj
 /TestNamedPipeServer/bin
 /TestNamedPipeServer/obj
+/PigeonPortProtocolDemo/bin
+/PigeonPortProtocolDemo/obj

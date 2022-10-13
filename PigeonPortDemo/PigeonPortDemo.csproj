@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PigeonPortProtocolDemo\PigeonPortProtocolDemo.csproj" />
     <ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
   </ItemGroup>
 

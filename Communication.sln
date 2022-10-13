@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28917.181
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Communication", "Communication\Communication.csproj", "{466776F9-481B-4679-B433-C7DF18E9AD96}"
 EndProject
@@ -26,6 +26,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestNamedPipeServer", "TestNamedPipeServer\TestNamedPipeServer.csproj", "{99EBFFBA-3F14-47B4-A019-BD6427D17839}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProject", "TestProject", "{520BBC60-891F-49D7-B4E1-E462498DF89C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PigeonPortProtocolDemo", "PigeonPortProtocolDemo\PigeonPortProtocolDemo.csproj", "{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{99EBFFBA-3F14-47B4-A019-BD6427D17839}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99EBFFBA-3F14-47B4-A019-BD6427D17839}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99EBFFBA-3F14-47B4-A019-BD6427D17839}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{252C87AF-E0F6-4C9E-92C4-EF2DCFFC5FF3} = {520BBC60-891F-49D7-B4E1-E462498DF89C}
 		{761D5220-BA4F-4666-9BF1-3939BB3AA751} = {520BBC60-891F-49D7-B4E1-E462498DF89C}
 		{99EBFFBA-3F14-47B4-A019-BD6427D17839} = {520BBC60-891F-49D7-B4E1-E462498DF89C}
+		{7661E7FE-C3E1-44B1-AC98-B1602E914DD0} = {520BBC60-891F-49D7-B4E1-E462498DF89C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4725AE6A-FFA2-4352-9DAB-5689B0B2C52F}

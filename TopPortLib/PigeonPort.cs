@@ -1,5 +1,6 @@
 ﻿using Communication;
 using Communication.Interfaces;
+using System.Reflection;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
 
@@ -13,12 +14,12 @@ namespace TopPortLib
         private readonly ITopPort _topPort;
         private readonly int _defaultTimeout;
         private readonly int _timeDelayAfterSending;
-        private readonly Func<byte[], Type> _getRspTypeByRspBytes;
+        private readonly Type[] _typeList;
         private readonly List<ReqInfo> _reqInfos = new();
         /// <inheritdoc/>
-        public event RequestedLogEventHandler? OnRequestedData;
+        public event RequestedLogEventHandler? OnSentData;
         /// <inheritdoc/>
-        public event RespondedLogEventHandler? OnRespondedData;
+        public event RespondedLogEventHandler? OnReceivedData;
         /// <inheritdoc/>
         public event ReceiveActivelyPushDataEventHandler? OnReceiveActivelyPushData;
         /// <inheritdoc/>
@@ -31,25 +32,35 @@ namespace TopPortLib
         /// 队列通讯口
         /// </summary>
         /// <param name="topPort">通讯口</param>
-        /// <param name="getRspTypeByRspBytes">根据返回命令获取返回类型</param>
         /// <param name="defaultTimeout">超时时间，默认5秒</param>
         /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
-        public PigeonPort(ITopPort topPort, Func<byte[], Type> getRspTypeByRspBytes, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
+        public PigeonPort(ITopPort topPort, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
         {
             _topPort = topPort;
             _topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
-            _getRspTypeByRspBytes = getRspTypeByRspBytes;
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
+            _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace.EndsWith("Response")).ToArray();
         }
 
         private async Task TopPort_OnReceiveParsedData(byte[] data)
         {
             await RespondedDataAsync(data);
-            Type rspType;
+            Type? rspType = null;
             try
             {
-                rspType = _getRspTypeByRspBytes(data);
+                foreach (var item in _typeList)
+                {
+                    var checkMethod = item.GetMethod("Check");
+                    var obj = Activator.CreateInstance(item, data);
+                    if ((bool)checkMethod.Invoke(obj, new object[] { data }))
+                    {
+                        rspType = item;
+                        break;
+                    }
+                }
+                if (rspType == null)
+                    throw new GetRspTypeByRspBytesFailedException("收到未知命令");
             }
             catch (Exception ex)
             {
@@ -147,11 +158,11 @@ namespace TopPortLib
 
         private async Task RequestDataAsync(byte[] data)
         {
-            if (OnRequestedData is not null)
+            if (OnSentData is not null)
             {
                 try
                 {
-                    await OnRequestedData(data);
+                    await OnSentData(data);
                 }
                 catch
                 {
@@ -161,11 +172,11 @@ namespace TopPortLib
 
         private async Task RespondedDataAsync(byte[] data)
         {
-            if (this.OnRespondedData != null)
+            if (this.OnReceivedData != null)
             {
                 try
                 {
-                    await OnRespondedData(data);
+                    await OnReceivedData(data);
                 }
                 catch
                 {
