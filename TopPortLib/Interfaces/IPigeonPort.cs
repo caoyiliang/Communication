@@ -1,4 +1,5 @@
-﻿using Communication.Interfaces;
+﻿using Communication;
+using Communication.Interfaces;
 
 namespace TopPortLib.Interfaces
 {
@@ -23,9 +24,19 @@ namespace TopPortLib.Interfaces
         event RespondedLogEventHandler OnRespondedData;
 
         /// <summary>
-        /// 接收有效数据
+        /// 接收到主动上传的数据
         /// </summary>
-        event ReceiveResponseDataEventHandler OnReceiveResponseData;
+        event ReceiveActivelyPushDataEventHandler OnReceiveActivelyPushData;
+
+        /// <summary>
+        /// 对端掉线
+        /// </summary>
+        event DisconnectEventHandler? OnDisconnect;
+
+        /// <summary>
+        /// 对端连接成功
+        /// </summary>
+        event ConnectEventHandler? OnConnect;
 
         /// <summary>
         /// 开启

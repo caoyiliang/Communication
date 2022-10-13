@@ -16,31 +16,38 @@ namespace TopPortLib.Interfaces
         /// 物理口
         /// </summary>
         IPhysicalPort PhysicalPort { get; set; }
+
         /// <summary>
         /// 发送的数据
         /// </summary>
         event SentDataEventHandler<byte[]> OnSentData;
+
         /// <summary>
         /// 接收的数据
         /// </summary>
         event ReceivedDataEventHandler<byte[]> OnReceivedData;
+
+        /// <summary>
+        /// 对端掉线
+        /// </summary>
+        event DisconnectEventHandler? OnDisconnect;
+
+        /// <summary>
+        /// 对端连接成功
+        /// </summary>
+        event ConnectEventHandler? OnConnect;
+
         /// <summary>
         /// 打开
         /// </summary>
         /// <exception cref="ConnectFailedException"></exception>
         Task OpenAsync();
+
         /// <summary>
         /// 关闭
         /// </summary>
         Task CloseAsync();
-        /// <summary>
-        /// 对端掉线
-        /// </summary>
-        event DisconnectEventHandler? OnDisconnect;
-        /// <summary>
-        /// 对端连接成功
-        /// </summary>
-        event ConnectEventHandler? OnConnect;
+
         /// <summary>
         /// 队列请求接收
         /// </summary>
@@ -58,6 +65,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
+
         /// <summary>
         /// 队列请求接收
         /// </summary>
@@ -75,6 +83,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
+
         /// <summary>
         /// 队列请求接收
         /// </summary>
@@ -92,6 +101,7 @@ namespace TopPortLib.Interfaces
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
+
         /// <summary>
         /// 队列只发不收
         /// </summary>

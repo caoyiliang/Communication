@@ -1,4 +1,5 @@
-﻿using Communication.Interfaces;
+﻿using Communication;
+using Communication.Interfaces;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
 
@@ -19,7 +20,11 @@ namespace TopPortLib
         /// <inheritdoc/>
         public event RespondedLogEventHandler? OnRespondedData;
         /// <inheritdoc/>
-        public event ReceiveResponseDataEventHandler? OnReceiveResponseData;
+        public event ReceiveActivelyPushDataEventHandler? OnReceiveActivelyPushData;
+        /// <inheritdoc/>
+        public event DisconnectEventHandler? OnDisconnect { add => _topPort.OnDisconnect += value; remove => _topPort.OnDisconnect -= value; }
+        /// <inheritdoc/>
+        public event ConnectEventHandler? OnConnect { add => _topPort.OnConnect += value; remove => _topPort.OnConnect -= value; }
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
         /// <summary>
@@ -77,12 +82,13 @@ namespace TopPortLib
             if (reqInfo != null)
             {
                 reqInfo.TaskCompletionSource.TrySetResult(rsp);
+                return;
             }
-            if (this.OnReceiveResponseData != null)
+            if (this.OnReceiveActivelyPushData != null)
             {
                 try
                 {
-                    await OnReceiveResponseData(rspType, rsp);
+                    await OnReceiveActivelyPushData(rspType, rsp);
                 }
                 catch
                 {

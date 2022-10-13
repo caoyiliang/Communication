@@ -36,7 +36,6 @@ namespace Crow
             _port.OnReceiveData += async data => { _rsp?.TrySetResult(data); await Task.CompletedTask; };
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
-
         }
 
         /// <inheritdoc/>
@@ -86,7 +85,7 @@ namespace Crow
                     _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
                     try
                     {
-                        await _port.SendAsync(data.Req);
+                        await _port.SendAsync(data.Req, _timeDelayAfterSending);
                         if (OnSentData is not null)
                         {
                             try
@@ -136,7 +135,6 @@ namespace Crow
                         data.Rsp.TrySetResult(default);
                         if (_startStop.Task.IsCompleted)
                             break;
-                        await Task.Delay(_timeDelayAfterSending);
                     }
                 }
                 _completeStop?.TrySetResult(true);

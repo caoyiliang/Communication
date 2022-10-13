@@ -14,9 +14,9 @@ namespace TopPortLib
             _topPort.OnReceiveParsedData += async data => { OnReceiveData?.Invoke(data); await Task.CompletedTask; };
         }
 
-        public async Task SendAsync(byte[] data)
+        public async Task SendAsync(byte[] data, int timeDelayAfterSending)
         {
-            await _topPort.SendAsync(data);
+            await _topPort.SendAsync(data, timeDelayAfterSending);
         }
     }
 }

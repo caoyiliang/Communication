@@ -22,18 +22,13 @@ namespace PigeonPortDemo
         {
             button1.Enabled = false;
             pigeonPort = new PigeonPort(new TopPort(new Communication.Bus.PhysicalPort.SerialPort(comboBox1.Text), new TimeParser(200)), GetRspTypeByRspBytes);
-            pigeonPort.OnReceiveResponseData += PigeonPort_OnReceiveResponseData;
+            pigeonPort.OnReceiveActivelyPushData += PigeonPort_OnReceiveActivelyPushData; ;
             await pigeonPort.StartAsync();
         }
 
-        private async Task PigeonPort_OnReceiveResponseData(Type type, object data)
+        private async Task PigeonPort_OnReceiveActivelyPushData(Type type, object data)
         {
-            if (type == typeof(GetRsp))
-            {
-                var rsp = data as GetRsp;
-                MessageBox.Show("获得对方主动的推送，类型为GetRsp");
-            }
-            else if (type == typeof(PushMsg))
+            if (type == typeof(PushMsg))
             {
                 var pushMsg = data as PushMsg;
                 MessageBox.Show("获得对方主动的推送，类型为PushMsg");

@@ -13,11 +13,11 @@ namespace TopPortLib
     /// <param name="data">接收字节数组</param>
     public delegate Task RespondedLogEventHandler(byte[] data);
     /// <summary>
-    /// 接收有效数据推送
+    /// 接收到主动上传数据推送
     /// </summary>
     /// <param name="type">接收数据类型</param>
     /// <param name="data">接收数据</param>
-    public delegate Task ReceiveResponseDataEventHandler(Type type, object data);
+    public delegate Task ReceiveActivelyPushDataEventHandler(Type type, object data);
     /// <summary>
     /// 设置解析器
     /// </summary>
