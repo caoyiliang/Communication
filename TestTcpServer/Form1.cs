@@ -29,8 +29,12 @@ namespace TestTcpServer
         private async Task TcpServer_ClientConnect(int clientId)
         {
             var info = await ((TcpServer)tcpServer!).GetClientInfo(clientId);
+
             if (info.HasValue)
             {
+
+                var clients = await ((TcpServer)tcpServer!).GetClientsByIp(info.Value.IPAddress);
+
                 await ((TcpServer)tcpServer).GetClientId(info.Value.IPAddress, info.Value.Port);
             }
         }

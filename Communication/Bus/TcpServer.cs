@@ -121,6 +121,16 @@ namespace Communication.Bus
             }
         }
 
+        /// <summary>
+        /// 获取IP下所有客户端
+        /// </summary>
+        /// <param name="ip">查询ip</param>
+        /// <returns>IP下所有客户端</returns>
+        public async Task<List<int>> GetClientsByIp(string ip)
+        {
+            return await Task.FromResult(_dicClients.Where(_ => _.Value.hostName == ip).Select(_ => _.Key).ToList());
+        }
+
         /// <inheritdoc/>
         public async Task DisconnectClientAsync(int clientId)
         {
