@@ -1,16 +1,20 @@
 ﻿namespace TopPortLib.Interfaces;
 
 /// <summary>
-/// 检测命令是否是该返回
+/// 返回约束
 /// </summary>
 public interface IResponse
 {
     /// <summary>
     /// 检测命令是否是该返回
     /// </summary>
-    /// <param name="bytes">板子主动上传命令</param>
-    /// <returns>是否是改返回</returns>
+    /// <param name="bytes">收到的命令</param>
+    /// <returns>是否是该返回</returns>
     bool Check(byte[] bytes);
 
+    /// <summary>
+    /// 从命令中解析有用数据
+    /// </summary>
+    /// <param name="bytes">收到的命令</param>
     Task AnalyticalData(byte[] bytes);
 }
