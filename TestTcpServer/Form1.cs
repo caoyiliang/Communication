@@ -22,6 +22,7 @@ namespace TestTcpServer
 
         private async Task TcpServer_ClientDisconnect(int clientId)
         {
+            var info = await ((TcpServer)tcpServer!).GetClientInfo(clientId);
             await Task.CompletedTask;
         }
 

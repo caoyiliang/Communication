@@ -13,7 +13,7 @@ namespace Communication.Bus
     public class TcpServer : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
-        private readonly ConcurrentDictionary<int, TcpClient> _dicClients = new();
+        private readonly ConcurrentDictionary<int, (TcpClient client, string hostName, int port)> _dicClients = new();
         private readonly string _hostName;
         private readonly int _port;
         private readonly int _bufferSize;
@@ -78,7 +78,7 @@ namespace Communication.Bus
             try
             {
                 if (!_dicClients.TryGetValue(clientId, out var client)) return;
-                var stream = client.GetStream();
+                var stream = client.client.GetStream();
                 lock (stream)
                 {
                     stream.Write(data, 0, data.Length);
@@ -99,8 +99,7 @@ namespace Communication.Bus
         public async Task<(string IPAddress, int Port)?> GetClientInfo(int clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out var client)) return null;
-            var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
-            return await Task.FromResult((remoteEndPoint!.Address.ToString(), remoteEndPoint.Port));
+            return await Task.FromResult((client.hostName, client.port));
         }
 
         /// <summary>
@@ -113,11 +112,7 @@ namespace Communication.Bus
         {
             try
             {
-                var pair = _dicClients.Single(_ =>
-                {
-                    var remoteEndPoint = _.Value.Client.RemoteEndPoint as IPEndPoint;
-                    return (remoteEndPoint!.Address.ToString() == ip) && (remoteEndPoint.Port == port);
-                });
+                var pair = _dicClients.Single(_ => (_.Value.hostName == ip) && (_.Value.port == port));
                 return await Task.FromResult(pair.Key);
             }
             catch (InvalidOperationException)
@@ -132,7 +127,7 @@ namespace Communication.Bus
             if (!_dicClients.TryGetValue(clientId, out var client)) return;
             try
             {
-                client.Close();
+                client.client.Close();
             }
             catch (Exception e)
             {
@@ -161,7 +156,8 @@ namespace Communication.Bus
                         }
                         int clientId = clientCounter;
                         clientCounter++;
-                        _dicClients.TryAdd(clientId, client);
+                        var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
+                        _dicClients.TryAdd(clientId, (client, remoteEndPoint!.Address.ToString(), remoteEndPoint.Port));
                         try
                         {
                             if (OnClientConnect is not null)
@@ -198,7 +194,7 @@ namespace Communication.Bus
                     }
                     foreach (var c in _dicClients.Values)
                     {
-                        c.Close();
+                        c.client.Close();
                     }
                     _dicClients.Clear();
                     _stopTcs?.TrySetResult(true);
@@ -250,7 +246,6 @@ namespace Communication.Bus
             }
             finally
             {
-                _dicClients.TryRemove(clientId, out var value);
                 try
                 {
                     if (OnClientDisconnect is not null)
@@ -262,6 +257,7 @@ namespace Communication.Bus
                 {
                     _logger.Error(e, "Handle client disconnect error");
                 }
+                _dicClients.TryRemove(clientId, out var value);
             }
         }
     }
