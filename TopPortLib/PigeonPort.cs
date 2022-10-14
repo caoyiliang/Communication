@@ -47,15 +47,29 @@ namespace TopPortLib
         {
             await RespondedDataAsync(data);
             Type? rspType = null;
+            object? rsp = null;
             try
             {
                 foreach (var item in _typeList)
                 {
+                    object? obj = null;
+                    try
+                    {
+                        obj = Activator.CreateInstance(item);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                    if (obj == null)
+                        throw new ResponseCreateFailedException("Response创建失败");
                     var checkMethod = item.GetMethod("Check");
-                    var obj = Activator.CreateInstance(item, data);
                     if ((bool)checkMethod.Invoke(obj, new object[] { data }))
                     {
+                        var analyticalData = item.GetMethod("AnalyticalData");
+                        analyticalData.Invoke(obj, new object[] { data });
                         rspType = item;
+                        rsp = obj;
                         break;
                     }
                 }
@@ -66,25 +80,7 @@ namespace TopPortLib
             {
                 throw new GetRspTypeByRspBytesFailedException("通过响应的字节来获取响应类型失败", ex);
             }
-            object? rsp = null;
-            try
-            {
-                var constructors = rspType.GetConstructors();
-                foreach (var constructor in constructors)
-                {
-                    var args = constructor.GetParameters();
-                    if (args.Length == 1)
-                    {
-                        rsp = constructor.Invoke(new object[] { data });
-                    }
-                }
-                if (rsp == null)
-                    throw new ResponseParameterCreateFailedException("缺少一个参数的构造器");
-            }
-            catch (Exception ex)
-            {
-                throw new ResponseParameterCreateFailedException("ResponseParameterCreateFailedException", ex);
-            }
+
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {

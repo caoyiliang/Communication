@@ -3,10 +3,10 @@ using TopPortLib.Interfaces;
 
 namespace PigeonPortProtocolDemo.Request;
 
-internal class ReadSignalValueReq : IByteStream
+internal class ReadValueReq : IByteStream
 {
     private readonly string _addr = "01";
-    public ReadSignalValueReq(string addr)
+    public ReadValueReq(string addr)
     {
         this._addr = addr;
     }
