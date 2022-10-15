@@ -101,8 +101,24 @@ namespace TopPortLib
                 }
                 else
                 {
-                    rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(byte[]) });
-                    return (TRsp)rsp.Invoke(new object[] { rspBytes });
+                    rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(byte[]), typeof(byte[]) });
+                    if (rsp is not null)
+                    {
+                        return (TRsp)rsp.Invoke(new object[] { reqBytes, rspBytes });
+                    }
+                    else
+                    {
+                        rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(string), typeof(byte[]) });
+                        if (rsp is not null)
+                        {
+                            return (TRsp)rsp.Invoke(new object[] { req.ToString(), rspBytes });
+                        }
+                        else
+                        {
+                            rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(byte[]) });
+                            return (TRsp)rsp.Invoke(new object[] { rspBytes });
+                        }
+                    }
                 }
             }
             catch (Exception ex)
