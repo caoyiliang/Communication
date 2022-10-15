@@ -14,15 +14,7 @@ namespace TopPortLibIntTest
         }
         public async Task<PlayerRsp> Play(PlayerReq req)
         {
-            var makeRsp = new Func<byte[], PlayerRsp>(data =>
-            {
-                if (data.Length > 2)
-                {
-                    return new PlayerRsp() { Success = true };
-                }
-                return new PlayerRsp() { Success = false };
-            });
-            return await _crowPort.RequestAsync(req, makeRsp);
+            return await _crowPort.RequestAsync<PlayerReq, PlayerRsp>(req);
         }
     }
 }

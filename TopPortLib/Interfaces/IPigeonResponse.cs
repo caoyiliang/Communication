@@ -3,7 +3,7 @@
 /// <summary>
 /// 返回约束
 /// </summary>
-public interface IResponse
+public interface IPigeonResponse
 {
     /// <summary>
     /// 检测命令是否是该返回

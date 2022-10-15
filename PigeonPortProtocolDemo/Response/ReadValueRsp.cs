@@ -2,7 +2,7 @@
 
 namespace PigeonPortProtocolDemo.Response;
 
-internal class ReadValueRsp : IResponse
+internal class ReadValueRsp : IPigeonResponse
 {
     public List<decimal> RecData { get; set; } = new();
 

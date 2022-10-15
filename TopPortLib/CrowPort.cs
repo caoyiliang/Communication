@@ -79,6 +79,39 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1, bool background = true) where TReq : IByteStream
+        {
+            byte[] reqBytes;
+            try
+            {
+                reqBytes = req.ToBytes();
+            }
+            catch (Exception ex)
+            {
+                throw new RequestParameterToBytesFailedException("Request parameter to bytes failed", ex);
+            }
+            var rspBytes = await _crowLayer.RequestAsync(reqBytes, timeout, background);
+
+            try
+            {
+                var rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(TReq), typeof(byte[]) });
+                if (rsp is not null)
+                {
+                    return (TRsp)rsp.Invoke(new object[] { req, rspBytes });
+                }
+                else
+                {
+                    rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(byte[]) });
+                    return (TRsp)rsp.Invoke(new object[] { rspBytes });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ResponseParameterCreateFailedException("ResponseParameterCreateFailedException", ex);
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream
         {
             byte[] reqBytes;
