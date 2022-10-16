@@ -3,7 +3,8 @@
 /// <summary>
 /// 返回约束
 /// </summary>
-public interface IPigeonResponse
+/// <typeparam name="T">返回类型</typeparam>
+public interface IPigeonResponse<T>
 {
     /// <summary>
     /// 检测命令是否是该返回
@@ -17,4 +18,10 @@ public interface IPigeonResponse
     /// </summary>
     /// <param name="bytes">收到的命令</param>
     Task AnalyticalData(byte[] bytes);
+
+    /// <summary>
+    /// 获取返回数据
+    /// </summary>
+    /// <returns>返回数据</returns>
+    T GetResult();
 }

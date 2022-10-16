@@ -1,4 +1,5 @@
 ﻿using Communication;
+using static PigeonPortProtocolDemo.PigeonPortProtocolDemo;
 
 namespace PigeonPortProtocolDemo;
 
@@ -18,6 +19,11 @@ public interface IPigeonPortProtocolDemo
     /// 关闭串口
     /// </summary>
     Task CloseAsync();
+
+    /// <summary>
+    /// 主动上传的数据比如读浓度
+    /// </summary>
+    event ActivelyPushDataEventHandler<(List<decimal> recData, int result)>? OnReadValue;
 
     /// <summary>
     /// 对端掉线

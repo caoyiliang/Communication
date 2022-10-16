@@ -11,6 +11,7 @@ namespace TopPortLib
     /// </summary>
     public class PigeonPort : IPigeonPort
     {
+        private readonly object _instance;
         private readonly ITopPort _topPort;
         private readonly int _defaultTimeout;
         private readonly int _timeDelayAfterSending;
@@ -34,13 +35,20 @@ namespace TopPortLib
         /// <param name="topPort">通讯口</param>
         /// <param name="defaultTimeout">超时时间，默认5秒</param>
         /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
-        public PigeonPort(ITopPort topPort, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
+        public PigeonPort(object instance, ITopPort topPort, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
         {
+            _instance = instance;
             _topPort = topPort;
             _topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
             _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace.EndsWith("Response")).ToArray();
+        }
+
+        private void InitActivelyPush(object obj, Type type, object data)
+        {
+            var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
+            eventMethod?.Invoke(obj, new object?[] { type.GetMethod("GetValue")!.Invoke(data, null) });
         }
 
         private async Task TopPort_OnReceiveParsedData(byte[] data)
@@ -61,7 +69,7 @@ namespace TopPortLib
                     {
 
                     }
-                    if (obj == null)
+                    if (obj is null)
                         throw new ResponseCreateFailedException("Response创建失败");
                     var checkMethod = item.GetMethod("Check");
                     if ((bool)checkMethod.Invoke(obj, new object[] { data }))
@@ -73,8 +81,10 @@ namespace TopPortLib
                         break;
                     }
                 }
-                if (rspType == null)
+                if (rspType is null)
                     throw new GetRspTypeByRspBytesFailedException("收到未知命令");
+                if (rsp is null)
+                    throw new GetRspTypeByRspBytesFailedException("解析失败");
             }
             catch (Exception ex)
             {
@@ -91,6 +101,7 @@ namespace TopPortLib
                 reqInfo.TaskCompletionSource.TrySetResult(rsp);
                 return;
             }
+            InitActivelyPush(_instance, rspType, rsp);
             if (this.OnReceiveActivelyPushData != null)
             {
                 try

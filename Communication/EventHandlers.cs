@@ -36,4 +36,11 @@
     /// 对端连接成功
     /// </summary>
     public delegate Task ConnectEventHandler();
+
+    /// <summary>
+    /// 接收到主动推送的数据
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="objects">数据</param>
+    public delegate Task ActivelyPushDataEventHandler<T>(T objects);
 }

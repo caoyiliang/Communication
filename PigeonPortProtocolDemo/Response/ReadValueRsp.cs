@@ -1,19 +1,27 @@
-﻿using TopPortLib.Interfaces;
+﻿using System.Xml.Linq;
+using TopPortLib.Interfaces;
 
 namespace PigeonPortProtocolDemo.Response;
 
-internal class ReadValueRsp : IPigeonResponse
+internal class ReadValueRsp : IPigeonResponse<(List<decimal> recData,int result)>
 {
     public List<decimal> RecData { get; set; } = new();
+    public int Result { get; set; }
 
     public async Task AnalyticalData(byte[] bytes)
     {
         RecData = new List<decimal> { 1, 2, 3 };
+        Result = 1;
         await Task.CompletedTask;
     }
 
     public bool Check(byte[] bytes)
     {
-        return bytes[2] == 0x03;
+        return bytes[0] == 0x01;
+    }
+
+    public (List<decimal> recData, int result) GetResult()
+    {
+        return (RecData, Result);
     }
 }

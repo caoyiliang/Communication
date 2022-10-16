@@ -1,4 +1,5 @@
-﻿using Communication;
+﻿using System.Reflection;
+using Communication;
 using Communication.Bus.PhysicalPort;
 using Communication.Exceptions;
 using LogInterface;
@@ -8,6 +9,7 @@ using PigeonPortProtocolDemo.Response;
 using TopPortLib;
 using TopPortLib.Interfaces;
 using Utils;
+using static PigeonPortProtocolDemo.PigeonPortProtocolDemo;
 
 namespace PigeonPortProtocolDemo;
 
@@ -20,14 +22,16 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
     private bool _isConnect = false;
     public bool IsConnect => _isConnect;
 
+    public event ActivelyPushDataEventHandler<(List<decimal> recData, int result)>? OnReadValue;
+
     /// <inheritdoc/>
     public event DisconnectEventHandler? OnDisconnect { add => _crowPort.OnDisconnect += value; remove => _crowPort.OnDisconnect -= value; }
     /// <inheritdoc/>
     public event ConnectEventHandler? OnConnect { add => _crowPort.OnConnect += value; remove => _crowPort.OnConnect -= value; }
 
-    public PigeonPortProtocolDemo(SerialPort serialPort, int defaultTimeout = 5000)
+    public PigeonPortProtocolDemo(TcpClient serialPort, int defaultTimeout = 5000)
     {
-        _crowPort = new PigeonPort(new TopPort(serialPort, new FootParser(Foot)), defaultTimeout);
+        _crowPort = new PigeonPort(this, new TopPort(serialPort, new FootParser(Foot)), defaultTimeout);
         _crowPort.OnReceiveActivelyPushData += _crowPort_OnReceiveActivelyPushData;
         _crowPort.OnSentData += CrowPort_OnSentData;
         _crowPort.OnReceivedData += CrowPort_OnReceivedData;
@@ -37,6 +41,8 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
 
     private async Task _crowPort_OnReceiveActivelyPushData(Type type, object data)
     {
+        //可不在此处处理
+        await Task.CompletedTask;
     }
 
     private async Task _crowPort_OnDisconnect()
@@ -74,5 +80,12 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
     {
         if (!_isConnect) throw new NotConnectedException();
         return await ProcessUtils.ReTry(async () => (await _crowPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut)).RecData, tryCount, cancelToken);
+    }
+
+
+    private async Task ReadValueRspEvent((List<decimal> recData, int result) rs)
+    {
+        if (OnReadValue is not null)
+            await OnReadValue(rs);
     }
 }
