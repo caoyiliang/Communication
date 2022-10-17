@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Communication\Communication.csproj" />
+    <ProjectReference Include="..\..\Communication\Communication.csproj" />
   </ItemGroup>
 
 </Project>

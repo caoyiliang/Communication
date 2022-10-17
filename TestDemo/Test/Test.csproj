@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Communication\Communication.csproj" />
+    <ProjectReference Include="..\..\TopPortLib\TopPortLib.csproj" />
   </ItemGroup>
 
 </Project>

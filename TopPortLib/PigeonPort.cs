@@ -48,7 +48,7 @@ namespace TopPortLib
         private void InitActivelyPush(object obj, Type type, object data)
         {
             var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
-            eventMethod?.Invoke(obj, new object?[] { type.GetMethod("GetValue")!.Invoke(data, null) });
+            eventMethod?.Invoke(obj, new object?[] { type.GetMethod("GetResult")!.Invoke(data, null) });
         }
 
         private async Task TopPort_OnReceiveParsedData(byte[] data)

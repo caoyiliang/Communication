@@ -11,23 +11,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parser", "Parser\Parser.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crow", "Crow\Crow.csproj", "{D6524266-441F-4E01-A95C-1EF3A585892F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopPortLibIntTest", "TopPortLibIntTest\TopPortLibIntTest.csproj", "{B1B28601-6B92-4539-86A2-0CA5BB26CDD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopPortLibIntTest", "TestDemo\TopPortLibIntTest\TopPortLibIntTest.csproj", "{B1B28601-6B92-4539-86A2-0CA5BB26CDD1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockTcpClient", "MockTcpClient\MockTcpClient.csproj", "{2C817CDE-A7B2-416E-B3A7-B41E3AB0AA08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockTcpClient", "TestDemo\MockTcpClient\MockTcpClient.csproj", "{2C817CDE-A7B2-416E-B3A7-B41E3AB0AA08}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{734FDD67-D74C-4BD8-8478-010B55B33607}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "TestDemo\Test\Test.csproj", "{734FDD67-D74C-4BD8-8478-010B55B33607}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestNamedPipeClient", "TestNamedPipeClient\TestNamedPipeClient.csproj", "{761D5220-BA4F-4666-9BF1-3939BB3AA751}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestNamedPipeClient", "TestDemo\TestNamedPipeClient\TestNamedPipeClient.csproj", "{761D5220-BA4F-4666-9BF1-3939BB3AA751}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestNamedPipeServer", "TestNamedPipeServer\TestNamedPipeServer.csproj", "{99EBFFBA-3F14-47B4-A019-BD6427D17839}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestNamedPipeServer", "TestDemo\TestNamedPipeServer\TestNamedPipeServer.csproj", "{99EBFFBA-3F14-47B4-A019-BD6427D17839}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProject", "TestProject", "{520BBC60-891F-49D7-B4E1-E462498DF89C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestDemoProject", "TestDemoProject", "{520BBC60-891F-49D7-B4E1-E462498DF89C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PigeonPortProtocolDemo", "PigeonPortProtocolDemo\PigeonPortProtocolDemo.csproj", "{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PigeonPortProtocolDemo", "TestDemo\PigeonPortProtocolDemo\PigeonPortProtocolDemo.csproj", "{7661E7FE-C3E1-44B1-AC98-B1602E914DD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PigeonPortDemo", "PigeonPortDemo\PigeonPortDemo.csproj", "{1C481803-758F-4C7B-BDA3-80BC9E280CF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PigeonPortDemo", "TestDemo\PigeonPortDemo\PigeonPortDemo.csproj", "{1C481803-758F-4C7B-BDA3-80BC9E280CF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServer", "TcpServer\TcpServer.csproj", "{000DF2BA-FE1A-4712-8379-408E93601270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpServer", "TestDemo\TcpServer\TcpServer.csproj", "{000DF2BA-FE1A-4712-8379-408E93601270}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
