@@ -60,6 +60,8 @@ namespace TopPortLib
             {
                 foreach (var item in _typeList)
                 {
+                    var a = item.GetInterface("IPigeonResponse`1");
+                    if (a is null) continue;
                     object? obj = null;
                     try
                     {
