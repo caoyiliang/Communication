@@ -32,6 +32,7 @@ namespace TopPortLib
         /// <summary>
         /// 队列通讯口
         /// </summary>
+        /// <param name="instance">主动推出事件所在实体</param>
         /// <param name="topPort">通讯口</param>
         /// <param name="defaultTimeout">超时时间，默认5秒</param>
         /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
@@ -60,8 +61,7 @@ namespace TopPortLib
             {
                 foreach (var item in _typeList)
                 {
-                    var a = item.GetInterface("IPigeonResponse`1");
-                    if (a is null) continue;
+                    if (item.GetInterface("IPigeonResponse`1") is null) continue;
                     object? obj = null;
                     try
                     {
