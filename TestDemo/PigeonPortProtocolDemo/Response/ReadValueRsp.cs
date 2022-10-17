@@ -1,9 +1,8 @@
-﻿using System.Xml.Linq;
-using TopPortLib.Interfaces;
+﻿using TopPortLib.Interfaces;
 
 namespace PigeonPortProtocolDemo.Response;
 
-internal class ReadValueRsp : IPigeonResponse<(List<decimal> recData,int result)>
+internal class ReadValueRsp : IPigeonResponse<(List<decimal> recData, int result)>
 {
     public List<decimal> RecData { get; set; } = new();
     public int Result { get; set; }

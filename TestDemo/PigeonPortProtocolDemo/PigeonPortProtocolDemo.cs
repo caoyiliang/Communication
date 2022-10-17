@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Communication;
+﻿using Communication;
 using Communication.Bus.PhysicalPort;
 using Communication.Exceptions;
 using LogInterface;
@@ -9,7 +8,6 @@ using PigeonPortProtocolDemo.Response;
 using TopPortLib;
 using TopPortLib.Interfaces;
 using Utils;
-using static PigeonPortProtocolDemo.PigeonPortProtocolDemo;
 
 namespace PigeonPortProtocolDemo;
 

@@ -1,5 +1,4 @@
 ﻿using Communication;
-using static PigeonPortProtocolDemo.PigeonPortProtocolDemo;
 
 namespace PigeonPortProtocolDemo;
 
