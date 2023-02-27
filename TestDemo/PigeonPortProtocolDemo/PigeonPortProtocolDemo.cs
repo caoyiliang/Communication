@@ -30,26 +30,26 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
     public PigeonPortProtocolDemo(TcpClient serialPort, int defaultTimeout = 5000)
     {
         _crowPort = new PigeonPort(this, new TopPort(serialPort, new FootParser(Foot)), defaultTimeout);
-        _crowPort.OnReceiveActivelyPushData += _crowPort_OnReceiveActivelyPushData;
+        _crowPort.OnReceiveActivelyPushData += CrowPort_OnReceiveActivelyPushData;
         _crowPort.OnSentData += CrowPort_OnSentData;
         _crowPort.OnReceivedData += CrowPort_OnReceivedData;
-        _crowPort.OnConnect += _crowPort_OnConnect;
-        _crowPort.OnDisconnect += _crowPort_OnDisconnect;
+        _crowPort.OnConnect += CrowPort_OnConnect;
+        _crowPort.OnDisconnect += CrowPort_OnDisconnect;
     }
 
-    private async Task _crowPort_OnReceiveActivelyPushData(Type type, object data)
+    private async Task CrowPort_OnReceiveActivelyPushData(Type type, object data)
     {
         //可不在此处处理
         await Task.CompletedTask;
     }
 
-    private async Task _crowPort_OnDisconnect()
+    private async Task CrowPort_OnDisconnect()
     {
         _isConnect = false;
         await Task.CompletedTask;
     }
 
-    private async Task _crowPort_OnConnect()
+    private async Task CrowPort_OnConnect()
     {
         _isConnect = true;
         await Task.CompletedTask;

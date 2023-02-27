@@ -111,11 +111,12 @@ namespace TopPortLib
                         rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(string), typeof(byte[]) });
                         if (rsp is not null)
                         {
-                            return (TRsp)rsp.Invoke(new object[] { req.ToString(), rspBytes });
+                            return (TRsp)rsp.Invoke(new object[] { req.ToString()!, rspBytes });
                         }
                         else
                         {
                             rsp = typeof(TRsp).GetConstructor(new Type[] { typeof(byte[]) });
+                            if (rsp is null) throw new ResponseParameterCreateFailedException();
                             return (TRsp)rsp.Invoke(new object[] { rspBytes });
                         }
                     }

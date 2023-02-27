@@ -4,7 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>7.0.1</Version>
+		<Version>7.0.2</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>数据分帧解析器</PackageReleaseNotes>

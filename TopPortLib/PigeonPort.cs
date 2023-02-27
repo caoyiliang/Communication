@@ -73,11 +73,11 @@ namespace TopPortLib
                     }
                     if (obj is null)
                         throw new ResponseCreateFailedException("Response创建失败");
-                    var checkMethod = item.GetMethod("Check");
-                    if ((bool)checkMethod.Invoke(obj, new object[] { data }))
+                    var checkMethod = item.GetMethod("Check") ?? throw new CheckMethodNotFoundException("Check方法不存在");
+                    if ((bool)checkMethod.Invoke(obj, new object[] { data })!)
                     {
                         var analyticalData = item.GetMethod("AnalyticalData");
-                        analyticalData.Invoke(obj, new object[] { data });
+                        analyticalData?.Invoke(obj, new object[] { data });
                         rspType = item;
                         rsp = obj;
                         break;
