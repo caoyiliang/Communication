@@ -7,10 +7,7 @@ Console.WriteLine("Hello, World!");
 ICondorPortProtocol condorPortProtocolDemox = new CondorPortProtocol(new TcpServer("0.0.0.0", 2756));
 condorPortProtocolDemox.OnReadValue += CondorPortProtocolDemox_OnReadValue;
 
-async Task CondorPortProtocolDemox_OnReadValue(int clientId, (List<decimal> recData, int result) objects)
-{
-    await Task.CompletedTask;
-}
+static async Task CondorPortProtocolDemox_OnReadValue(int clientId, (List<decimal> recData, int result) objects) => await Task.CompletedTask;
 
 await condorPortProtocolDemox.StartAsync();
 

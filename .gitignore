@@ -30,7 +30,7 @@
 /TestDemo/PigeonPortProtocolDemo/obj
 /TestDemo/TcpServer/bin
 /TestDemo/TcpServer/obj
-/CondorPortDemo/bin
-/CondorPortDemo/obj
-/CondorPortProtocolDemo/bin
-/CondorPortProtocolDemo/obj
+/TestDemo/CondorPortDemo/bin
+/TestDemo/CondorPortDemo/obj
+/TestDemo/CondorPortProtocolDemo/bin
+/TestDemo/CondorPortProtocolDemo/obj

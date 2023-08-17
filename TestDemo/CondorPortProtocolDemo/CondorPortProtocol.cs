@@ -25,12 +25,12 @@ namespace CondorPortProtocolDemo
         public CondorPortProtocol(TcpServer serverPort, int defaultTimeout = 5000)
         {
             _condorPort = new CondorPort(this, new TopPort_Server(serverPort, async () => await Task.FromResult(new FootParser(Foot))), defaultTimeout);
-            _condorPort.OnReceiveActivelyPushData += _condorPort_OnReceiveActivelyPushData;
-            _condorPort.OnSentData += _condorPort_OnSentData;
-            _condorPort.OnReceivedData += _condorPort_OnReceivedData;
+            _condorPort.OnReceiveActivelyPushData += CondorPort_OnReceiveActivelyPushData;
+            _condorPort.OnSentData += CondorPort_OnSentData;
+            _condorPort.OnReceivedData += CondorPort_OnReceivedData;
         }
 
-        private async Task _condorPort_OnReceivedData(int clientId, byte[] data)
+        private async Task CondorPort_OnReceivedData(int clientId, byte[] data)
         {
             var info = await ((TcpServer)_condorPort.PhysicalPort).GetClientInfo(clientId);
             if (!info.HasValue) return;
@@ -38,7 +38,7 @@ namespace CondorPortProtocolDemo
             await Task.CompletedTask;
         }
 
-        private async Task _condorPort_OnSentData(int clientId, byte[] data)
+        private async Task CondorPort_OnSentData(int clientId, byte[] data)
         {
             var info = await ((TcpServer)_condorPort.PhysicalPort).GetClientInfo(clientId);
             if (!info.HasValue) return;
@@ -46,7 +46,7 @@ namespace CondorPortProtocolDemo
             await Task.CompletedTask;
         }
 
-        private async Task _condorPort_OnReceiveActivelyPushData(int clientId, Type type, object data)
+        private async Task CondorPort_OnReceiveActivelyPushData(int clientId, Type type, object data)
         {
             //可不在此处处理
             await Task.CompletedTask;

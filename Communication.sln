@@ -33,9 +33,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PigeonPort", "PigeonPort", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CondorPort", "CondorPort", "{7C7A840F-F822-48F1-BBDE-09F538DF17FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondorPortProtocolDemo", "CondorPortProtocolDemo\CondorPortProtocolDemo.csproj", "{EFFCA7DB-259E-434F-A3A6-4186CEF2AE75}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondorPortProtocolDemo", "TestDemo\CondorPortProtocolDemo\CondorPortProtocolDemo.csproj", "{EFFCA7DB-259E-434F-A3A6-4186CEF2AE75}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondorPortDemo", "CondorPortDemo\CondorPortDemo.csproj", "{D9C7624C-469C-4FAA-8D59-931C8FD43D59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondorPortDemo", "TestDemo\CondorPortDemo\CondorPortDemo.csproj", "{D9C7624C-469C-4FAA-8D59-931C8FD43D59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
