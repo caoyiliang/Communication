@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
-    <Version>7.0.3</Version>
+    <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
+    <Version>7.0.4</Version>
     <Description>通讯口使用类库</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>通讯口使用类库</PackageReleaseNotes>

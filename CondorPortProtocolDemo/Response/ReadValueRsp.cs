@@ -1,6 +1,6 @@
 ﻿using TopPortLib.Interfaces;
 
-namespace PigeonPortProtocolDemo.Response;
+namespace CondorPortProtocolDemo.Response;
 
 internal class ReadValueRsp : IAsyncResponse<(List<decimal> recData, int result)>
 {

@@ -43,4 +43,12 @@
     /// <typeparam name="T">数据类型</typeparam>
     /// <param name="objects">数据</param>
     public delegate Task ActivelyPushDataEventHandler<T>(T objects);
+
+    /// <summary>
+    /// 接收到主动推送的数据
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="clientId">客户端ID</param>
+    /// <param name="objects">数据</param>
+    public delegate Task ActivelyPushDataServerEventHandler<T>(int clientId, T objects);
 }

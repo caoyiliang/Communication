@@ -11,10 +11,10 @@ using Utils;
 
 namespace PigeonPortProtocolDemo;
 
-public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
+public class PigeonPortProtocol : IPigeonPortProtocol
 {
-    private static readonly ILogger _logger = Logs.LogFactory.GetLogger<PigeonPortProtocolDemo>();
-    private readonly IPigeonPort _crowPort;
+    private static readonly ILogger _logger = Logs.LogFactory.GetLogger<PigeonPortProtocol>();
+    private readonly IPigeonPort _pigeonPort;
     internal static readonly byte[] Foot = new byte[] { 0x0d };
 
     private bool _isConnect = false;
@@ -23,18 +23,18 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
     public event ActivelyPushDataEventHandler<(List<decimal> recData, int result)>? OnReadValue;
 
     /// <inheritdoc/>
-    public event DisconnectEventHandler? OnDisconnect { add => _crowPort.OnDisconnect += value; remove => _crowPort.OnDisconnect -= value; }
+    public event DisconnectEventHandler? OnDisconnect { add => _pigeonPort.OnDisconnect += value; remove => _pigeonPort.OnDisconnect -= value; }
     /// <inheritdoc/>
-    public event ConnectEventHandler? OnConnect { add => _crowPort.OnConnect += value; remove => _crowPort.OnConnect -= value; }
+    public event ConnectEventHandler? OnConnect { add => _pigeonPort.OnConnect += value; remove => _pigeonPort.OnConnect -= value; }
 
-    public PigeonPortProtocolDemo(TcpClient serialPort, int defaultTimeout = 5000)
+    public PigeonPortProtocol(TcpClient serialPort, int defaultTimeout = 5000)
     {
-        _crowPort = new PigeonPort(this, new TopPort(serialPort, new FootParser(Foot)), defaultTimeout);
-        _crowPort.OnReceiveActivelyPushData += CrowPort_OnReceiveActivelyPushData;
-        _crowPort.OnSentData += CrowPort_OnSentData;
-        _crowPort.OnReceivedData += CrowPort_OnReceivedData;
-        _crowPort.OnConnect += CrowPort_OnConnect;
-        _crowPort.OnDisconnect += CrowPort_OnDisconnect;
+        _pigeonPort = new PigeonPort(this, new TopPort(serialPort, new FootParser(Foot)), defaultTimeout);
+        _pigeonPort.OnReceiveActivelyPushData += CrowPort_OnReceiveActivelyPushData;
+        _pigeonPort.OnSentData += CrowPort_OnSentData;
+        _pigeonPort.OnReceivedData += CrowPort_OnReceivedData;
+        _pigeonPort.OnConnect += CrowPort_OnConnect;
+        _pigeonPort.OnDisconnect += CrowPort_OnDisconnect;
     }
 
     private async Task CrowPort_OnReceiveActivelyPushData(Type type, object data)
@@ -68,16 +68,16 @@ public class PigeonPortProtocolDemo : IPigeonPortProtocolDemo
     }
 
     /// <inheritdoc/>
-    public Task OpenAsync() => _crowPort.StartAsync();
+    public Task OpenAsync() => _pigeonPort.StartAsync();
 
     /// <inheritdoc/>
-    public Task CloseAsync() => _crowPort.StopAsync();
+    public Task CloseAsync() => _pigeonPort.StopAsync();
 
     /// <inheritdoc/>
     public async Task<List<decimal>?> ReadSignalValueAsync(string address = "01", int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
     {
         if (!_isConnect) throw new NotConnectedException();
-        return await ProcessUtils.ReTry(async () => (await _crowPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut)).RecData, tryCount, cancelToken);
+        return await ProcessUtils.ReTry(async () => (await _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut)).RecData, tryCount, cancelToken);
     }
 
 

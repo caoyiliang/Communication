@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>7.0.3</Version>
+    <Version>7.0.4</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>通讯物理口封装</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSoft.LogInterface" Version="7.0.0" />
-    <PackageReference Include="CSoft.Utils" Version="7.0.2" />
+    <PackageReference Include="CSoft.Utils" Version="7.0.3" />
     <PackageReference Include="System.IO.Ports" Version="7.0.0" />
   </ItemGroup>
 

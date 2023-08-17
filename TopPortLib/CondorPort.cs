@@ -9,52 +9,50 @@ namespace TopPortLib
     /// <summary>
     /// 队列通讯口
     /// </summary>
-    public class PigeonPort : IPigeonPort
+    public class CondorPort : ICondorPort
     {
         private readonly object _instance;
-        private readonly ITopPort _topPort;
+        private readonly ITopPort_Server _topPortServer;
         private readonly int _defaultTimeout;
-        private readonly int _timeDelayAfterSending;
         private readonly Type[] _typeList;
         private readonly List<ReqInfo> _reqInfos = new();
         /// <inheritdoc/>
-        public event RequestedLogEventHandler? OnSentData;
+        public IPhysicalPort_Server PhysicalPort { get => _topPortServer.PhysicalPort; }
         /// <inheritdoc/>
-        public event RespondedLogEventHandler? OnReceivedData;
+        public event RequestedLogServerEventHandler? OnSentData;
         /// <inheritdoc/>
-        public event ReceiveActivelyPushDataEventHandler? OnReceiveActivelyPushData;
+        public event RespondedLogServerEventHandler? OnReceivedData;
         /// <inheritdoc/>
-        public event DisconnectEventHandler? OnDisconnect { add => _topPort.OnDisconnect += value; remove => _topPort.OnDisconnect -= value; }
+        public event ReceiveActivelyPushDataServerEventHandler? OnReceiveActivelyPushData;
         /// <inheritdoc/>
-        public event ConnectEventHandler? OnConnect { add => _topPort.OnConnect += value; remove => _topPort.OnConnect -= value; }
+        public event ClientConnectEventHandler? OnClientConnect { add => _topPortServer.OnClientConnect += value; remove => _topPortServer.OnClientConnect -= value; }
         /// <inheritdoc/>
-        public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
+        public event ClientDisconnectEventHandler? OnClientDisconnect { add => _topPortServer.OnClientDisconnect += value; remove => _topPortServer.OnClientDisconnect -= value; }
+
         /// <summary>
         /// 队列通讯口
         /// </summary>
         /// <param name="instance">主动推出事件所在实体</param>
-        /// <param name="topPort">通讯口</param>
+        /// <param name="topPortServer">通讯口</param>
         /// <param name="defaultTimeout">超时时间，默认5秒</param>
-        /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
-        public PigeonPort(object instance, ITopPort topPort, int defaultTimeout = 5000, int timeDelayAfterSending = 20)
+        public CondorPort(object instance, ITopPort_Server topPortServer, int defaultTimeout = 5000)
         {
             _instance = instance;
-            _topPort = topPort;
-            _topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
+            _topPortServer = topPortServer;
+            _topPortServer.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _defaultTimeout = defaultTimeout;
-            _timeDelayAfterSending = timeDelayAfterSending;
             _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
         }
 
-        private void InitActivelyPush(object obj, Type type, object data)
+        private void InitActivelyPush(object obj, Type type, object data, int clientId)
         {
             var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
-            eventMethod?.Invoke(obj, new object?[] { type.GetMethod("GetResult")!.Invoke(data, null) });
+            eventMethod?.Invoke(obj, new object?[] { clientId, type.GetMethod("GetResult")!.Invoke(data, null) });
         }
 
-        private async Task TopPort_OnReceiveParsedData(byte[] data)
+        private async Task TopPort_OnReceiveParsedData(int clientId, byte[] data)
         {
-            await RespondedDataAsync(data);
+            await RespondedDataAsync(clientId, data);
             Type? rspType = null;
             object? rsp = null;
             try
@@ -96,19 +94,47 @@ namespace TopPortLib
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {
-                reqInfo = _reqInfos.Find(ri => ri.RspType == rspType);
+                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType);
             }
             if (reqInfo != null)
             {
                 reqInfo.TaskCompletionSource.TrySetResult(rsp);
                 return;
             }
-            InitActivelyPush(_instance, rspType, rsp);
+            InitActivelyPush(_instance, rspType, rsp, clientId);
             if (this.OnReceiveActivelyPushData != null)
             {
                 try
                 {
-                    await OnReceiveActivelyPushData(rspType, rsp);
+                    await OnReceiveActivelyPushData(clientId, rspType, rsp);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private async Task RequestDataAsync(int clientId, byte[] data)
+        {
+            if (OnSentData is not null)
+            {
+                try
+                {
+                    await OnSentData(clientId, data);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        private async Task RespondedDataAsync(int clientId, byte[] data)
+        {
+            if (OnReceivedData is not null)
+            {
+                try
+                {
+                    await OnReceivedData(clientId, data);
                 }
                 catch
                 {
@@ -117,12 +143,13 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
+                ClientId = clientId,
                 RspType = typeof(TRsp),
                 TaskCompletionSource = tcs,
             };
@@ -134,11 +161,11 @@ namespace TopPortLib
             var bytes = req.ToBytes();
             try
             {
-                var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
+                var sendTask = _topPortServer.SendAsync(clientId, bytes);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                     throw new TimeoutException($"timeout={to}");
                 await sendTask;
-                await RequestDataAsync(bytes);
+                await RequestDataAsync(clientId, bytes);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"timeout={to}");
                 return (TRsp)await tcs.Task;
@@ -153,56 +180,28 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync<TReq>(TReq req, int timeout = -1) where TReq : IByteStream
+        public async Task SendAsync<TReq>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var timeoutTask = Task.Delay(to);
             var bytes = req.ToBytes();
-            var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
+            var sendTask = _topPortServer.SendAsync(clientId, bytes);
             if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
-                throw new TimeoutException($"timeout={to}");
+                throw new TimeoutException($"send timeout={to}");
             await sendTask;
-            await RequestDataAsync(bytes);
-        }
-
-        private async Task RequestDataAsync(byte[] data)
-        {
-            if (OnSentData is not null)
-            {
-                try
-                {
-                    await OnSentData(data);
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        private async Task RespondedDataAsync(byte[] data)
-        {
-            if (this.OnReceivedData is not null)
-            {
-                try
-                {
-                    await OnReceivedData(data);
-                }
-                catch
-                {
-                }
-            }
+            await RequestDataAsync(clientId, bytes);
         }
 
         /// <inheritdoc/>
         public async Task StartAsync()
         {
-            await _topPort.OpenAsync();
+            await _topPortServer.OpenAsync();
         }
 
         /// <inheritdoc/>
         public async Task StopAsync()
         {
-            await _topPort.CloseAsync();
+            await _topPortServer.CloseAsync();
             lock (_reqInfos)
             {
                 _reqInfos.Clear();
@@ -211,6 +210,7 @@ namespace TopPortLib
 
         class ReqInfo
         {
+            public int ClientId;
             public Type RspType { get; set; } = null!;
             public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
         }

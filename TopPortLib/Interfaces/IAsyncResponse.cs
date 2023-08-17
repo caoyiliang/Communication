@@ -4,7 +4,7 @@
 /// 返回约束
 /// </summary>
 /// <typeparam name="T">返回类型</typeparam>
-public interface IPigeonResponse<T>
+public interface IAsyncResponse<T>
 {
     /// <summary>
     /// 检测命令是否是该返回

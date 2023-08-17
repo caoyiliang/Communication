@@ -2,7 +2,7 @@
 
 namespace PigeonPortProtocolDemo;
 
-public interface IPigeonPortProtocolDemo
+public interface IPigeonPortProtocol
 {
     /// <summary>
     /// 设备是否连接
