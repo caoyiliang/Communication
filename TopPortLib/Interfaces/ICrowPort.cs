@@ -82,7 +82,6 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        [Obsolete("已优化")]
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
 
         /// <summary>
@@ -101,7 +100,6 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        [Obsolete("已优化")]
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<byte[], byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
 
         /// <summary>
@@ -120,7 +118,6 @@ namespace TopPortLib.Interfaces
         /// <exception cref="RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
         /// <exception cref="ResponseParameterCreateFailedException">Response parameter create failed</exception>
         /// <returns>接收类型</returns>
-        [Obsolete("已优化")]
         Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, Func<string, byte[], TRsp> makeRsp, int timeout = -1, bool background = true) where TReq : IByteStream;
         #endregion
 

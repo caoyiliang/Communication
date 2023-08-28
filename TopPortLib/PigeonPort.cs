@@ -117,7 +117,9 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp, T>(TReq req, int timeout = -1)
+            where TReq : IByteStream
+            where TRsp : IAsyncResponse<T>
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
