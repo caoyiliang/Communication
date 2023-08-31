@@ -27,14 +27,14 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task OpenAsync()
         {
-            base.Open();
+            Open();
             await Task.CompletedTask;
         }
 
         /// <inheritdoc/>
         public async Task CloseAsync()
         {
-            base.Close();
+            Close();
             await Task.CompletedTask;
         }
 
@@ -42,19 +42,18 @@ namespace Communication.Bus.PhysicalPort
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
             var data = new byte[count];
-            int length = base.Read(data, 0, count);
-            return await Task.FromResult(new ReadDataResult
+            int length = await BaseStream.ReadAsync(data, 0, count, cancellationToken);
+            return new ReadDataResult
             {
                 Length = length,
                 Data = data
-            });
+            };
         }
 
         /// <inheritdoc/>
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)
         {
-            base.Write(data, 0, data.Length);
-            await Task.CompletedTask;
+            await BaseStream.WriteAsync(data, 0, data.Length, cancellationToken);
         }
     }
 }

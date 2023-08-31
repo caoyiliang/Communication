@@ -11,6 +11,7 @@ namespace Communication.Bus.PhysicalPort
         private System.Net.Sockets.UdpClient? _client;
         private readonly string _hostName;
         private readonly int _port;
+        private bool _disposed = false;
         /// <inheritdoc/>
         public bool IsOpen { get; private set; }
         /// <summary>
@@ -20,22 +21,16 @@ namespace Communication.Bus.PhysicalPort
         /// <param name="port">Port</param>
         public UdpClient(string hostName, int port)
         {
-            this._hostName = hostName;
-            this._port = port;
+            _hostName = hostName;
+            _port = port;
         }
 
         /// <inheritdoc/>
         public async Task CloseAsync()
         {
-            this._client?.Close();
-            this.IsOpen = false;
+            _client?.Close();
+            IsOpen = false;
             await Task.CompletedTask;
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            _client?.Dispose();
         }
 
         /// <inheritdoc/>
@@ -43,12 +38,12 @@ namespace Communication.Bus.PhysicalPort
         {
             try
             {
-                _client = new System.Net.Sockets.UdpClient(this._hostName, this._port);
+                _client = new System.Net.Sockets.UdpClient(_hostName, _port);
                 IsOpen = true;
             }
             catch (Exception e)
             {
-                throw new ConnectFailedException($"建立UDP连接失败:{this._hostName}:{this._port}", e);
+                throw new ConnectFailedException($"建立UDP连接失败:{_hostName}:{_port}", e);
             }
             await Task.CompletedTask;
         }
@@ -68,6 +63,36 @@ namespace Communication.Bus.PhysicalPort
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)
         {
             await _client!.SendAsync(data, data.Length);
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc/>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    _client?.Dispose();
+                }
+
+                // 释放其他非托管资源
+
+                _disposed = true;
+            }
+        }
+
+        /// <inheritdoc/>
+        ~UdpClient()
+        {
+            Dispose(false);
         }
     }
 }

@@ -169,6 +169,8 @@ namespace Communication.Bus
             var task = this.CloseAsync();
             task.ConfigureAwait(false);
             task.Wait();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

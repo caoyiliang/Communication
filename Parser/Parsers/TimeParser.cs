@@ -30,7 +30,7 @@ namespace Parser.Parsers
             TimeInterval = timeInterval;
             _timer = new NormalTimer();
             _bytes = new RemainBytes();
-            Task.Run(async () => await HandleDataAsync());
+            _ = Task.Run(HandleDataAsync);
         }
 
         /// <inheritdoc/>
@@ -51,7 +51,7 @@ namespace Parser.Parsers
         /// <inheritdoc/>
         public void Dispose()
         {
-            this._isDisposeRequested = true;
+            _isDisposeRequested = true;
             GC.SuppressFinalize(this);
         }
 

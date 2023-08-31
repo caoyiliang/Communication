@@ -23,8 +23,8 @@ namespace Parser.Parsers
         public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength)
         {
             if (head == null || head.Length == 0) throw new Exception("必须传入帧头");
-            this._head = head;
-            this.OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
+            _head = head;
+            OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
         }
 
         /// <summary>
@@ -33,8 +33,8 @@ namespace Parser.Parsers
         /// <param name="getDataLength">获取数据包长度</param>
         public HeadLengthParser(GetDataLengthEventHandler getDataLength)
         {
-            this._head = new byte[0];
-            this.OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
+            _head = Array.Empty<byte>();
+            OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
         }
 
         /// <inheritdoc/>

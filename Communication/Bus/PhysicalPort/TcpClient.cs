@@ -11,8 +11,9 @@ namespace Communication.Bus.PhysicalPort
     {
         private System.Net.Sockets.TcpClient? _client;
         private NetworkStream? _networkStream;
-        private string _hostName;
-        private int _port;
+        private readonly string _hostName;
+        private readonly int _port;
+        private bool _disposed = false;
         /// <summary>
         /// TCP客户端
         /// </summary>
@@ -27,8 +28,8 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task CloseAsync()
         {
-            this._networkStream?.Close();
-            this._client?.Close();
+            _networkStream?.Close();
+            _client?.Close();
             await Task.CompletedTask;
         }
 
@@ -93,8 +94,32 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public void Dispose()
         {
-            _networkStream?.Dispose();
-            _client?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc/>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // 释放托管资源
+                    _networkStream?.Dispose();
+                    _client?.Dispose();
+                }
+
+                // 释放其他非托管资源
+
+                _disposed = true;
+            }
+        }
+
+        /// <inheritdoc/>
+        ~TcpClient()
+        {
+            Dispose(false);
         }
     }
 }
