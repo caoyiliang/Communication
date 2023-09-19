@@ -66,7 +66,7 @@ namespace CondorPortProtocolDemo
 
         public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
         {
-            return await ProcessUtils.ReTry(async () => (await _condorPort.RequestAsync<ReadValueReq, ReadValueRsp, (List<decimal> recData, int result)>(clientId, new ReadValueReq(), timeOut)).RecData, tryCount, cancelToken);
+            return await ProcessUtils.ReTry(async () => (await _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut)).RecData, tryCount, cancelToken);
         }
 
         private async Task ReadValueRspEvent(int clientId, (List<decimal> recData, int result) rs)
