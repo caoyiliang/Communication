@@ -53,7 +53,6 @@ namespace TopPortLib.Interfaces
         /// </summary>
         /// <typeparam name="TReq">请求类型</typeparam>
         /// <typeparam name="TRsp">接收类型</typeparam>
-        /// <typeparam name="T">返回类型</typeparam>
         /// <param name="clientId">客户端ID</param>
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>

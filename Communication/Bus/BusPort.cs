@@ -7,7 +7,9 @@ namespace Communication.Bus
     /// <summary>
     /// 处理总线
     /// </summary>
-    public class BusPort : IBusPort
+    /// <param name="physicalPort">物理口</param>
+    /// <exception cref="NullReferenceException"></exception>
+    public class BusPort(IPhysicalPort physicalPort) : IBusPort
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<BusPort>();
         private const int BUFFER_SIZE = 8192;
@@ -15,7 +17,7 @@ namespace Communication.Bus
         private TaskCompletionSource<bool>? _closeTcs;
         private volatile bool _isActiveClose = true;//是否主动断开
         private readonly SemaphoreSlim _semaphore4Write = new(1, 1);
-        private IPhysicalPort _physicalPort;
+        private IPhysicalPort _physicalPort = physicalPort ?? throw new NullReferenceException("physicalPort is null");
         private bool IsOpen { get => _physicalPort.IsOpen; }
 
         /// <inheritdoc/>
@@ -26,16 +28,6 @@ namespace Communication.Bus
         public event DisconnectEventHandler? OnDisconnect;
         /// <inheritdoc/>
         public event ConnectEventHandler? OnConnect;
-
-        /// <summary>
-        /// 处理总线
-        /// </summary>
-        /// <param name="physicalPort">物理口</param>
-        /// <exception cref="NullReferenceException"></exception>
-        public BusPort(IPhysicalPort physicalPort)
-        {
-            this._physicalPort = physicalPort ?? throw new NullReferenceException("physicalPort is null");
-        }
 
         /// <inheritdoc/>
         public async Task OpenAsync()

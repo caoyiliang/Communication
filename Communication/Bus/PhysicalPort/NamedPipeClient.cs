@@ -7,23 +7,13 @@ namespace Communication.Bus.PhysicalPort
     /// <summary>
     /// 命名管道客户端
     /// </summary>
-    public class NamedPipeClient : IPhysicalPort, IDisposable
+    /// <param name="pipeName">名称</param>
+    public class NamedPipeClient(string pipeName) : IPhysicalPort, IDisposable
     {
-        private readonly string _pipeName;
-        private readonly NamedPipeClientStream _client;
+        private readonly NamedPipeClientStream _client = new(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
         private bool _disposed = false;
         /// <inheritdoc/>
         public bool IsOpen { get => _client.IsConnected; }
-
-        /// <summary>
-        /// 命名管道客户端
-        /// </summary>
-        /// <param name="pipeName">名称</param>
-        public NamedPipeClient(string pipeName)
-        {
-            _pipeName = pipeName;
-            _client = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
-        }
 
         /// <inheritdoc/>
         public async Task CloseAsync()
@@ -41,7 +31,7 @@ namespace Communication.Bus.PhysicalPort
             }
             catch (Exception e)
             {
-                throw new ConnectFailedException($"建立NamedPipe连接失败:{_pipeName}", e);
+                throw new ConnectFailedException($"建立NamedPipe连接失败:{pipeName}", e);
             }
         }
 

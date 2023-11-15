@@ -6,24 +6,14 @@ namespace Communication.Bus.PhysicalPort
     /// <summary>
     /// UDP
     /// </summary>
-    public class UdpClient : IPhysicalPort, IDisposable
+    /// <param name="hostName">HostName</param>
+    /// <param name="port">Port</param>
+    public class UdpClient(string hostName, int port) : IPhysicalPort, IDisposable
     {
         private System.Net.Sockets.UdpClient? _client;
-        private readonly string _hostName;
-        private readonly int _port;
         private bool _disposed = false;
         /// <inheritdoc/>
         public bool IsOpen { get; private set; }
-        /// <summary>
-        /// UDP
-        /// </summary>
-        /// <param name="hostName">HostName</param>
-        /// <param name="port">Port</param>
-        public UdpClient(string hostName, int port)
-        {
-            _hostName = hostName;
-            _port = port;
-        }
 
         /// <inheritdoc/>
         public async Task CloseAsync()
@@ -38,12 +28,12 @@ namespace Communication.Bus.PhysicalPort
         {
             try
             {
-                _client = new System.Net.Sockets.UdpClient(_hostName, _port);
+                _client = new System.Net.Sockets.UdpClient(hostName, port);
                 IsOpen = true;
             }
             catch (Exception e)
             {
-                throw new ConnectFailedException($"建立UDP连接失败:{_hostName}:{_port}", e);
+                throw new ConnectFailedException($"建立UDP连接失败:{hostName}:{port}", e);
             }
             await Task.CompletedTask;
         }

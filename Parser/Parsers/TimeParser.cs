@@ -14,7 +14,9 @@ namespace Parser.Parsers
         private volatile bool _isDisposeRequested = false;
         private readonly RemainBytes _bytes;
         private readonly SemaphoreSlim _bytesSemaphore = new(1, 1);
-        private readonly ITimer _timer;
+#pragma warning disable CA1859 // 尽可能使用具体类型以提高性能
+        private readonly Timers.ITimer _timer;
+#pragma warning restore CA1859 // 尽可能使用具体类型以提高性能
         /// <summary>
         /// 时间间隔
         /// </summary>

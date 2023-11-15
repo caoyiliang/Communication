@@ -2,7 +2,7 @@
 {
     internal class NormalTimer : ITimer
     {
-        private AutoResetEvent _autoResetEvent = new AutoResetEvent(false);
+        private readonly AutoResetEvent _autoResetEvent = new(false);
         public void Release()
         {
             _autoResetEvent.Set();

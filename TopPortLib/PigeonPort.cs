@@ -46,7 +46,7 @@ namespace TopPortLib
             _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
         }
 
-        private void InitActivelyPush(object obj, Type type, object data)
+        private static void InitActivelyPush(object obj, Type type, object data)
         {
             var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
             eventMethod?.Invoke(obj, new object?[] { type.GetMethod("GetResult")!.Invoke(data, null) });

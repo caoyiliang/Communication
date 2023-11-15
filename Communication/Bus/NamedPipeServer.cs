@@ -8,13 +8,13 @@ namespace Communication.Bus
     /// <summary>
     /// 命名管道服务端
     /// </summary>
-    public class NamedPipeServer : IPhysicalPort_Server
+    /// <param name="pipeName">名称</param>
+    /// <param name="maxNumberOfServerInstances">最大服务数</param>
+    /// <param name="bufferSize">读缓存</param>
+    public class NamedPipeServer(string pipeName, int maxNumberOfServerInstances = 100, int bufferSize = 8192) : IPhysicalPort_Server
     {
-        private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
+        private static readonly ILogger _logger = Logs.LogFactory.GetLogger<NamedPipeServer>();
         private readonly ConcurrentDictionary<int, NamedPipeServerStream> _dicClients = new();
-        private readonly int _bufferSize;
-        private readonly string _pipeName;
-        private readonly int _maxNumberOfServerInstances;
         private CancellationTokenSource? _stopCts;
         private TaskCompletionSource<bool>? _stopTcs;
         /// <inheritdoc/>
@@ -25,19 +25,6 @@ namespace Communication.Bus
         public event ClientConnectEventHandler? OnClientConnect;
         /// <inheritdoc/>
         public event ClientDisconnectEventHandler? OnClientDisconnect;
-
-        /// <summary>
-        /// 命名管道服务端
-        /// </summary>
-        /// <param name="pipeName">名称</param>
-        /// <param name="maxNumberOfServerInstances">最大服务数</param>
-        /// <param name="bufferSize">读缓存</param>
-        public NamedPipeServer(string pipeName, int maxNumberOfServerInstances = 100, int bufferSize = 8192)
-        {
-            this._pipeName = pipeName;
-            this._maxNumberOfServerInstances = maxNumberOfServerInstances;
-            this._bufferSize = bufferSize;
-        }
 
         /// <inheritdoc/>
         public async Task StartAsync()
@@ -103,12 +90,12 @@ namespace Communication.Bus
                 {
                     while (!_stopCts!.IsCancellationRequested)
                     {
-                        if (clientCounter >= _maxNumberOfServerInstances)
+                        if (clientCounter >= maxNumberOfServerInstances)
                         {
                             await Task.Delay(1000);
                             continue;
                         }
-                        var client = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, _maxNumberOfServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                        var client = new NamedPipeServerStream(pipeName, PipeDirection.InOut, maxNumberOfServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
                         try
                         {
                             await client.WaitForConnectionAsync();
@@ -160,7 +147,7 @@ namespace Communication.Bus
                 using (client)
                 {
                     var amountRead = 0;
-                    var buf = new byte[this._bufferSize];
+                    var buf = new byte[bufferSize];
                     while (!_stopCts!.IsCancellationRequested && client.IsConnected)
                     {
                         amountRead = await client.ReadAsync(buf, 0, buf.Length, _stopCts.Token);

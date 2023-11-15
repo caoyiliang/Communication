@@ -44,6 +44,8 @@ namespace Crow
             var task = StopAsync();
             task.ConfigureAwait(false);
             task.Wait();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc/>

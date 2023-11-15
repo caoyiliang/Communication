@@ -7,23 +7,13 @@ namespace Communication.Bus.PhysicalPort
     /// <summary>
     /// TCP客户端
     /// </summary>
-    public class TcpClient : IPhysicalPort, IDisposable
+    /// <param name="hostName">域名/IP</param>
+    /// <param name="port">端口</param>
+    public class TcpClient(string hostName, int port) : IPhysicalPort, IDisposable
     {
         private System.Net.Sockets.TcpClient? _client;
         private NetworkStream? _networkStream;
-        private readonly string _hostName;
-        private readonly int _port;
         private bool _disposed = false;
-        /// <summary>
-        /// TCP客户端
-        /// </summary>
-        /// <param name="hostName">域名/IP</param>
-        /// <param name="port">端口</param>
-        public TcpClient(string hostName, int port)
-        {
-            _hostName = hostName;
-            _port = port;
-        }
 
         /// <inheritdoc/>
         public async Task CloseAsync()
@@ -64,12 +54,12 @@ namespace Communication.Bus.PhysicalPort
             try
             {
                 _client = new System.Net.Sockets.TcpClient();
-                await _client.ConnectAsync(_hostName, _port);
+                await _client.ConnectAsync(hostName, port);
                 _networkStream = _client.GetStream();
             }
             catch (Exception e)
             {
-                throw new ConnectFailedException($"建立TCP连接失败:{_hostName}:{_port}", e);
+                throw new ConnectFailedException($"建立TCP连接失败:{hostName}:{port}", e);
             }
         }
 

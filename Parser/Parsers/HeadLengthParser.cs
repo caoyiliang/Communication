@@ -33,7 +33,7 @@ namespace Parser.Parsers
         /// <param name="getDataLength">获取数据包长度</param>
         public HeadLengthParser(GetDataLengthEventHandler getDataLength)
         {
-            _head = Array.Empty<byte>();
+            _head = [];
             OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
         }
 

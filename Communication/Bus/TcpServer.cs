@@ -10,13 +10,13 @@ namespace Communication.Bus
     /// <summary>
     /// TCP服务端
     /// </summary>
-    public class TcpServer : IPhysicalPort_Server
+    /// <param name="hostName">服务端IP</param>
+    /// <param name="port">服务端端口</param>
+    /// <param name="bufferSize">缓存默认8192</param>
+    public class TcpServer(string hostName, int port, int bufferSize = 8192) : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
         private readonly ConcurrentDictionary<int, (TcpClient client, string hostName, int port)> _dicClients = new();
-        private readonly string _hostName;
-        private readonly int _port;
-        private readonly int _bufferSize;
         private TcpListener? _listener;
         private CancellationTokenSource? _stopCts;
         private TaskCompletionSource<bool>? _stopTcs;
@@ -31,25 +31,12 @@ namespace Communication.Bus
         /// <inheritdoc/>
         public event ClientDisconnectEventHandler? OnClientDisconnect;
 
-        /// <summary>
-        /// TCP服务端
-        /// </summary>
-        /// <param name="hostName"></param>
-        /// <param name="port"></param>
-        /// <param name="bufferSize"></param>
-        public TcpServer(string hostName, int port, int bufferSize = 8192)
-        {
-            _hostName = hostName;
-            _port = port;
-            _bufferSize = bufferSize;
-        }
-
         /// <inheritdoc/>
         public async Task StartAsync()
         {
             if (this.IsActive) return;
 
-            _listener = new TcpListener(IPAddress.Parse(_hostName), _port);
+            _listener = new TcpListener(IPAddress.Parse(hostName), port);
             _listener.Start();
             _stopCts = new CancellationTokenSource();
             _stopTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -202,9 +189,9 @@ namespace Communication.Bus
                     {
                         _logger.Warn(ex);
                     }
-                    foreach (var c in _dicClients.Values)
+                    foreach (var (client, hostName, port) in _dicClients.Values)
                     {
-                        c.client.Close();
+                        client.Close();
                     }
                     _dicClients.Clear();
                     _stopTcs?.TrySetResult(true);
@@ -214,7 +201,7 @@ namespace Communication.Bus
             await Task.CompletedTask;
         }
 
-        private byte[] KeepAlive(int onOff, int keepAliveTime, int keepAliveInterval)
+        private static byte[] KeepAlive(int onOff, int keepAliveTime, int keepAliveInterval)
         {
             byte[] buffer = new byte[12];
             BitConverter.GetBytes(onOff).CopyTo(buffer, 0);
@@ -231,7 +218,7 @@ namespace Communication.Bus
                 using (client)
                 {
                     var amountRead = 0;
-                    var buf = new byte[this._bufferSize];
+                    var buf = new byte[bufferSize];
                     while (!_stopCts!.IsCancellationRequested && client.Connected)
                     {
                         amountRead = await clientStream.ReadAsync(buf, 0, buf.Length, _stopCts.Token);
@@ -267,7 +254,7 @@ namespace Communication.Bus
                 {
                     _logger.Error(e, "Handle client disconnect error");
                 }
-                _dicClients.TryRemove(clientId, out var value);
+                _dicClients.TryRemove(clientId, out _);
             }
         }
     }
