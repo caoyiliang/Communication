@@ -1,6 +1,7 @@
 ﻿using Communication.Exceptions;
 using Communication.Interfaces;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace Communication.Bus.PhysicalPort
 {
@@ -54,6 +55,19 @@ namespace Communication.Bus.PhysicalPort
             try
             {
                 _client = new System.Net.Sockets.TcpClient();
+                // 获取底层Socket对象
+                Socket socket = _client.Client;
+
+                // 启用Keep-Alive
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                // 设置Keep-Alive参数
+                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
+                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 100);
+                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
+
                 await _client.ConnectAsync(hostName, port);
                 _networkStream = _client.GetStream();
             }
@@ -61,6 +75,15 @@ namespace Communication.Bus.PhysicalPort
             {
                 throw new ConnectFailedException($"建立TCP连接失败:{hostName}:{port}", e);
             }
+        }
+
+        private static byte[] KeepAlive(int onOff, int keepAliveTime, int keepAliveInterval)
+        {
+            byte[] buffer = new byte[12];
+            BitConverter.GetBytes(onOff).CopyTo(buffer, 0);
+            BitConverter.GetBytes(keepAliveTime).CopyTo(buffer, 4);
+            BitConverter.GetBytes(keepAliveInterval).CopyTo(buffer, 8);
+            return buffer;
         }
 
         /// <inheritdoc/>

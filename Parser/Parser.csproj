@@ -4,7 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>8.0.0</Version>
+		<Version>8.0.1</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>更新.net8</PackageReleaseNotes>

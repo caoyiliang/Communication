@@ -22,7 +22,7 @@ async Task TcpServer_ReceiveOriginalDataFromTcpClient(byte[] data, int size, int
 
 async Task TcpServer_ClientConnect(int clientId)
 {
-    await tcpServer!.SendDataAsync(clientId, new byte[] { 0x01, 0x0d });
+    await tcpServer!.SendDataAsync(clientId, [0x01, 0x0d]);
     var info = await ((TcpServer)tcpServer!).GetClientInfo(clientId);
 
     if (info.HasValue)

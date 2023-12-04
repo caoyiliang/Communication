@@ -168,7 +168,7 @@ namespace Communication.Bus
                         }
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
-                            _ = client.Client.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 100), null);
+                            _ = client.Client.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
                         }
                         _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                     }

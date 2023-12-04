@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>8.0.0</Version>
+    <Version>8.0.1</Version>
     <Description>通讯物理口封装</Description>
-    <PackageReleaseNotes>支持.net8</PackageReleaseNotes>
+    <PackageReleaseNotes>修复TCPclient在网络断开情况下快速发现</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>
     <Authors>CSoft</Authors>
