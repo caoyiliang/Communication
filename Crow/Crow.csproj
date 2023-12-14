@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>8.0.2</Version>
+		<Version>8.0.3</Version>
 		<Description>数据收发队列</Description>
 		<PackageId>CSoft.Crow</PackageId>
 		<Authors>CSoft</Authors>
 		<Company>CSoft</Company>
-		<PackageReleaseNotes>修复公共库bug</PackageReleaseNotes>
+		<PackageReleaseNotes>修复推送对端连接成功的严重问题</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>

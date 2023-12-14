@@ -48,10 +48,6 @@ namespace Communication.Bus
                 while (!_isActiveClose)
                 {
                     await OpenAsync_();
-                    if (OnConnect is not null)
-                    {
-                        await OnConnect.Invoke();
-                    }
                     await ReadBusAsync();
                     if (OnDisconnect is not null)
                     {
@@ -145,6 +141,10 @@ namespace Communication.Bus
                     await _physicalPort.OpenAsync();
                     _closeCts = new CancellationTokenSource();
                     _closeTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    if (OnConnect is not null)
+                    {
+                        await OnConnect.Invoke();
+                    }
                     return;
                 }
                 catch (Exception ex)
