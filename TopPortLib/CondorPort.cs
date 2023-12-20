@@ -15,7 +15,7 @@ namespace TopPortLib
         private readonly ITopPort_Server _topPortServer;
         private readonly int _defaultTimeout;
         private readonly Type[] _typeList;
-        private readonly List<ReqInfo> _reqInfos = new();
+        private readonly List<ReqInfo> _reqInfos = [];
         /// <inheritdoc/>
         public IPhysicalPort_Server PhysicalPort { get => _topPortServer.PhysicalPort; }
         /// <inheritdoc/>
@@ -47,7 +47,7 @@ namespace TopPortLib
         private static void InitActivelyPush(object obj, Type type, object data, int clientId)
         {
             var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
-            eventMethod?.Invoke(obj, new object?[] { clientId, type.GetMethod("GetResult")!.Invoke(data, null) });
+            eventMethod?.Invoke(obj, [clientId, type.GetMethod("GetResult")!.Invoke(data, null)]);
         }
 
         private async Task TopPort_OnReceiveParsedData(int clientId, byte[] data)
