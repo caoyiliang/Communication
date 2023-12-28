@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-    <Version>8.0.4</Version>
+    <Version>8.0.6</Version>
     <Description>通讯口使用类库</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>对共用链路支持，解决方案：上层自行管理物理口总线</PackageReleaseNotes>
+    <PackageReleaseNotes>Linux下连接状态优化</PackageReleaseNotes>
     <PackageId>CSoft.TopPortLib</PackageId>
     <Authors>CSoft</Authors>
     <Company>CSoft</Company>

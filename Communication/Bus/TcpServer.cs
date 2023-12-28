@@ -37,6 +37,26 @@ namespace Communication.Bus
             if (this.IsActive) return;
 
             _listener = new TcpListener(IPAddress.Parse(hostName), port);
+            _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _listener.Server.NoDelay = true; // 禁用 Nagle 算法，可以提高实时性
+#if NETSTANDARD2_0
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // 在 Linux 上通过系统参数配置 TCP Keep-Alive
+                string procPath = "/proc/sys/net/ipv4/";
+                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "100");
+                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
+                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "3"); // 设置尝试次数
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
+            }
+#else
+            _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
+            _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 3);
+#endif
             _listener.Start();
             _stopCts = new CancellationTokenSource();
             _stopTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -165,10 +185,6 @@ namespace Communication.Bus
                         catch (Exception e)
                         {
                             _logger.Error(e, "Handle client connect error");
-                        }
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        {
-                            _ = client.Client.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
                         }
                         _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                     }

@@ -58,16 +58,27 @@ namespace Communication.Bus.PhysicalPort
                 // 获取底层Socket对象
                 Socket socket = _client.Client;
 
+                socket.NoDelay = true;
                 // 启用Keep-Alive
                 socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 // 设置Keep-Alive参数
-                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
-                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 100);
-                //socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
+#if NETSTANDARD2_0
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    // 在 Linux 上通过系统参数配置 TCP Keep-Alive
+                    string procPath = "/proc/sys/net/ipv4/";
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "100");
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "3"); // 设置尝试次数
+                }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
-
+#else
+                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
+                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 3);
+                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
+#endif
                 await _client.ConnectAsync(hostName, port);
                 _networkStream = _client.GetStream();
             }
