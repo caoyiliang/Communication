@@ -77,7 +77,7 @@ public class PigeonPortProtocol : IPigeonPortProtocol
     public async Task<List<decimal>?> ReadSignalValueAsync(string address = "01", int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
     {
         if (!_isConnect) throw new NotConnectedException();
-        return await ProcessUtils.ReTry(async () => (await _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut)).RecData, tryCount, cancelToken);
+        return (await _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut).ReTry(tryCount, cancelToken))?.RecData;
     }
 
 

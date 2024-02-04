@@ -4,6 +4,7 @@ using CondorPortProtocolDemo.Request;
 using CondorPortProtocolDemo.Response;
 using LogInterface;
 using Parser.Parsers;
+using System.Xml.Linq;
 using TopPortLib;
 using TopPortLib.Interfaces;
 using Utils;
@@ -66,7 +67,7 @@ namespace CondorPortProtocolDemo
 
         public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
         {
-            return await ProcessUtils.ReTry(async () => (await _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut)).RecData, tryCount, cancelToken);
+            return (await _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut).ReTry(tryCount, cancelToken))?.RecData;
         }
 
         private async Task ReadValueRspEvent(int clientId, (List<decimal> recData, int result) rs)
