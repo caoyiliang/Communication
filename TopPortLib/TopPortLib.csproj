@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-    <Version>8.0.7</Version>
+    <Version>8.0.8</Version>
     <Description>通讯口使用类库</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes>更新CSoft.Utils依赖</PackageReleaseNotes>
