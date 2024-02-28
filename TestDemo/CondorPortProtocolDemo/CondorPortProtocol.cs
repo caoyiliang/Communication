@@ -4,7 +4,6 @@ using CondorPortProtocolDemo.Request;
 using CondorPortProtocolDemo.Response;
 using LogInterface;
 using Parser.Parsers;
-using System.Xml.Linq;
 using TopPortLib;
 using TopPortLib.Interfaces;
 using Utils;

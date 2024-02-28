@@ -1,6 +1,5 @@
 ﻿using Communication;
 using Communication.Interfaces;
-using Parser.Interfaces;
 using System.Reflection;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
@@ -45,20 +44,6 @@ namespace TopPortLib
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
             _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
-        }
-
-        /// <summary>
-        /// 该构造为共用通讯链路的情况准备
-        /// 使用该构造IBusPort的开关将自行管理
-        /// </summary>
-        /// <param name="instance">主动推出事件所在实体</param>
-        /// <param name="busPort">物理口总线</param>
-        /// <param name="parser">分包器</param>
-        /// <param name="defaultTimeout">超时时间，默认5秒</param>
-        /// <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
-        public PigeonPort(object instance, IBusPort busPort, IParser parser, int defaultTimeout = 5000, int timeDelayAfterSending = 20) : this(instance, new TopPort(busPort, parser), defaultTimeout, timeDelayAfterSending)
-        {
-
         }
 
         private static void InitActivelyPush(object obj, Type type, object data)

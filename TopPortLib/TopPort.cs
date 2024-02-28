@@ -14,7 +14,6 @@ namespace TopPortLib
     {
         private readonly IBusPort _port;
         private readonly IParser _parser;
-        private readonly bool _autogesto;
 
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
@@ -37,30 +36,16 @@ namespace TopPortLib
             _port.OnReceiveOriginalData += parser.ReceiveOriginalDataAsync;
         }
 
-        /// <summary>
-        /// 该构造为485等共用通讯链路的情况准备
-        /// 使用该构造IBusPort的开关将自行管理
-        /// </summary>
-        /// <param name="busPort">物理口总线</param>
-        /// <param name="parser">解析器</param>
-        public TopPort(IBusPort busPort, IParser parser)
-        {
-            _autogesto = true;
-            _parser = parser;
-            _port = busPort;
-            _port.OnReceiveOriginalData += parser.ReceiveOriginalDataAsync;
-        }
-
         /// <inheritdoc/>
         public async Task CloseAsync()
         {
-            if (!_autogesto) await _port.CloseAsync();
+            await _port.CloseAsync();
         }
 
         /// <inheritdoc/>
         public async Task OpenAsync()
         {
-            if (!_autogesto) await _port.OpenAsync();
+            await _port.OpenAsync();
         }
 
         /// <inheritdoc/>
