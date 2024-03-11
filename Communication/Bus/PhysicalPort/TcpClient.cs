@@ -59,8 +59,6 @@ namespace Communication.Bus.PhysicalPort
                 Socket socket = _client.Client;
 
                 socket.NoDelay = true;
-                // 启用Keep-Alive
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 // 设置Keep-Alive参数
 #if NETSTANDARD2_0
@@ -68,15 +66,16 @@ namespace Communication.Bus.PhysicalPort
                 {
                     // 在 Linux 上通过系统参数配置 TCP Keep-Alive
                     string procPath = "/proc/sys/net/ipv4/";
-                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "100");
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "5");
                     File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
-                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "3"); // 设置尝试次数
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "1"); // 设置尝试次数
                 }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
+                    _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 3000, 200), null);
 #else
-                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
-                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 3);
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 3);
+                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 2);
                 socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
 #endif
                 await _client.ConnectAsync(hostName, port);

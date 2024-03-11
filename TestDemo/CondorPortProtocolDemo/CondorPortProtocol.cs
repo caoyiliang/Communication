@@ -66,7 +66,8 @@ namespace CondorPortProtocolDemo
 
         public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
         {
-            return (await _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut).ReTry(tryCount, cancelToken))?.RecData;
+            Func<Task<ReadValueRsp>> func = () => _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut);
+            return (await func.ReTry(tryCount, cancelToken))?.RecData;
         }
 
         private async Task ReadValueRspEvent(int clientId, (List<decimal> recData, int result) rs)

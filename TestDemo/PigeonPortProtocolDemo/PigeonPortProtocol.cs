@@ -15,7 +15,7 @@ public class PigeonPortProtocol : IPigeonPortProtocol
 {
     private static readonly ILogger _logger = Logs.LogFactory.GetLogger<PigeonPortProtocol>();
     private readonly IPigeonPort _pigeonPort;
-    internal static readonly byte[] Foot = new byte[] { 0x0d };
+    internal static readonly byte[] Foot = [0x0d];
 
     private bool _isConnect = false;
     public bool IsConnect => _isConnect;
@@ -77,7 +77,8 @@ public class PigeonPortProtocol : IPigeonPortProtocol
     public async Task<List<decimal>?> ReadSignalValueAsync(string address = "01", int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
     {
         if (!_isConnect) throw new NotConnectedException();
-        return (await _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut).ReTry(tryCount, cancelToken))?.RecData;
+        Func<Task<ReadValueRsp>> func = () => _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut);
+        return (await func.ReTry(tryCount, cancelToken))?.RecData;
     }
 
 

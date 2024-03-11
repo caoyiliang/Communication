@@ -44,18 +44,19 @@ namespace Communication.Bus
             {
                 // 在 Linux 上通过系统参数配置 TCP Keep-Alive
                 string procPath = "/proc/sys/net/ipv4/";
-                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "100");
+                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "5");
                 File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
-                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "3"); // 设置尝试次数
+                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "1"); // 设置尝试次数
             }
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 100, 3), null);
+                _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 5000, 3000), null);
             }
 #else
             _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-            _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 100);
+            _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 5);
             _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 3);
+            _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
 #endif
             _listener.Start();
             _stopCts = new CancellationTokenSource();
