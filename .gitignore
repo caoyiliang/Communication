@@ -36,3 +36,5 @@
 /TestDemo/CondorPortProtocolDemo/obj
 /TestDemo/TcpClient/bin
 /TestDemo/TcpClient/obj
+/TestDemo/ParserTest/bin
+/TestDemo/ParserTest/obj
