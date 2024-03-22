@@ -49,16 +49,16 @@ namespace Crow
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync(TReq req, int timeout = -1, bool background = true)
+        public async Task<TRsp> RequestAsync(TReq req, int timeout = -1)
         {
-            var rsp = await RequestAsync(req, true, timeout, background);
+            var rsp = await RequestAsync(req, true, timeout);
             return rsp!;
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync(TReq req, int timeout = -1, bool background = true)
+        public async Task SendAsync(TReq req, int timeout = -1)
         {
-            await RequestAsync(req, false, timeout, background);
+            await RequestAsync(req, false, timeout);
         }
 
         /// <inheritdoc/>
@@ -80,9 +80,6 @@ namespace Crow
                         else
                             continue;
                     }
-                    if (!data.Background)
-                        if (data.Timeout!.IsCompleted)
-                            continue;
                     _rsp?.TrySetCanceled();
                     _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
                     try
@@ -104,7 +101,8 @@ namespace Crow
                     }
                     if (data.NeedRsp)
                     {
-                        var tasks = new List<Task>() { _rsp.Task, _startStop.Task, data.Timeout };
+                        var timeOut = Task.Delay(data.Time);
+                        var tasks = new List<Task>() { _rsp.Task, _startStop.Task, timeOut };
                         var task = await Task.WhenAny(tasks);
                         if (task == _startStop.Task)
                         {
@@ -123,7 +121,7 @@ namespace Crow
                                 catch { }
                             }
                         }
-                        else if (data.Background && (task == data.Timeout))
+                        else if (task == timeOut)
                         {
                             data.Rsp.TrySetException(new TimeoutException($"background timeout"));
                         }
@@ -154,19 +152,14 @@ namespace Crow
             _isActive = false;
         }
 
-        private async Task<TRsp?> RequestAsync(TReq req, bool needRsp, int timeout, bool background = true)
+        private async Task<TRsp?> RequestAsync(TReq req, bool needRsp, int timeout)
         {
             if (!_isActive) throw new CrowStopWorkingException();
             if (_queue!.Count > 10) throw new CrowBusyException();
             var rsp = new TaskCompletionSource<TRsp?>(TaskCreationOptions.RunContinuationsAsynchronously);
             var tm = timeout == -1 ? _defaultTimeout : timeout;
-            var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm, Background = background, Timeout = Task.Delay(tm) };
+            var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm };
             _queue.Enqueue(data);
-            if (!background)
-            {
-                if (await Task.WhenAny(rsp.Task, data.Timeout) == data.Timeout)
-                    throw new TimeoutException($"timeout={tm}");
-            }
             return await rsp.Task;
         }
         class ReqInfo
@@ -174,9 +167,7 @@ namespace Crow
             public TReq Req { get; set; } = default!;
             public bool NeedRsp { get; set; }
             public TaskCompletionSource<TRsp?> Rsp { get; set; } = null!;
-            public Task Timeout { get; set; } = null!;
             public int Time { get; set; }
-            public bool Background { get; set; }
         }
     }
 }
