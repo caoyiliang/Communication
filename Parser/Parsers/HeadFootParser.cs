@@ -64,8 +64,7 @@ namespace Parser.Parsers
         protected override int FindEndIndex()
         {
             var rsp = FindIndex(_startIndex + _head.Length, _foot);
-            if (rsp.Code != StateCode.Success) return -1;
-            return rsp.Index + _foot.Length;
+            return rsp.Code == StateCode.Success ? rsp.Index + _foot.Length : -1;
         }
 
         /// <inheritdoc/>

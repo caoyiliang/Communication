@@ -31,8 +31,7 @@
         protected override int FindEndIndex()
         {
             var rsp = FindIndex(_bytes.StartIndex, _foot);
-            if (rsp.Code != StateCode.Success) return -1;
-            return rsp.Index + _foot.Length;
+            return rsp.Code == StateCode.Success ? rsp.Index + _foot.Length : -1;
         }
     }
 }
