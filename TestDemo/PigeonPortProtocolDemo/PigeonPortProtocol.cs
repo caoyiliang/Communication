@@ -74,7 +74,7 @@ public class PigeonPortProtocol : IPigeonPortProtocol
     public Task CloseAsync() => _pigeonPort.StopAsync();
 
     /// <inheritdoc/>
-    public async Task<List<decimal>?> ReadSignalValueAsync(string address = "01", int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
+    public async Task<List<decimal>?> ReadSignalValueAsync(string address = "01", int tryCount = 0, int timeOut = -1, CancellationToken cancelToken = default)
     {
         if (!_isConnect) throw new NotConnectedException();
         Func<Task<ReadValueRsp>> func = () => _pigeonPort.RequestAsync<ReadValueReq, ReadValueRsp>(new ReadValueReq(address), timeOut);

@@ -14,7 +14,7 @@ namespace CondorPortProtocolDemo
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<CondorPortProtocol>();
         private readonly ICondorPort _condorPort;
-        internal static readonly byte[] Foot = new byte[] { 0x0d };
+        internal static readonly byte[] Foot = [0x0d];
         private bool _isListened = false;
         public bool IsListened => _isListened;
 
@@ -64,7 +64,7 @@ namespace CondorPortProtocolDemo
             _isListened = false;
         }
 
-        public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null)
+        public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationToken cancelToken = default)
         {
             Func<Task<ReadValueRsp>> func = () => _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut);
             return (await func.ReTry(tryCount, cancelToken))?.RecData;

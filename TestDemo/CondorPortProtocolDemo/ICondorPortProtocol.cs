@@ -42,6 +42,6 @@ namespace CondorPortProtocolDemo
         /// <param name="timeOut">超时时间(-1则使用构造传入超时)</param>
         /// <param name="cancelToken">取消</param>
         /// <returns>信号量值</returns>
-        Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationTokenSource? cancelToken = null);
+        Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationToken cancelToken = default);
     }
 }
