@@ -73,10 +73,20 @@ namespace Communication.Bus.PhysicalPort
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 3000, 200), null);
 #else
-                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 3);
-                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 2);
-                socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
+                try
+                {
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 3);
+                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 2);
+                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
+                }
+                catch (Exception)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 5000, 3000), null);
+                    }
+                }
 #endif
                 await _client.ConnectAsync(hostName, port);
                 _networkStream = _client.GetStream();
