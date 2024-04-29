@@ -3,12 +3,11 @@ using TopPortLib.Interfaces;
 
 namespace PigeonPortProtocolDemo.Request;
 
-internal class ReadValueReq : IByteStream
+internal class ReadValueReq(string addr) : IAsyncRequest
 {
-    private readonly string _addr = "01";
-    public ReadValueReq(string addr)
+    public byte[]? Check()
     {
-        this._addr = addr;
+        return null;
     }
 
     public byte[] ToBytes()
@@ -18,6 +17,6 @@ internal class ReadValueReq : IByteStream
 
     public override string ToString()
     {
-        return $"#{_addr}\r";
+        return $"#{addr}\r";
     }
 }

@@ -56,7 +56,7 @@ namespace TopPortLib.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1) where TReq : IByteStream;
+        Task<TRsp> RequestAsync<TReq, TRsp>(TReq req, int timeout = -1) where TReq : IAsyncRequest;
 
         /// <summary>
         /// 队列只发

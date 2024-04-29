@@ -11,7 +11,7 @@ public interface IAsyncResponse<T>
     /// </summary>
     /// <param name="bytes">收到的命令</param>
     /// <returns>是否是该返回</returns>
-    bool Check(byte[] bytes);
+    (bool Type, byte[]? CheckBytes) Check(byte[] bytes);
 
     /// <summary>
     /// 从命令中解析有用数据

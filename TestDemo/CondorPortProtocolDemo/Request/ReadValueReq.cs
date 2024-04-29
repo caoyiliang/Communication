@@ -3,10 +3,11 @@ using TopPortLib.Interfaces;
 
 namespace CondorPortProtocolDemo.Request;
 
-internal class ReadValueReq : IByteStream
+internal class ReadValueReq : IAsyncRequest
 {
-    public ReadValueReq()
+    public byte[]? Check()
     {
+        return null;
     }
 
     public byte[] ToBytes()

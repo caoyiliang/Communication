@@ -55,6 +55,7 @@ namespace TopPortLib
             await RespondedDataAsync(clientId, data);
             Type? rspType = null;
             object? rsp = null;
+            byte[]? checkBytes = null;
             try
             {
                 foreach (var item in _typeList)
@@ -72,10 +73,13 @@ namespace TopPortLib
                     if (obj is null)
                         throw new ResponseCreateFailedException("Response创建失败");
                     var checkMethod = item.GetMethod("Check") ?? throw new CheckMethodNotFoundException("Check方法不存在");
-                    if ((bool)checkMethod.Invoke(obj, new object[] { data })!)
+                    var rs = ((bool Type, byte[]? CheckBytes))checkMethod.Invoke(obj, [data])!;
+                    if (rs.Type)
                     {
+                        checkBytes = rs.CheckBytes;
                         var analyticalData = item.GetMethod("AnalyticalData");
-                        analyticalData?.Invoke(obj, new object[] { data });
+                        var task = (Task?)analyticalData?.Invoke(obj, [data]);
+                        if (task != null) await task;
                         rspType = item;
                         rsp = obj;
                         break;
@@ -94,7 +98,7 @@ namespace TopPortLib
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {
-                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType);
+                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType && ri.CheckBytes == checkBytes);
             }
             if (reqInfo != null)
             {
@@ -143,13 +147,14 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
+                CheckBytes = req.Check(),
                 RspType = typeof(TRsp),
                 TaskCompletionSource = tcs,
             };
@@ -157,8 +162,8 @@ namespace TopPortLib
             {
                 _reqInfos.Add(reqInfo);
             }
-            var timeoutTask = Task.Delay(to);
             var bytes = req.ToBytes();
+            var timeoutTask = Task.Delay(to);
             try
             {
                 var sendTask = _topPortServer.SendAsync(clientId, bytes);
@@ -211,6 +216,7 @@ namespace TopPortLib
         class ReqInfo
         {
             public int ClientId;
+            public byte[]? CheckBytes { get; set; }
             public Type RspType { get; set; } = null!;
             public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
         }
