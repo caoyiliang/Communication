@@ -3,6 +3,7 @@ using Communication.Interfaces;
 using System.Reflection;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
+using Utils;
 
 namespace TopPortLib
 {
@@ -98,7 +99,7 @@ namespace TopPortLib
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {
-                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType && ri.CheckBytes == checkBytes);
+                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType && ri.CheckBytes.ValueEqual(checkBytes));
             }
             if (reqInfo != null)
             {
