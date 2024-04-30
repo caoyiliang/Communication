@@ -2,14 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-		<Version>8.1.5</Version>
+		<Version>8.1.6</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			1.修复异步口解析等待
-			2.异步口接口变更
-			3.异步口支持返回命令对应多个请求，使用请求帧中的特征来识别对应返回
-			4.修复帧特征对比
+			异步口请求接口继承自IByteStream
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>
