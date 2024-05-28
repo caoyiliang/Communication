@@ -25,6 +25,7 @@ namespace CondorPortProtocolDemo
         public CondorPortProtocol(TcpServer serverPort, int defaultTimeout = 5000)
         {
             _condorPort = new CondorPort(this, new TopPort_Server(serverPort, async () => await Task.FromResult(new FootParser(Foot))), defaultTimeout);
+            //_condorPort.CheckEvent = async (byte[] bytes) => await Task.FromResult(false);
             _condorPort.OnReceiveActivelyPushData += CondorPort_OnReceiveActivelyPushData;
             _condorPort.OnSentData += CondorPort_OnSentData;
             _condorPort.OnReceivedData += CondorPort_OnReceivedData;

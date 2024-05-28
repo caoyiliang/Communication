@@ -30,6 +30,8 @@ namespace TopPortLib
         public event ConnectEventHandler? OnConnect { add => _topPort.OnConnect += value; remove => _topPort.OnConnect -= value; }
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
+        /// <inheritdoc/>
+        public CheckEventHandler? CheckEvent { get; set; }
         /// <summary>
         /// 队列通讯口
         /// </summary>
@@ -56,6 +58,15 @@ namespace TopPortLib
         private async Task TopPort_OnReceiveParsedData(byte[] data)
         {
             await RespondedDataAsync(data);
+
+            if (CheckEvent != null)
+            {
+                if (!await CheckEvent.Invoke(data))
+                {
+                    throw new Exception("crc error");
+                }
+            }
+
             Type? rspType = null;
             object? rsp = null;
             byte[]? checkBytes = null;

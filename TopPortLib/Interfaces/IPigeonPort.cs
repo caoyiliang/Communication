@@ -14,6 +14,11 @@ namespace TopPortLib.Interfaces
         IPhysicalPort PhysicalPort { get; set; }
 
         /// <summary>
+        /// 设置校验接收数据方法
+        /// </summary>
+        CheckEventHandler? CheckEvent { get; set; }
+
+        /// <summary>
         /// 请求数据
         /// </summary>
         event RequestedLogEventHandler OnSentData;

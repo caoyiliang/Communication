@@ -1,5 +1,6 @@
 ﻿using Communication;
 using Communication.Interfaces;
+using Parser;
 using System.Reflection;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
@@ -18,8 +19,6 @@ namespace TopPortLib
         private readonly Type[] _typeList;
         private readonly List<ReqInfo> _reqInfos = [];
         /// <inheritdoc/>
-        public IPhysicalPort_Server PhysicalPort { get => _topPortServer.PhysicalPort; }
-        /// <inheritdoc/>
         public event RequestedLogServerEventHandler? OnSentData;
         /// <inheritdoc/>
         public event RespondedLogServerEventHandler? OnReceivedData;
@@ -29,7 +28,10 @@ namespace TopPortLib
         public event ClientConnectEventHandler? OnClientConnect { add => _topPortServer.OnClientConnect += value; remove => _topPortServer.OnClientConnect -= value; }
         /// <inheritdoc/>
         public event ClientDisconnectEventHandler? OnClientDisconnect { add => _topPortServer.OnClientDisconnect += value; remove => _topPortServer.OnClientDisconnect -= value; }
-
+        /// <inheritdoc/>
+        public IPhysicalPort_Server PhysicalPort { get => _topPortServer.PhysicalPort; }
+        /// <inheritdoc/>
+        public CheckEventHandler? CheckEvent { get; set; }
         /// <summary>
         /// 队列通讯口
         /// </summary>
@@ -54,6 +56,15 @@ namespace TopPortLib
         private async Task TopPort_OnReceiveParsedData(int clientId, byte[] data)
         {
             await RespondedDataAsync(clientId, data);
+
+            if (CheckEvent != null)
+            {
+                if (!await CheckEvent.Invoke(data))
+                {
+                    throw new Exception("crc error");
+                }
+            }
+
             Type? rspType = null;
             object? rsp = null;
             byte[]? checkBytes = null;

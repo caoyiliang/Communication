@@ -48,4 +48,10 @@ namespace TopPortLib
     /// <param name="clientId">客户端ID</param>
     /// <param name="data">收到字节数组</param>
     public delegate Task ReceiveParsedDataFromClientEventHandler(int clientId, byte[] data);
+    /// <summary>
+    /// 校验接收数据是否正确
+    /// </summary>
+    /// <param name="data">待校验数据</param>
+    /// <returns>接收是否正确</returns>
+    public delegate Task<bool> CheckEventHandler(byte[] data);
 }
