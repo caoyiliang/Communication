@@ -11,6 +11,4 @@ public class CheckMethodNotFoundException : Exception
     public CheckMethodNotFoundException(string message) : base(message) { }
     /// <summary>Check方法不存在</summary>
     public CheckMethodNotFoundException(string message, Exception innerException) : base(message, innerException) { }
-    /// <summary>Check方法不存在</summary>
-    protected CheckMethodNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 }

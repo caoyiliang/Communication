@@ -197,6 +197,52 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
+        public async Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
+        {
+            var to = timeout == -1 ? _defaultTimeout : timeout;
+            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var reqInfo = new ReqInfo()
+            {
+                ClientId = clientId,
+                CheckBytes = req.Check(),
+                RspType = typeof(TRsp1),
+                TaskCompletionSource = tcs,
+            };
+            lock (_reqInfos)
+            {
+                _reqInfos.Add(reqInfo);
+            }
+            var bytes = req.ToBytes();
+            try
+            {
+                var timeoutTask = Task.Delay(to);
+                var sendTask = _topPortServer.SendAsync(clientId, bytes);
+                if (sendTask != await Task.WhenAny(timeoutTask, sendTask))
+                    throw new TimeoutException($"timeout={to}");
+                await sendTask;
+                await RequestDataAsync(clientId, bytes);
+                if (tcs.Task != await Task.WhenAny(timeoutTask, tcs.Task))
+                    throw new TimeoutException($"rec time out={to}");
+                var rs1 = (TRsp1)await tcs.Task;
+                var timeoutTask1 = Task.Delay(to);
+                tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+                reqInfo.RspType = typeof(TRsp2);
+                reqInfo.TaskCompletionSource = tcs;
+                if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
+                    throw new TimeoutException($"exe time out={to}");
+                var rs2 = (TRsp2)await tcs.Task;
+                return (rs1, rs2);
+            }
+            finally
+            {
+                lock (_reqInfos)
+                {
+                    _reqInfos.Remove(reqInfo);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task SendAsync<TReq>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;

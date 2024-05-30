@@ -14,7 +14,5 @@ namespace TopPortLib.Exceptions
         public RequestParameterToBytesFailedException(string message) : base(message) { }
         /// <summary>请求转字节数组失败</summary>
         public RequestParameterToBytesFailedException(string message, Exception innerException) : base(message, innerException) { }
-        /// <summary>请求转字节数组失败</summary>
-        protected RequestParameterToBytesFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

@@ -16,9 +16,5 @@ namespace TopPortLib.Exceptions
         public GetRspTypeByRspBytesFailedException(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected GetRspTypeByRspBytesFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

@@ -6,11 +6,25 @@ using CondorPortProtocolDemo;
 Console.WriteLine("Hello, World!");
 ICondorPortProtocol condorPortProtocolDemox = new CondorPortProtocol(new TcpServer("0.0.0.0", 2756));
 condorPortProtocolDemox.OnReadValue += CondorPortProtocolDemox_OnReadValue;
+condorPortProtocolDemox.OnClientConnect += CondorPortProtocolDemox_OnClientConnect;
+async Task CondorPortProtocolDemox_OnClientConnect(int clientId)
+{
+    try
+    {
+        await condorPortProtocolDemox.ReadSignalValueAsync(0);
+    }
+    catch (Exception ex)
+    {
+
+    }
+
+    await Task.CompletedTask;
+}
 
 static async Task CondorPortProtocolDemox_OnReadValue(int clientId, (List<decimal> recData, int result) objects) => await Task.CompletedTask;
 
 await condorPortProtocolDemox.StartAsync();
 
-//await condorPortProtocolDemox.ReadSignalValueAsync(0);
+
 
 Console.ReadKey();

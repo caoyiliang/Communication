@@ -186,6 +186,7 @@ namespace Communication.Bus
                         clientCounter++;
                         var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
                         _dicClients.TryAdd(clientId, (client, remoteEndPoint!.Address.ToString(), remoteEndPoint.Port));
+                        _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                         try
                         {
                             if (OnClientConnect is not null)
@@ -197,7 +198,6 @@ namespace Communication.Bus
                         {
                             _logger.Error(e, "Handle client connect error");
                         }
-                        _ = Task.Run(async () => await HandleClientAsync(client, clientId));
                     }
                 }
                 catch (Exception e)
