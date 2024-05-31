@@ -72,7 +72,7 @@ namespace TopPortLib
             {
                 foreach (var item in _typeList)
                 {
-                    if (item.GetInterface("IAsyncResponse`1") is null) continue;
+                    if (item.GetInterface("IAsyncResponse_Server`1") is null) continue;
                     object? obj = null;
                     try
                     {
@@ -85,12 +85,12 @@ namespace TopPortLib
                     if (obj is null)
                         throw new ResponseCreateFailedException("Response创建失败");
                     var checkMethod = item.GetMethod("Check") ?? throw new CheckMethodNotFoundException("Check方法不存在");
-                    var rs = ((bool Type, byte[]? CheckBytes))checkMethod.Invoke(obj, [data])!;
+                    var rs = ((bool Type, byte[]? CheckBytes))checkMethod.Invoke(obj, [clientId, data])!;
                     if (rs.Type)
                     {
                         checkBytes = rs.CheckBytes;
                         var analyticalData = item.GetMethod("AnalyticalData");
-                        var task = (Task?)analyticalData?.Invoke(obj, [data]);
+                        var task = (Task?)analyticalData?.Invoke(obj, [clientId, data]);
                         if (task != null) await task;
                         rspType = item;
                         rsp = obj;
@@ -110,7 +110,7 @@ namespace TopPortLib
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {
-                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType == rspType && ri.CheckBytes.ValueEqual(checkBytes));
+                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType) && ri.CheckBytes.ValueEqual(checkBytes));
             }
             if (reqInfo != null)
             {
@@ -167,7 +167,7 @@ namespace TopPortLib
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
-                RspType = typeof(TRsp),
+                RspType = [typeof(TRsp)],
                 TaskCompletionSource = tcs,
             };
             lock (_reqInfos)
@@ -205,7 +205,7 @@ namespace TopPortLib
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
-                RspType = typeof(TRsp1),
+                RspType = [typeof(TRsp1), typeof(TRsp2)],
                 TaskCompletionSource = tcs,
             };
             lock (_reqInfos)
@@ -226,12 +226,70 @@ namespace TopPortLib
                 var rs1 = (TRsp1)await tcs.Task;
                 var timeoutTask1 = Task.Delay(to);
                 tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                reqInfo.RspType = typeof(TRsp2);
                 reqInfo.TaskCompletionSource = tcs;
                 if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
                     throw new TimeoutException($"exe time out={to}");
                 var rs2 = (TRsp2)await tcs.Task;
                 return (rs1, rs2);
+            }
+            finally
+            {
+                lock (_reqInfos)
+                {
+                    _reqInfos.Remove(reqInfo);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<(TRsp1 Rsp1, IEnumerable<TRsp2> Rsp2, TRsp3 Rsp3)> RequestAsync<TReq, TRsp1, TRsp2, TRsp3>(int clientId, TReq req, int timeout = -1)
+            where TReq : IAsyncRequest
+            where TRsp2 : IRspEnumerable
+        {
+            var to = timeout == -1 ? _defaultTimeout : timeout;
+            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var reqInfo = new ReqInfo()
+            {
+                ClientId = clientId,
+                CheckBytes = req.Check(),
+                RspType = [typeof(TRsp1), typeof(TRsp2), typeof(TRsp3)],
+                TaskCompletionSource = tcs,
+            };
+            lock (_reqInfos)
+            {
+                _reqInfos.Add(reqInfo);
+            }
+            var bytes = req.ToBytes();
+            try
+            {
+                var timeoutTask = Task.Delay(to);
+                var sendTask = _topPortServer.SendAsync(clientId, bytes);
+                if (sendTask != await Task.WhenAny(timeoutTask, sendTask))
+                    throw new TimeoutException($"timeout={to}");
+                await sendTask;
+                await RequestDataAsync(clientId, bytes);
+                if (tcs.Task != await Task.WhenAny(timeoutTask, tcs.Task))
+                    throw new TimeoutException($"rec time out={to}");
+                var rs1 = (TRsp1)await tcs.Task;
+                var rs2 = new List<TRsp2>();
+                TRsp2 trs2;
+                do
+                {
+                    var timeoutTask1 = Task.Delay(to);
+                    tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    reqInfo.TaskCompletionSource = tcs;
+                    if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
+                        throw new TimeoutException($"rspEnumerable time out={to}");
+                    trs2 = (TRsp2)await tcs.Task;
+                    rs2.Add(trs2);
+                } while (!await trs2.IsFinish());
+                var timeoutTask2 = Task.Delay(to);
+                tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+                reqInfo.TaskCompletionSource = tcs;
+                if (timeoutTask2 == await Task.WhenAny(timeoutTask2, tcs.Task))
+                    throw new TimeoutException($"exe time out={to}");
+                var rs3 = (TRsp3)await tcs.Task;
+                return (rs1, rs2, rs3);
             }
             finally
             {
@@ -275,7 +333,7 @@ namespace TopPortLib
         {
             public int ClientId;
             public byte[]? CheckBytes { get; set; }
-            public Type RspType { get; set; } = null!;
+            public List<Type> RspType { get; set; } = [];
             public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
         }
     }

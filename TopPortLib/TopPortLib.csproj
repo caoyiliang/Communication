@@ -2,12 +2,12 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-		<Version>8.2.0</Version>
+		<Version>8.2.2-pre</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			异步口请求多次回复
-			修复在客户端上线通知事件中请求发生问题
+			服务端异步口请求多次回复
+			服务端异步口数据回复改接口为IAsyncResponse_Server
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>
