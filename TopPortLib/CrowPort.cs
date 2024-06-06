@@ -17,7 +17,7 @@ namespace TopPortLib
         private readonly ITilesLayer<byte[], byte[]> _tilesLayer;
         private readonly ITopPort _topPort;
         /// <inheritdoc/>
-        public event SentDataEventHandler<byte[]>? OnSentData;
+        public event Communication.SentDataEventHandler<byte[]>? OnSentData { add => _topPort.OnSentData += value; remove => _topPort.OnSentData -= value; }
         /// <inheritdoc/>
         public event ReceivedDataEventHandler<byte[]>? OnReceivedData;
         /// <inheritdoc/>
@@ -37,13 +37,6 @@ namespace TopPortLib
             _topPort = topPort;
             _tilesLayer = new TilesLayer(_topPort);
             _crowLayer = new CrowLayer<byte[], byte[]>(_tilesLayer, defaultTimeout, timeDelayAfterSending);
-            _crowLayer.OnSentData += async data =>
-            {
-                if (OnSentData is not null)
-                {
-                    await OnSentData(data);
-                }
-            };
             _crowLayer.OnReceivedData += async data =>
             {
                 if (OnReceivedData is not null)

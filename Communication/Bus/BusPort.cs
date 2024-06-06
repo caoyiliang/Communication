@@ -28,6 +28,8 @@ namespace Communication.Bus
         public event DisconnectEventHandler? OnDisconnect;
         /// <inheritdoc/>
         public event ConnectEventHandler? OnConnect;
+        /// <inheritdoc/>
+        public event SentDataEventHandler<byte[]>? OnSentData;
 
         /// <inheritdoc/>
         public async Task OpenAsync()
@@ -85,8 +87,8 @@ namespace Communication.Bus
                 {
                     await _semaphore4Write.WaitAsync();
                     await _physicalPort.SendDataAsync(data, _closeCts!.Token);
-                    if (timeInterval > 0)
-                        await Task.Delay(timeInterval);
+                    if (OnSentData is not null) await OnSentData.Invoke(data);
+                    if (timeInterval > 0) await Task.Delay(timeInterval);
                 }
                 finally
                 {

@@ -18,6 +18,8 @@ namespace TopPortLib
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
         /// <inheritdoc/>
+        public event SentDataEventHandler<byte[]>? OnSentData { add => _port.OnSentData += value; remove => _port.OnSentData -= value; }
+        /// <inheritdoc/>
         public event ReceiveParsedDataEventHandler? OnReceiveParsedData { add => _parser.OnReceiveParsedData += value; remove => _parser.OnReceiveParsedData -= value; }
         /// <inheritdoc/>
         public event DisconnectEventHandler? OnDisconnect { add => _port.OnDisconnect += value; remove => _port.OnDisconnect -= value; }

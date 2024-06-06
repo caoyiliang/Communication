@@ -19,7 +19,23 @@ namespace TopPortLib
         private readonly Type[] _typeList;
         private readonly List<ReqInfo> _reqInfos = [];
         /// <inheritdoc/>
-        public event RequestedLogEventHandler? OnSentData;
+        public event RequestedLogEventHandler? OnSentData
+        {
+            add
+            {
+                _topPort.OnSentData += async bytes =>
+                {
+                    if (value is not null) await value.Invoke(bytes);
+                };
+            }
+            remove
+            {
+                _topPort.OnSentData -= async bytes =>
+                {
+                    if (value is not null) await value.Invoke(bytes);
+                };
+            }
+        }
         /// <inheritdoc/>
         public event RespondedLogEventHandler? OnReceivedData;
         /// <inheritdoc/>
@@ -153,9 +169,7 @@ namespace TopPortLib
             {
                 var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
-                    throw new TimeoutException($"timeout={to}");
-                await sendTask;
-                await RequestDataAsync(bytes);
+                    throw new TimeoutException($"send timeout={to}");
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"timeout={to}");
                 return (TRsp)await tcs.Task;
@@ -190,11 +204,9 @@ namespace TopPortLib
                 var timeoutTask = Task.Delay(to);
                 var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
-                    throw new TimeoutException($"timeout={to}");
-                await sendTask;
-                await RequestDataAsync(bytes);
+                    throw new TimeoutException($"send timeout={to}");
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
-                    throw new TimeoutException($"timeout={to}");
+                    throw new TimeoutException($"rec timeout={to}");
                 var rs1 = (TRsp1)await tcs.Task;
                 var timeoutTask1 = Task.Delay(to);
                 tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -223,22 +235,6 @@ namespace TopPortLib
             var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
             if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                 throw new TimeoutException($"timeout={to}");
-            await sendTask;
-            await RequestDataAsync(bytes);
-        }
-
-        private async Task RequestDataAsync(byte[] data)
-        {
-            if (OnSentData is not null)
-            {
-                try
-                {
-                    await OnSentData(data);
-                }
-                catch
-                {
-                }
-            }
         }
 
         private async Task RespondedDataAsync(byte[] data)

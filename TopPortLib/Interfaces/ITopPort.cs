@@ -16,19 +16,24 @@ namespace TopPortLib.Interfaces
         IPhysicalPort PhysicalPort { get; set; }
 
         /// <summary>
+        /// 请求数据
+        /// </summary>
+        event SentDataEventHandler<byte[]> OnSentData;
+
+        /// <summary>
         /// 数据接收
         /// </summary>
-        event ReceiveParsedDataEventHandler? OnReceiveParsedData;
+        event ReceiveParsedDataEventHandler OnReceiveParsedData;
 
         /// <summary>
         /// 对端掉线
         /// </summary>
-        event DisconnectEventHandler? OnDisconnect;
+        event DisconnectEventHandler OnDisconnect;
 
         /// <summary>
         /// 对端连接成功
         /// </summary>
-        event ConnectEventHandler? OnConnect;
+        event ConnectEventHandler OnConnect;
 
         /// <summary>
         /// 打开通讯口

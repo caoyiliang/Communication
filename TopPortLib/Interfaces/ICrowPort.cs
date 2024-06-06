@@ -20,7 +20,7 @@ namespace TopPortLib.Interfaces
         /// <summary>
         /// 发送的数据
         /// </summary>
-        event SentDataEventHandler<byte[]> OnSentData;
+        event Communication.SentDataEventHandler<byte[]> OnSentData;
 
         /// <summary>
         /// 接收的数据

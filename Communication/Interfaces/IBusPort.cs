@@ -13,19 +13,24 @@ namespace Communication.Interfaces
         IPhysicalPort PhysicalPort { get; set; }
 
         /// <summary>
+        /// 发出的数据
+        /// </summary>
+        event SentDataEventHandler<byte[]> OnSentData;
+
+        /// <summary>
         /// 数据接收
         /// </summary>
-        event ReceiveOriginalDataEventHandler? OnReceiveOriginalData;
+        event ReceiveOriginalDataEventHandler OnReceiveOriginalData;
 
         /// <summary>
         /// 对端掉线
         /// </summary>
-        event DisconnectEventHandler? OnDisconnect;
+        event DisconnectEventHandler OnDisconnect;
 
         /// <summary>
         /// 对端连接成功
         /// </summary>
-        event ConnectEventHandler? OnConnect;
+        event ConnectEventHandler OnConnect;
 
         /// <summary>
         /// 打开
