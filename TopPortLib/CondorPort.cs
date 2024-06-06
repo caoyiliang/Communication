@@ -85,12 +85,13 @@ namespace TopPortLib
                     if (obj is null)
                         throw new ResponseCreateFailedException("Response创建失败");
                     var checkMethod = item.GetMethod("Check") ?? throw new CheckMethodNotFoundException("Check方法不存在");
-                    var rs = ((bool Type, byte[]? CheckBytes))checkMethod.Invoke(obj, [clientId, data])!;
+                    var clientInfo = await _topPortServer.PhysicalPort.GetClientInfos(clientId);
+                    var rs = ((bool Type, byte[]? CheckBytes))checkMethod.Invoke(obj, [clientInfo, data])!;
                     if (rs.Type)
                     {
                         checkBytes = rs.CheckBytes;
                         var analyticalData = item.GetMethod("AnalyticalData");
-                        var task = (Task?)analyticalData?.Invoke(obj, [clientId, data]);
+                        var task = (Task?)analyticalData?.Invoke(obj, [clientInfo, data]);
                         if (task != null) await task;
                         rspType = item;
                         rsp = obj;
