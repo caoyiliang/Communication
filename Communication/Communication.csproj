@@ -3,11 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>8.1.4</Version>
+    <Version>8.1.5</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>
-		修复在客户端上线通知事件中请求发生问题
-		修复异步口发送日志延迟问题
+		IPhysicalPort_Server新增接口GetClientInfos
 	</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>

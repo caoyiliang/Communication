@@ -47,5 +47,12 @@
         /// <param name="clientId">客户端ID</param>
         /// <param name="data">发送字节数组</param>
         Task SendDataAsync(int clientId, byte[] data);
+
+        /// <summary>
+        /// 获取客户端信息
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
+        /// <returns>客户端信息</returns>
+        Task<string?> GetClientInfos(int clientId);
     }
 }

@@ -120,6 +120,13 @@ namespace Communication.Bus
             return await Task.FromResult((client.hostName, client.port));
         }
 
+        /// <inheritdoc/>
+        public async Task<string?> GetClientInfos(int clientId)
+        {
+            if (!_dicClients.TryGetValue(clientId, out var client)) return default;
+            return await Task.FromResult($"{client.hostName}:{client.port}");
+        }
+
         /// <summary>
         /// 获取客户端ID
         /// </summary>

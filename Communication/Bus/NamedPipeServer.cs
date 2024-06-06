@@ -186,5 +186,12 @@ namespace Communication.Bus
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public async Task<string?> GetClientInfos(int clientId)
+        {
+            if (!_dicClients.TryGetValue(clientId, out _)) return default;
+            return await Task.FromResult($"{clientId}");
+        }
     }
 }

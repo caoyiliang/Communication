@@ -2,13 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-		<Version>8.2.3</Version>
+		<Version>8.2.4</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			服务端异步口请求多次回复
-			服务端异步口数据回复改接口为IAsyncResponse_Server
-			修复异步口发送日志延迟问题
+			IPhysicalPort_Server新增接口GetClientInfos
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>
