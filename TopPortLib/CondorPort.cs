@@ -110,7 +110,21 @@ namespace TopPortLib
             ReqInfo? reqInfo;
             lock (_reqInfos)
             {
-                reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType) && ri.CheckBytes.ValueEqual(checkBytes));
+                if (rsp is IRspEnumerable rspEnumerable)
+                {
+                    if (rspEnumerable.NeedCheck())
+                    {
+                        reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType) && ri.CheckBytes.ValueEqual(checkBytes));
+                    }
+                    else
+                    {
+                        reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType));
+                    }
+                }
+                else
+                {
+                    reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType) && ri.CheckBytes.ValueEqual(checkBytes));
+                }
             }
             if (reqInfo != null)
             {
