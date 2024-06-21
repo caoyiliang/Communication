@@ -343,6 +343,12 @@ namespace TopPortLib
             }
         }
 
+        /// <inheritdoc/>
+        public async Task<string?> GetClientInfos(int clientId)
+        {
+            return await PhysicalPort.GetClientInfos(clientId);
+        }
+
         class ReqInfo
         {
             public int ClientId;

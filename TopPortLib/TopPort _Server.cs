@@ -88,5 +88,11 @@ namespace TopPortLib
             task.Wait();
             GC.SuppressFinalize(this);
         }
+
+        /// <inheritdoc/>
+        public async Task<string?> GetClientInfos(int clientId)
+        {
+            return await PhysicalPort.GetClientInfos(clientId);
+        }
     }
 }

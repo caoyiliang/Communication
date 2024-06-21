@@ -54,6 +54,13 @@ namespace TopPortLib.Interfaces
         Task StopAsync();
 
         /// <summary>
+        /// 获取客户端信息
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
+        /// <returns>客户端信息</returns>
+        Task<string?> GetClientInfos(int clientId);
+
+        /// <summary>
         /// 队列请求接收
         /// </summary>
         /// <typeparam name="TReq">请求类型</typeparam>

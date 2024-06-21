@@ -2,11 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-		<Version>8.2.7</Version>
+		<Version>8.2.8</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			为IRspEnumerable添加NeedCheck接口
+			为Server增加GetClientInfos接口
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>
