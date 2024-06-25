@@ -12,8 +12,23 @@ namespace Communication.Bus
     /// </summary>
     /// <param name="hostName">服务端IP</param>
     /// <param name="port">服务端端口</param>
+    /// <param name="keepAlive">是否启用KeepAlive，默认true</param>
+    /// <param name="keepAliveTime">正常心跳时间，默认5s</param>
+    /// <param name="keepAliveInterval">异常心跳间隔，默认3s</param>
+    /// <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+    /// <param name="noDelay">是否禁用Nagle算法，默认true</param>
+    /// <param name="reuseAddress">是否允许端口复用，默认true</param>
     /// <param name="bufferSize">缓存默认8192</param>
-    public class TcpServer(string hostName, int port, int bufferSize = 8192) : IPhysicalPort_Server
+    public class TcpServer(
+        string hostName,
+        int port,
+        bool keepAlive = true,
+        int keepAliveTime = 5,
+        int keepAliveInterval = 3,
+        int keepAliveRetryCount = 1,
+        bool noDelay = true,
+        bool reuseAddress = true,
+        int bufferSize = 8192) : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
         private readonly ConcurrentDictionary<int, (TcpClient client, string hostName, int port)> _dicClients = new();
@@ -37,37 +52,40 @@ namespace Communication.Bus
             if (this.IsActive) return;
 
             _listener = new TcpListener(IPAddress.Parse(hostName), port);
-            _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _listener.Server.NoDelay = true; // 禁用 Nagle 算法，可以提高实时性
+            _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, reuseAddress);
+            _listener.Server.NoDelay = noDelay;
+            if (keepAlive)
+            {
 #if NETSTANDARD2_0
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                // 在 Linux 上通过系统参数配置 TCP Keep-Alive
-                string procPath = "/proc/sys/net/ipv4/";
-                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "5");
-                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
-                File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "1"); // 设置尝试次数
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 5000, 3000), null);
-            }
-#else
-            try
-            {
-                _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 5);
-                _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 3);
-                _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
-            }
-            catch (Exception)
-            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    // 在 Linux 上通过系统参数配置 TCP Keep-Alive
+                    string procPath = "/proc/sys/net/ipv4/";
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), keepAliveTime.ToString());
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), keepAliveInterval.ToString());
+                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), keepAliveRetryCount.ToString());
+                }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 5000, 3000), null);
+                    _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
                 }
-            }
+#else
+                try
+                {
+                    _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                    _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, keepAliveTime);
+                    _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, keepAliveInterval);
+                    _listener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, keepAliveRetryCount);
+                }
+                catch (Exception)
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
+                    }
+                }
 #endif
+            }
             _listener.Start();
             _stopCts = new CancellationTokenSource();
             _stopTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);

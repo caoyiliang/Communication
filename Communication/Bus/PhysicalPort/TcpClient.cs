@@ -10,7 +10,19 @@ namespace Communication.Bus.PhysicalPort
     /// </summary>
     /// <param name="hostName">域名/IP</param>
     /// <param name="port">端口</param>
-    public class TcpClient(string hostName, int port) : IPhysicalPort, IDisposable
+    /// <param name="keepAlive">是否启用KeepAlive，默认true</param>
+    /// <param name="keepAliveTime">正常心跳时间，默认5s</param>
+    /// <param name="keepAliveInterval">异常心跳间隔，默认3s</param>
+    /// <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+    /// <param name="noDelay">是否禁用Nagle算法，默认true</param>
+    public class TcpClient(
+        string hostName,
+        int port,
+        bool keepAlive = true,
+        int keepAliveTime = 3,
+        int keepAliveInterval = 2,
+        int keepAliveRetryCount = 1,
+        bool noDelay = true) : IPhysicalPort, IDisposable
     {
         private System.Net.Sockets.TcpClient? _client;
         private NetworkStream? _networkStream;
@@ -58,36 +70,38 @@ namespace Communication.Bus.PhysicalPort
                 // 获取底层Socket对象
                 Socket socket = _client.Client;
 
-                socket.NoDelay = true;
+                socket.NoDelay = noDelay;
 
-                // 设置Keep-Alive参数
+                if (keepAlive)
+                {
 #if NETSTANDARD2_0
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    // 在 Linux 上通过系统参数配置 TCP Keep-Alive
-                    string procPath = "/proc/sys/net/ipv4/";
-                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), "5");
-                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), "3");
-                    File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), "1"); // 设置尝试次数
-                }
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 3000, 200), null);
-#else
-                try
-                {
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, 3);
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, 2);
-                    socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 1);
-                }
-                catch (Exception)
-                {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
-                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, 5000, 3000), null);
+                        // 在 Linux 上通过系统参数配置 TCP Keep-Alive
+                        string procPath = "/proc/sys/net/ipv4/";
+                        File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_time"), keepAliveTime.ToString());
+                        File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_intvl"), keepAliveInterval.ToString());
+                        File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), keepAliveRetryCount.ToString());
                     }
-                }
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
+#else
+                    try
+                    {
+                        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, keepAliveTime);
+                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, keepAliveInterval);
+                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, keepAliveRetryCount);
+                    }
+                    catch (Exception)
+                    {
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
+                        }
+                    }
 #endif
+                }
                 await _client.ConnectAsync(hostName, port);
                 _networkStream = _client.GetStream();
             }
