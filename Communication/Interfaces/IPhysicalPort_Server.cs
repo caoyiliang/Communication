@@ -39,20 +39,20 @@
         /// 断开客户端
         /// </summary>
         /// <param name="clientId">客户端ID</param>
-        Task DisconnectClientAsync(int clientId);
+        Task DisconnectClientAsync(Guid clientId);
 
         /// <summary>
         /// 向客户端发送数据
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <param name="data">发送字节数组</param>
-        Task SendDataAsync(int clientId, byte[] data);
+        Task SendDataAsync(Guid clientId, byte[] data);
 
         /// <summary>
         /// 获取客户端信息
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <returns>客户端信息</returns>
-        Task<string?> GetClientInfos(int clientId);
+        Task<string?> GetClientInfos(Guid clientId);
     }
 }

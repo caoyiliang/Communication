@@ -21,7 +21,7 @@ namespace TestNamedPipeServer
             await server.StartAsync();
         }
 
-        private async Task Server_OnReceiveOriginalDataFromClient(byte[] data, int size, int clientId)
+        private async Task Server_OnReceiveOriginalDataFromClient(byte[] data, int size, Guid clientId)
         {
             _ = Encoding.ASCII.GetString(data, 0, size);
             var buf = new byte[size];
@@ -29,12 +29,12 @@ namespace TestNamedPipeServer
             await server!.SendDataAsync(clientId, buf);
         }
 
-        private async Task Server_OnClientDisconnect(int clientId)
+        private async Task Server_OnClientDisconnect(Guid clientId)
         {
             await Task.CompletedTask;
         }
 
-        private async Task Server_OnClientConnect(int clientId)
+        private async Task Server_OnClientConnect(Guid clientId)
         {
             await Task.CompletedTask;
         }

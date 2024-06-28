@@ -11,7 +11,7 @@ namespace TopPortLib
     /// </summary>
     public class TopPort_Server : ITopPort_Server, IDisposable
     {
-        private readonly ConcurrentDictionary<int, IParser> _dicParsers = new();
+        private readonly ConcurrentDictionary<Guid, IParser> _dicParsers = new();
 
         /// <inheritdoc/>
         public IPhysicalPort_Server PhysicalPort { get; }
@@ -31,7 +31,7 @@ namespace TopPortLib
         public TopPort_Server(IPhysicalPort_Server physicalPort, GetParserEventHandler getParser)
         {
             PhysicalPort = physicalPort;
-            PhysicalPort.OnReceiveOriginalDataFromClient += async (byte[] data, int size, int clientId) =>
+            PhysicalPort.OnReceiveOriginalDataFromClient += async (byte[] data, int size, Guid clientId) =>
             {
                 if (_dicParsers.ContainsKey(clientId))
                 {
@@ -75,7 +75,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync(int clientId, byte[] data)
+        public async Task SendAsync(Guid clientId, byte[] data)
         {
             await PhysicalPort.SendDataAsync(clientId, data);
         }
@@ -90,7 +90,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<string?> GetClientInfos(int clientId)
+        public async Task<string?> GetClientInfos(Guid clientId)
         {
             return await PhysicalPort.GetClientInfos(clientId);
         }

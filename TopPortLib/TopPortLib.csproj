@@ -2,11 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net7.0;net8.0</TargetFrameworks>
-		<Version>8.2.9</Version>
+		<Version>8.3.0</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			Tcp开放设置keepAlive,keepAliveTime,keepAliveInterval,keepAliveRetryCount,noDelay,reuseAddress
+			Server改ClientId为Guid类型
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>

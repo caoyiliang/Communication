@@ -46,13 +46,13 @@ namespace TopPortLib
             _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
         }
 
-        private static void InitActivelyPush(object obj, Type type, object data, int clientId)
+        private static void InitActivelyPush(object obj, Type type, object data, Guid clientId)
         {
             var eventMethod = obj.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod).SingleOrDefault(_ => _.Name == $"{type.Name}Event");
             eventMethod?.Invoke(obj, [clientId, type.GetMethod("GetResult")!.Invoke(data, null)]);
         }
 
-        private async Task TopPort_OnReceiveParsedData(int clientId, byte[] data)
+        private async Task TopPort_OnReceiveParsedData(Guid clientId, byte[] data)
         {
             await RespondedDataAsync(clientId, data);
 
@@ -144,7 +144,7 @@ namespace TopPortLib
             }
         }
 
-        private async Task RequestDataAsync(int clientId, byte[] data)
+        private async Task RequestDataAsync(Guid clientId, byte[] data)
         {
             if (OnSentData is not null)
             {
@@ -158,7 +158,7 @@ namespace TopPortLib
             }
         }
 
-        private async Task RespondedDataAsync(int clientId, byte[] data)
+        private async Task RespondedDataAsync(Guid clientId, byte[] data)
         {
             if (OnReceivedData is not null)
             {
@@ -173,7 +173,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<TRsp> RequestAsync<TReq, TRsp>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
+        public async Task<TRsp> RequestAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -211,7 +211,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
+        public async Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -256,7 +256,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<(TRsp1 Rsp1, IEnumerable<TRsp2> Rsp2, TRsp3 Rsp3)> RequestAsync<TReq, TRsp1, TRsp2, TRsp3>(int clientId, TReq req, int timeout = -1)
+        public async Task<(TRsp1 Rsp1, IEnumerable<TRsp2> Rsp2, TRsp3 Rsp3)> RequestAsync<TReq, TRsp1, TRsp2, TRsp3>(Guid clientId, TReq req, int timeout = -1)
             where TReq : IAsyncRequest
             where TRsp2 : IRspEnumerable
         {
@@ -315,7 +315,7 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task SendAsync<TReq>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream
+        public async Task SendAsync<TReq>(Guid clientId, TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
             var timeoutTask = Task.Delay(to);
@@ -344,14 +344,14 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task<string?> GetClientInfos(int clientId)
+        public async Task<string?> GetClientInfos(Guid clientId)
         {
             return await PhysicalPort.GetClientInfos(clientId);
         }
 
         class ReqInfo
         {
-            public int ClientId;
+            public Guid ClientId;
             public byte[]? CheckBytes { get; set; }
             public List<Type> RspType { get; set; } = [];
             public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;

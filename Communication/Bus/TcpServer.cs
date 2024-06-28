@@ -31,7 +31,7 @@ namespace Communication.Bus
         int bufferSize = 8192) : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<TcpServer>();
-        private readonly ConcurrentDictionary<int, (TcpClient client, string hostName, int port)> _dicClients = new();
+        private readonly ConcurrentDictionary<Guid, (TcpClient client, string hostName, int port)> _dicClients = new();
         private TcpListener? _listener;
         private CancellationTokenSource? _stopCts;
         private TaskCompletionSource<bool>? _stopTcs;
@@ -109,7 +109,7 @@ namespace Communication.Bus
         }
 
         /// <inheritdoc/>
-        public async Task SendDataAsync(int clientId, byte[] data)
+        public async Task SendDataAsync(Guid clientId, byte[] data)
         {
             try
             {
@@ -132,14 +132,14 @@ namespace Communication.Bus
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <returns>(IP,端口)</returns>
-        public async Task<(string IPAddress, int Port)?> GetClientInfo(int clientId)
+        public async Task<(string IPAddress, int Port)?> GetClientInfo(Guid clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out var client)) return null;
             return await Task.FromResult((client.hostName, client.port));
         }
 
         /// <inheritdoc/>
-        public async Task<string?> GetClientInfos(int clientId)
+        public async Task<string?> GetClientInfos(Guid clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out var client)) return default;
             return await Task.FromResult($"{client.hostName}:{client.port}");
@@ -151,7 +151,7 @@ namespace Communication.Bus
         /// <param name="ip">ip</param>
         /// <param name="port">端口</param>
         /// <returns>客户端ID</returns>
-        public async Task<int?> GetClientId(string ip, int port)
+        public async Task<Guid?> GetClientId(string ip, int port)
         {
             try
             {
@@ -169,13 +169,13 @@ namespace Communication.Bus
         /// </summary>
         /// <param name="ip">查询ip</param>
         /// <returns>IP下所有客户端</returns>
-        public async Task<List<int>> GetClientsByIp(string ip)
+        public async Task<List<Guid>> GetClientsByIp(string ip)
         {
             return await Task.FromResult(_dicClients.Where(_ => _.Value.hostName == ip).Select(_ => _.Key).ToList());
         }
 
         /// <inheritdoc/>
-        public async Task DisconnectClientAsync(int clientId)
+        public async Task DisconnectClientAsync(Guid clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out var client)) return;
             try
@@ -193,7 +193,6 @@ namespace Communication.Bus
         {
             _ = Task.Run(async () =>
             {
-                var clientCounter = 0;
                 try
                 {
                     while (!_stopCts!.IsCancellationRequested)
@@ -207,8 +206,7 @@ namespace Communication.Bus
                         {
                             continue;
                         }
-                        int clientId = clientCounter;
-                        clientCounter++;
+                        var clientId = Guid.NewGuid();
                         var remoteEndPoint = client.Client.RemoteEndPoint as IPEndPoint;
                         _dicClients.TryAdd(clientId, (client, remoteEndPoint!.Address.ToString(), remoteEndPoint.Port));
                         _ = Task.Run(async () => await HandleClientAsync(client, clientId));
@@ -262,7 +260,7 @@ namespace Communication.Bus
             return buffer;
         }
 
-        private async Task HandleClientAsync(TcpClient client, int clientId)
+        private async Task HandleClientAsync(TcpClient client, Guid clientId)
         {
             try
             {

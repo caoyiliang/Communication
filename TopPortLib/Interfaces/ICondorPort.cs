@@ -58,7 +58,7 @@ namespace TopPortLib.Interfaces
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <returns>客户端信息</returns>
-        Task<string?> GetClientInfos(int clientId);
+        Task<string?> GetClientInfos(Guid clientId);
 
         /// <summary>
         /// 队列请求接收
@@ -69,7 +69,7 @@ namespace TopPortLib.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>
         /// <returns>接收类型</returns>
-        Task<TRsp> RequestAsync<TReq, TRsp>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest;
+        Task<TRsp> RequestAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest;
 
         /// <summary>
         /// 队列请求接收(2次返回)
@@ -81,7 +81,7 @@ namespace TopPortLib.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>
         /// <returns>接收类型元组</returns>
-        Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(int clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest;
+        Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest;
 
         /// <summary>
         /// 队列请求接收(多次返回)
@@ -94,7 +94,7 @@ namespace TopPortLib.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>
         /// <returns>接收类型元组</returns>
-        Task<(TRsp1 Rsp1, IEnumerable<TRsp2> Rsp2, TRsp3 Rsp3)> RequestAsync<TReq, TRsp1, TRsp2, TRsp3>(int clientId, TReq req, int timeout = -1)
+        Task<(TRsp1 Rsp1, IEnumerable<TRsp2> Rsp2, TRsp3 Rsp3)> RequestAsync<TReq, TRsp1, TRsp2, TRsp3>(Guid clientId, TReq req, int timeout = -1)
             where TReq : IAsyncRequest
             where TRsp2 : IRspEnumerable;
 
@@ -105,6 +105,6 @@ namespace TopPortLib.Interfaces
         /// <param name="clientId">客户端ID</param>
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时，默认使用构造传入</param>
-        Task SendAsync<TReq>(int clientId, TReq req, int timeout = -1) where TReq : IByteStream;
+        Task SendAsync<TReq>(Guid clientId, TReq req, int timeout = -1) where TReq : IByteStream;
     }
 }

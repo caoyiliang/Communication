@@ -23,20 +23,20 @@ namespace TopPortLib
     /// </summary>
     /// <param name="clientId">客户端ID</param>
     /// <param name="data">请求字节数组</param>
-    public delegate Task RequestedLogServerEventHandler(int clientId, byte[] data);
+    public delegate Task RequestedLogServerEventHandler(Guid clientId, byte[] data);
     /// <summary>
     /// 接收日志推送
     /// </summary>
     /// <param name="clientId">客户端ID</param>
     /// <param name="data">接收字节数组</param>
-    public delegate Task RespondedLogServerEventHandler(int clientId, byte[] data);
+    public delegate Task RespondedLogServerEventHandler(Guid clientId, byte[] data);
     /// <summary>
     /// 接收到主动上传数据推送
     /// </summary>
     /// <param name="clientId">客户端ID</param>
     /// <param name="type">接收数据类型</param>
     /// <param name="data">接收数据</param>
-    public delegate Task ReceiveActivelyPushDataServerEventHandler(int clientId, Type type, object data);
+    public delegate Task ReceiveActivelyPushDataServerEventHandler(Guid clientId, Type type, object data);
     /// <summary>
     /// 设置解析器
     /// </summary>
@@ -47,7 +47,7 @@ namespace TopPortLib
     /// </summary>
     /// <param name="clientId">客户端ID</param>
     /// <param name="data">收到字节数组</param>
-    public delegate Task ReceiveParsedDataFromClientEventHandler(int clientId, byte[] data);
+    public delegate Task ReceiveParsedDataFromClientEventHandler(Guid clientId, byte[] data);
     /// <summary>
     /// 校验接收数据是否正确
     /// </summary>

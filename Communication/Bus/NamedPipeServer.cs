@@ -14,7 +14,7 @@ namespace Communication.Bus
     public class NamedPipeServer(string pipeName, int maxNumberOfServerInstances = 100, int bufferSize = 8192) : IPhysicalPort_Server
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<NamedPipeServer>();
-        private readonly ConcurrentDictionary<int, NamedPipeServerStream> _dicClients = new();
+        private readonly ConcurrentDictionary<Guid, NamedPipeServerStream> _dicClients = new();
         private CancellationTokenSource? _stopCts;
         private TaskCompletionSource<bool>? _stopTcs;
         /// <inheritdoc/>
@@ -49,7 +49,7 @@ namespace Communication.Bus
         }
 
         /// <inheritdoc/>
-        public async Task SendDataAsync(int clientId, byte[] data)
+        public async Task SendDataAsync(Guid clientId, byte[] data)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace Communication.Bus
         }
 
         /// <inheritdoc/>
-        public async Task DisconnectClientAsync(int clientId)
+        public async Task DisconnectClientAsync(Guid clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out var client)) return;
             try
@@ -85,12 +85,11 @@ namespace Communication.Bus
         {
             _ = Task.Run(async () =>
             {
-                var clientCounter = 0;
                 try
                 {
                     while (!_stopCts!.IsCancellationRequested)
                     {
-                        if (clientCounter >= maxNumberOfServerInstances)
+                        if (_dicClients.Count >= maxNumberOfServerInstances)
                         {
                             await Task.Delay(1000);
                             continue;
@@ -104,8 +103,7 @@ namespace Communication.Bus
                         {
                             continue;
                         }
-                        int clientId = clientCounter;
-                        clientCounter++;
+                        var clientId = Guid.NewGuid();
                         _dicClients.TryAdd(clientId, client);
                         try
                         {
@@ -140,7 +138,7 @@ namespace Communication.Bus
             await Task.CompletedTask;
         }
 
-        private async Task HandleClientAsync(NamedPipeServerStream client, int clientId)
+        private async Task HandleClientAsync(NamedPipeServerStream client, Guid clientId)
         {
             try
             {
@@ -188,7 +186,7 @@ namespace Communication.Bus
         }
 
         /// <inheritdoc/>
-        public async Task<string?> GetClientInfos(int clientId)
+        public async Task<string?> GetClientInfos(Guid clientId)
         {
             if (!_dicClients.TryGetValue(clientId, out _)) return default;
             return await Task.FromResult($"{clientId}");

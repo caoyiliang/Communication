@@ -20,19 +20,19 @@
     /// <param name="data">收到字节数组</param>
     /// <param name="size">收到字节个数</param>
     /// <param name="clientId">客户端ID</param>
-    public delegate Task ReceiveOriginalDataFromClientEventHandler(byte[] data, int size, int clientId);
+    public delegate Task ReceiveOriginalDataFromClientEventHandler(byte[] data, int size, Guid clientId);
 
     /// <summary>
     /// 服务端有新客户端连接
     /// </summary>
     /// <param name="clientId">客户端ID</param>
-    public delegate Task ClientConnectEventHandler(int clientId);
+    public delegate Task ClientConnectEventHandler(Guid clientId);
 
     /// <summary>
     /// 服务端有客户端断线
     /// </summary>
     /// <param name="clientId">客户端ID</param>
-    public delegate Task ClientDisconnectEventHandler(int clientId);
+    public delegate Task ClientDisconnectEventHandler(Guid clientId);
 
     /// <summary>
     /// 对端断线
@@ -57,5 +57,5 @@
     /// <typeparam name="T">数据类型</typeparam>
     /// <param name="clientId">客户端ID</param>
     /// <param name="objects">数据</param>
-    public delegate Task ActivelyPushDataServerEventHandler<T>(int clientId, T objects);
+    public delegate Task ActivelyPushDataServerEventHandler<T>(Guid clientId, T objects);
 }

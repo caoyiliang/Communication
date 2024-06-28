@@ -9,7 +9,7 @@ tcpServer.OnClientDisconnect += TcpServer_ClientDisconnect;
 tcpServer.OnReceiveOriginalDataFromClient += TcpServer_ReceiveOriginalDataFromTcpClient;
 await tcpServer.StartAsync();
 
-async Task TcpServer_ReceiveOriginalDataFromTcpClient(byte[] data, int size, int clientId)
+async Task TcpServer_ReceiveOriginalDataFromTcpClient(byte[] data, int size, Guid clientId)
 {
     var tmp = new byte[size];
     Array.Copy(data, 0, tmp, 0, size);
@@ -20,7 +20,7 @@ async Task TcpServer_ReceiveOriginalDataFromTcpClient(byte[] data, int size, int
     }
 }
 
-async Task TcpServer_ClientConnect(int clientId)
+async Task TcpServer_ClientConnect(Guid clientId)
 {
     await tcpServer!.SendDataAsync(clientId, [0x01, 0x0d]);
     var info = await ((TcpServer)tcpServer!).GetClientInfo(clientId);
@@ -34,7 +34,7 @@ async Task TcpServer_ClientConnect(int clientId)
     }
 }
 
-async Task TcpServer_ClientDisconnect(int clientId)
+async Task TcpServer_ClientDisconnect(Guid clientId)
 {
     var info = await ((TcpServer)tcpServer!).GetClientInfo(clientId);
 }

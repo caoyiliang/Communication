@@ -31,7 +31,7 @@ namespace CondorPortProtocolDemo
             _condorPort.OnReceivedData += CondorPort_OnReceivedData;
         }
 
-        private async Task CondorPort_OnReceivedData(int clientId, byte[] data)
+        private async Task CondorPort_OnReceivedData(Guid clientId, byte[] data)
         {
             var info = await ((TcpServer)_condorPort.PhysicalPort).GetClientInfo(clientId);
             if (!info.HasValue) return;
@@ -39,7 +39,7 @@ namespace CondorPortProtocolDemo
             await Task.CompletedTask;
         }
 
-        private async Task CondorPort_OnSentData(int clientId, byte[] data)
+        private async Task CondorPort_OnSentData(Guid clientId, byte[] data)
         {
             var info = await ((TcpServer)_condorPort.PhysicalPort).GetClientInfo(clientId);
             if (!info.HasValue) return;
@@ -47,7 +47,7 @@ namespace CondorPortProtocolDemo
             await Task.CompletedTask;
         }
 
-        private async Task CondorPort_OnReceiveActivelyPushData(int clientId, Type type, object data)
+        private async Task CondorPort_OnReceiveActivelyPushData(Guid clientId, Type type, object data)
         {
             //可不在此处处理
             await Task.CompletedTask;
@@ -65,13 +65,13 @@ namespace CondorPortProtocolDemo
             _isListened = false;
         }
 
-        public async Task<List<decimal>?> ReadSignalValueAsync(int clientId, int tryCount = 0, int timeOut = -1, CancellationToken cancelToken = default)
+        public async Task<List<decimal>?> ReadSignalValueAsync(Guid clientId, int tryCount = 0, int timeOut = -1, CancellationToken cancelToken = default)
         {
             Func<Task<ReadValueRsp>> func = () => _condorPort.RequestAsync<ReadValueReq, ReadValueRsp>(clientId, new ReadValueReq(), timeOut);
             return (await func.ReTry(tryCount, cancelToken))?.RecData;
         }
 
-        private async Task ReadValueRspEvent(int clientId, (List<decimal> recData, int result) rs)
+        private async Task ReadValueRspEvent(Guid clientId, (List<decimal> recData, int result) rs)
         {
             if (OnReadValue is not null)
                 await OnReadValue(clientId, rs);

@@ -46,13 +46,13 @@ namespace TopPortLib.Interfaces
         /// <param name="clientId">客户端ID</param>
         /// <param name="data">要发送的字节数组</param>
         /// <returns></returns>
-        Task SendAsync(int clientId, byte[] data);
+        Task SendAsync(Guid clientId, byte[] data);
 
         /// <summary>
         /// 获取客户端信息
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <returns>客户端信息</returns>
-        Task<string?> GetClientInfos(int clientId);
+        Task<string?> GetClientInfos(Guid clientId);
     }
 }
