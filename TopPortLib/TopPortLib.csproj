@@ -6,7 +6,7 @@
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			调整 KeepAlive 参数单位
+			调整 KeepAlive 参数单位,更新依赖
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>

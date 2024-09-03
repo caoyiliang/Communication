@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSoft.LogInterface" Version="8.0.0" />
-    <PackageReference Include="CSoft.Utils" Version="8.0.8" />
+    <PackageReference Include="CSoft.Utils" Version="8.0.9" />
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
   </ItemGroup>
 
