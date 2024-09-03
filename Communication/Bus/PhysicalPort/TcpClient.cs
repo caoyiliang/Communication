@@ -11,16 +11,16 @@ namespace Communication.Bus.PhysicalPort
     /// <param name="hostName">域名/IP</param>
     /// <param name="port">端口</param>
     /// <param name="keepAlive">是否启用KeepAlive，默认true</param>
-    /// <param name="keepAliveTime">正常心跳时间，默认5s</param>
-    /// <param name="keepAliveInterval">异常心跳间隔，默认3s</param>
+    /// <param name="keepAliveTime">正常心跳时间，默认3s(3000ms)</param>
+    /// <param name="keepAliveInterval">异常心跳间隔，默认2s(2000ms)</param>
     /// <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
     /// <param name="noDelay">是否禁用Nagle算法，默认true</param>
     public class TcpClient(
         string hostName,
         int port,
         bool keepAlive = true,
-        int keepAliveTime = 3,
-        int keepAliveInterval = 2,
+        int keepAliveTime = 3000,
+        int keepAliveInterval = 2000,
         int keepAliveRetryCount = 1,
         bool noDelay = true) : IPhysicalPort, IDisposable
     {
@@ -84,20 +84,20 @@ namespace Communication.Bus.PhysicalPort
                         File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), keepAliveRetryCount.ToString());
                     }
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
+                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime , keepAliveInterval ), null);
 #else
                     try
                     {
                         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, keepAliveTime);
-                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, keepAliveInterval);
+                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, keepAliveTime / 1000);
+                        socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, keepAliveInterval / 1000);
                         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, keepAliveRetryCount);
                     }
                     catch (Exception)
                     {
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
-                            _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime * 1000, keepAliveInterval * 1000), null);
+                            _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime, keepAliveInterval), null);
                         }
                     }
 #endif
