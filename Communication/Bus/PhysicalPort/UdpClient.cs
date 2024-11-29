@@ -1,14 +1,16 @@
 ﻿using Communication.Exceptions;
 using Communication.Interfaces;
+using System.Net;
 
 namespace Communication.Bus.PhysicalPort
 {
     /// <summary>
     /// UDP
     /// </summary>
-    /// <param name="hostName">HostName</param>
-    /// <param name="port">Port</param>
-    public class UdpClient(string hostName, int port) : IPhysicalPort, IDisposable
+    /// <param name="hostName">目标HostName</param>
+    /// <param name="port">目标Port</param>
+    /// <param name="iPEndPoint">本地IPEndPoint</param>
+    public class UdpClient(string hostName, int port, IPEndPoint? iPEndPoint = null) : IPhysicalPort, IDisposable
     {
         private System.Net.Sockets.UdpClient? _client;
         private bool _disposed = false;
@@ -28,12 +30,19 @@ namespace Communication.Bus.PhysicalPort
         {
             try
             {
-                _client = new System.Net.Sockets.UdpClient(hostName, port);
+                if (iPEndPoint != null)
+                {
+                    _client = new System.Net.Sockets.UdpClient(iPEndPoint);
+                }
+                else
+                {
+                    _client = new System.Net.Sockets.UdpClient();
+                }
                 IsOpen = true;
             }
             catch (Exception e)
             {
-                throw new ConnectFailedException($"建立UDP连接失败:{hostName}:{port}", e);
+                throw new ConnectFailedException($"UDP打开失败", e);
             }
             await Task.CompletedTask;
         }
@@ -52,7 +61,7 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)
         {
-            await _client!.SendAsync(data, data.Length);
+            await _client!.SendAsync(data, data.Length, hostName, port);
         }
 
         /// <inheritdoc/>

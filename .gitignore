@@ -38,3 +38,7 @@
 /TestDemo/TcpClient/obj
 /TestDemo/ParserTest/bin
 /TestDemo/ParserTest/obj
+/TestDemo/TestUdp/bin
+/TestDemo/TestUdp/obj
+/TestDemo/TestUdp1/bin
+/TestDemo/TestUdp1/obj
