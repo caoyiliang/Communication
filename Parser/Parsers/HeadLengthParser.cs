@@ -15,12 +15,15 @@ namespace Parser.Parsers
         /// </summary>
         private readonly byte[] _head;
         private readonly GetDataLengthEventHandler OnGetDataLength;
+
         /// <summary>
         /// 长度为除了帧头之外的所有数据的长度
         /// </summary>
-        /// <param name="head"></param>
-        /// <param name="getDataLength"></param>
-        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength)
+        /// <param name="head">帧头</param>
+        /// <param name="getDataLength">获取数据包长度</param>
+        /// <param name="useChannel">是否启用内置处理队列</param>
+        /// <exception cref="Exception"></exception>
+        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength, bool useChannel = true) : base(useChannel)
         {
             if (head == null || head.Length == 0) throw new Exception("必须传入帧头");
             _head = head;
@@ -28,10 +31,12 @@ namespace Parser.Parsers
         }
 
         /// <summary>
-        ///  以特定字节数组为数据包头，数特定长度分包
+        /// 以特定字节数组为数据包头，数特定长度分包
         /// </summary>
         /// <param name="getDataLength">获取数据包长度</param>
-        public HeadLengthParser(GetDataLengthEventHandler getDataLength)
+        /// <param name="useChannel">是否启用内置处理队列</param>
+        /// <exception cref="Exception"></exception>
+        public HeadLengthParser(GetDataLengthEventHandler getDataLength, bool useChannel = true) : base(useChannel)
         {
             _head = [];
             OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");

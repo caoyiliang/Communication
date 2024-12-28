@@ -16,13 +16,15 @@ namespace Parser.Parsers
         /// 帧尾
         /// </summary>
         private readonly byte[] _foot;
+
         /// <summary>
         /// 以特定字节数组的开头和结尾来分数据包
         /// </summary>
         /// <param name="head">帧头</param>
         /// <param name="foot">帧尾</param>
+        /// <param name="useChannel">是否启用内置处理队列</param>
         /// <exception cref="ArgumentException"></exception>
-        public HeadFootParser(byte[] head, byte[] foot)
+        public HeadFootParser(byte[] head, byte[] foot, bool useChannel = true) : base(useChannel)
         {
             if (head == null || head.Length == 0) throw new ArgumentException("必须传入帧头");
             if (foot == null || foot.Length == 0) throw new ArgumentException("必须传入帧尾");

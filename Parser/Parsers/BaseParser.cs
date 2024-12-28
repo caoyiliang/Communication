@@ -1,5 +1,6 @@
 ﻿using LogInterface;
 using Parser.Interfaces;
+using System.Threading.Channels;
 using Utils;
 
 namespace Parser.Parsers
@@ -10,12 +11,34 @@ namespace Parser.Parsers
     public abstract class BaseParser : IParser
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger("BaseParser");
+        private readonly bool _useChannel = true;
+        private Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
+
         /// <summary>
         /// 解析器中的数据
         /// </summary>
         protected RemainBytes _bytes = new();
+
         /// <inheritdoc/>
         public event ReceiveParsedDataEventHandler? OnReceiveParsedData;
+
+        /// <inheritdoc/>
+        protected BaseParser(bool useChannel = true)
+        {
+            _useChannel = useChannel;
+            if (_useChannel) _ = Task.Run(ParseAndProcessDataAsync);
+        }
+
+        private async Task ParseAndProcessDataAsync()
+        {
+            await foreach (var data in _channel.Reader.ReadAllAsync())
+            {
+                if (OnReceiveParsedData is not null)
+                {
+                    await OnReceiveParsedData.Invoke(data);
+                }
+            }
+        }
 
         /// <inheritdoc/>
         public async Task ReceiveOriginalDataAsync(byte[] data, int size)
@@ -63,9 +86,16 @@ namespace Parser.Parsers
             _bytes.RemoveHeader(endIndex - _bytes.StartIndex);
             try
             {
-                if (OnReceiveParsedData is not null)
+                if (_useChannel)
                 {
-                    await OnReceiveParsedData.Invoke(data);
+                    await _channel.Writer.WriteAsync(data);
+                }
+                else
+                {
+                    if (OnReceiveParsedData is not null)
+                    {
+                        await OnReceiveParsedData.Invoke(data);
+                    }
                 }
             }
             catch (Exception ex)
