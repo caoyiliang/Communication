@@ -42,3 +42,9 @@
 /TestDemo/TestUdp/obj
 /TestDemo/TestUdp1/bin
 /TestDemo/TestUdp1/obj
+/Communication.Bluetooth/bin
+/Communication.Bluetooth/obj
+/TestDemo/Bluetooth/TestClient/bin
+/TestDemo/Bluetooth/TestClient/obj
+/TestDemo/Bluetooth/TestServer/bin
+/TestDemo/Bluetooth/TestServer/obj

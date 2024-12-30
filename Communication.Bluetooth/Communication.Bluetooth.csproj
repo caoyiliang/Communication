@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>default</LangVersion>
+		<PackageId>CSoft.Communication.Bluetooth</PackageId>
+		<Title>通讯库蓝牙拓展</Title>
+		<Version>9.1.0</Version>
+		<Authors>CSoft</Authors>
+		<PackageIcon>logo.png</PackageIcon>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
+		<PackageReleaseNotes>更新.net9.0</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\logo.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.1.44" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
+	</ItemGroup>
+
+</Project>
