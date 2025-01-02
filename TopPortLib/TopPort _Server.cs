@@ -17,6 +17,8 @@ namespace TopPortLib
         public IPhysicalPort_Server PhysicalPort { get; }
 
         /// <inheritdoc/>
+        public event SentDataToClientEventHandler<byte[]>? OnSentData;
+        /// <inheritdoc/>
         public event ReceiveParsedDataFromClientEventHandler? OnReceiveParsedData;
         /// <inheritdoc/>
         public event ClientConnectEventHandler? OnClientConnect;
@@ -78,6 +80,7 @@ namespace TopPortLib
         public async Task SendAsync(Guid clientId, byte[] data)
         {
             await PhysicalPort.SendDataAsync(clientId, data);
+            if (OnSentData is not null) await OnSentData.Invoke(data, clientId);
         }
 
         /// <inheritdoc/>

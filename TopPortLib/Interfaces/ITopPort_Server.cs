@@ -15,6 +15,11 @@ namespace TopPortLib.Interfaces
         IPhysicalPort_Server PhysicalPort { get; }
 
         /// <summary>
+        /// 发送数据
+        /// </summary>
+        event SentDataToClientEventHandler<byte[]>? OnSentData;
+
+        /// <summary>
         /// 推送解析数据
         /// </summary>
         event ReceiveParsedDataFromClientEventHandler? OnReceiveParsedData;

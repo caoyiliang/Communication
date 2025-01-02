@@ -15,6 +15,14 @@
     public delegate Task ReceiveOriginalDataEventHandler(byte[] data, int size);
 
     /// <summary>
+    /// 服务端发出的数据
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="data">发出的数据</param>
+    /// <param name="clientId">客户端ID</param>
+    public delegate Task SentDataToClientEventHandler<T>(T data, Guid clientId);
+
+    /// <summary>
     /// 服务端接收数据推送
     /// </summary>
     /// <param name="data">收到字节数组</param>
