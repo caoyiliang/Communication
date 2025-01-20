@@ -75,7 +75,7 @@ namespace Crow
                 {
                     if (!_queue.TryDequeue(out var data))
                     {
-                        if (await Task.WhenAny(Task.Delay(100), _startStop.Task) == _startStop.Task)
+                        if (await Task.WhenAny(Task.Delay(10), _startStop.Task) == _startStop.Task)
                             break;
                         else
                             continue;
