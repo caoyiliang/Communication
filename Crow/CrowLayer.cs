@@ -1,6 +1,6 @@
 ﻿using Crow.Exceptions;
 using Crow.Interfaces;
-using System.Collections.Concurrent;
+using System.Threading.Channels;
 
 namespace Crow
 {
@@ -17,8 +17,8 @@ namespace Crow
         private TaskCompletionSource<bool>? _startStop;
         private TaskCompletionSource<bool>? _completeStop;
         private TaskCompletionSource<TRsp>? _rsp;
-        private ConcurrentQueue<ReqInfo>? _queue;
         private volatile bool _isActive = false;
+        private Channel<ReqInfo> _channel = Channel.CreateUnbounded<ReqInfo>();
         /// <inheritdoc/>
         public event SentDataEventHandler<TReq>? OnSentData;
         /// <inheritdoc/>
@@ -67,79 +67,73 @@ namespace Crow
             if (_isActive) return;
 
             _isActive = true;
-            _queue = new ConcurrentQueue<ReqInfo>();
             _startStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _ = Task.Run(async () =>
+            _ = Task.Run(ProcessCrowQueueAsync);
+            await Task.CompletedTask;
+        }
+
+        private async Task ProcessCrowQueueAsync()
+        {
+            await foreach (var data in _channel.Reader.ReadAllAsync())
             {
-                while (true)
+                _rsp?.TrySetCanceled();
+                _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
+                try
                 {
-                    if (!_queue.TryDequeue(out var data))
+                    await _port.SendAsync(data.Req, _timeDelayAfterSending);
+                    if (OnSentData is not null)
                     {
-                        if (await Task.WhenAny(Task.Delay(10), _startStop.Task) == _startStop.Task)
-                            break;
-                        else
-                            continue;
+                        try
+                        {
+                            await OnSentData(data.Req);
+                        }
+                        catch { }
                     }
-                    _rsp?.TrySetCanceled();
-                    _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
-                    try
+                }
+                catch (Exception ex)
+                {
+                    data.Rsp.TrySetException(new TilesSendException("", ex));
+                    continue;
+                }
+                if (data.NeedRsp)
+                {
+                    var timeOut = Task.Delay(data.Time);
+                    var tasks = new List<Task>() { _rsp.Task, _startStop!.Task, timeOut };
+                    var task = await Task.WhenAny(tasks);
+                    if (task == _startStop.Task)
                     {
-                        await _port.SendAsync(data.Req, _timeDelayAfterSending);
-                        if (OnSentData is not null)
+                        data.Rsp.TrySetException(new CrowStopWorkingException());
+                    }
+                    else if (task == _rsp.Task)
+                    {
+                        var rsp = await _rsp.Task;
+                        data.Rsp.TrySetResult(rsp);
+                        if (OnReceivedData is not null)
                         {
                             try
                             {
-                                await OnSentData(data.Req);
+                                await OnReceivedData(rsp);
                             }
                             catch { }
                         }
                     }
-                    catch (Exception ex)
+                    else if (task == timeOut)
                     {
-                        data.Rsp.TrySetException(new TilesSendException("", ex));
-                        continue;
-                    }
-                    if (data.NeedRsp)
-                    {
-                        var timeOut = Task.Delay(data.Time);
-                        var tasks = new List<Task>() { _rsp.Task, _startStop.Task, timeOut };
-                        var task = await Task.WhenAny(tasks);
-                        if (task == _startStop.Task)
-                        {
-                            data.Rsp.TrySetException(new CrowStopWorkingException());
-                        }
-                        else if (task == _rsp.Task)
-                        {
-                            var rsp = await _rsp.Task;
-                            data.Rsp.TrySetResult(rsp);
-                            if (OnReceivedData is not null)
-                            {
-                                try
-                                {
-                                    await OnReceivedData(rsp);
-                                }
-                                catch { }
-                            }
-                        }
-                        else if (task == timeOut)
-                        {
-                            data.Rsp.TrySetException(new TimeoutException($"background timeout"));
-                        }
-                        else
-                        {
-
-                        }
+                        data.Rsp.TrySetException(new TimeoutException($"background timeout"));
                     }
                     else
                     {
-                        data.Rsp.TrySetResult(default);
-                        if (_startStop.Task.IsCompleted)
-                            break;
+
                     }
                 }
-                _completeStop?.TrySetResult(true);
-            });
-            await Task.CompletedTask;
+                else
+                {
+                    data.Rsp.TrySetResult(default);
+                    if (_startStop!.Task.IsCompleted)
+                        break;
+                }
+            }
+            _completeStop?.TrySetResult(true);
         }
 
         /// <inheritdoc/>
@@ -155,11 +149,11 @@ namespace Crow
         private async Task<TRsp?> RequestAsync(TReq req, bool needRsp, int timeout)
         {
             if (!_isActive) throw new CrowStopWorkingException();
-            if (_queue!.Count > 10) throw new CrowBusyException();
+            if (_channel!.Reader.Count > 10) throw new CrowBusyException();
             var rsp = new TaskCompletionSource<TRsp?>(TaskCreationOptions.RunContinuationsAsynchronously);
             var tm = timeout == -1 ? _defaultTimeout : timeout;
             var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm };
-            _queue.Enqueue(data);
+            await _channel.Writer.WriteAsync(data);
             return await rsp.Task;
         }
         class ReqInfo
