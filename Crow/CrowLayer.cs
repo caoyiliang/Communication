@@ -17,8 +17,10 @@ namespace Crow
         private TaskCompletionSource<bool>? _startStop;
         private TaskCompletionSource<bool>? _completeStop;
         private TaskCompletionSource<TRsp>? _rsp;
+        private CancellationTokenSource? _cts;
+        private Task? _task;
         private volatile bool _isActive = false;
-        private Channel<ReqInfo> _channel = Channel.CreateUnbounded<ReqInfo>();
+        private readonly Channel<ReqInfo> _channel = Channel.CreateUnbounded<ReqInfo>();
         /// <inheritdoc/>
         public event SentDataEventHandler<TReq>? OnSentData;
         /// <inheritdoc/>
@@ -68,70 +70,77 @@ namespace Crow
 
             _isActive = true;
             _startStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            _ = Task.Run(ProcessCrowQueueAsync);
+            _cts = new CancellationTokenSource();
+            _task = Task.Run(ProcessCrowQueueAsync);
             await Task.CompletedTask;
         }
 
         private async Task ProcessCrowQueueAsync()
         {
-            await foreach (var data in _channel.Reader.ReadAllAsync())
+            try
             {
-                _rsp?.TrySetCanceled();
-                _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
-                try
+                await foreach (var data in _channel.Reader.ReadAllAsync(_cts!.Token))
                 {
-                    await _port.SendAsync(data.Req, _timeDelayAfterSending);
-                    if (OnSentData is not null)
+                    _rsp?.TrySetCanceled();
+                    _rsp = new TaskCompletionSource<TRsp>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    try
                     {
-                        try
-                        {
-                            await OnSentData(data.Req);
-                        }
-                        catch { }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    data.Rsp.TrySetException(new TilesSendException("", ex));
-                    continue;
-                }
-                if (data.NeedRsp)
-                {
-                    var timeOut = Task.Delay(data.Time);
-                    var tasks = new List<Task>() { _rsp.Task, _startStop!.Task, timeOut };
-                    var task = await Task.WhenAny(tasks);
-                    if (task == _startStop.Task)
-                    {
-                        data.Rsp.TrySetException(new CrowStopWorkingException());
-                    }
-                    else if (task == _rsp.Task)
-                    {
-                        var rsp = await _rsp.Task;
-                        data.Rsp.TrySetResult(rsp);
-                        if (OnReceivedData is not null)
+                        await _port.SendAsync(data.Req, _timeDelayAfterSending);
+                        if (OnSentData is not null)
                         {
                             try
                             {
-                                await OnReceivedData(rsp);
+                                await OnSentData(data.Req);
                             }
                             catch { }
                         }
                     }
-                    else if (task == timeOut)
+                    catch (Exception ex)
                     {
-                        data.Rsp.TrySetException(new TimeoutException($"background timeout"));
+                        data.Rsp.TrySetException(new TilesSendException("", ex));
+                        continue;
+                    }
+                    if (data.NeedRsp)
+                    {
+                        var timeOut = Task.Delay(data.Time);
+                        var tasks = new List<Task>() { _rsp.Task, _startStop!.Task, timeOut };
+                        var task = await Task.WhenAny(tasks);
+                        if (task == _startStop.Task)
+                        {
+                            data.Rsp.TrySetException(new CrowStopWorkingException());
+                        }
+                        else if (task == _rsp.Task)
+                        {
+                            var rsp = await _rsp.Task;
+                            data.Rsp.TrySetResult(rsp);
+                            if (OnReceivedData is not null)
+                            {
+                                try
+                                {
+                                    await OnReceivedData(rsp);
+                                }
+                                catch { }
+                            }
+                        }
+                        else if (task == timeOut)
+                        {
+                            data.Rsp.TrySetException(new TimeoutException($"background timeout"));
+                        }
+                        else
+                        {
+
+                        }
                     }
                     else
                     {
-
+                        data.Rsp.TrySetResult(default);
+                        if (_startStop!.Task.IsCompleted)
+                            break;
                     }
                 }
-                else
-                {
-                    data.Rsp.TrySetResult(default);
-                    if (_startStop!.Task.IsCompleted)
-                        break;
-                }
+            }
+            catch (OperationCanceledException)
+            {
             }
             _completeStop?.TrySetResult(true);
         }
@@ -142,7 +151,9 @@ namespace Crow
             if (!_isActive) return;
             _completeStop = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             _startStop?.TrySetResult(true);
+            _cts?.Cancel();
             await _completeStop.Task;
+            if (_task is not null) await _task;
             _isActive = false;
         }
 
