@@ -1,6 +1,7 @@
 ﻿using Communication.Exceptions;
 using Communication.Interfaces;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Communication.Bus.PhysicalPort
 {
@@ -50,7 +51,22 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            var result = await _client!.ReceiveAsync();
+            UdpReceiveResult result = new();
+            await Task.Run(async () =>
+            {
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        result = await _client!.ReceiveAsync();
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    await Task.Delay(50, cancellationToken);
+                }
+            }, cancellationToken);
             return new ReadDataResult
             {
                 Data = result.Buffer,
