@@ -46,6 +46,7 @@
         /// </summary>
         /// <param name="clientId">客户端ID</param>
         /// <param name="data">发送字节数组</param>
+        /// <exception cref="DriveNotFoundException">未找到clientId对应设备</exception>
         Task SendDataAsync(Guid clientId, byte[] data);
 
         /// <summary>

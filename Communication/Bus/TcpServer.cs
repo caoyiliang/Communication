@@ -113,12 +113,16 @@ namespace Communication.Bus
         {
             try
             {
-                if (!_dicClients.TryGetValue(clientId, out var client)) return;
+                if (!_dicClients.TryGetValue(clientId, out var client)) throw new DriveNotFoundException();
                 var stream = client.client.GetStream();
                 lock (stream)
                 {
                     stream.Write(data, 0, data.Length);
                 }
+            }
+            catch (DriveNotFoundException)
+            {
+                throw;
             }
             catch (Exception e)
             {
