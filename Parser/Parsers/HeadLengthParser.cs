@@ -101,7 +101,7 @@ namespace Parser.Parsers
         }
 
         /// <inheritdoc/>
-        protected override void ResetSatrtIndex(int bytesOldIndex)
+        protected override void ResetStartIndex(int bytesOldIndex)
         {
             if (_startIndex != -1)
                 _startIndex -= bytesOldIndex;

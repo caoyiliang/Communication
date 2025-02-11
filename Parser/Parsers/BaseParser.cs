@@ -12,7 +12,7 @@ namespace Parser.Parsers
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger("BaseParser");
         private readonly bool _useChannel = true;
-        private Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
+        private readonly Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
 
         /// <summary>
         /// 解析器中的数据
@@ -47,7 +47,7 @@ namespace Parser.Parsers
             _bytes.Append(data, 0, size);
             if (bytesOldIndex != 0 && _bytes.StartIndex == 0)
             {
-                ResetSatrtIndex(bytesOldIndex);
+                ResetStartIndex(bytesOldIndex);
             }
             while (await ReceiveOneFrameAsync()) ;
         }
@@ -56,7 +56,7 @@ namespace Parser.Parsers
         /// 设置新的起始位置
         /// </summary>
         /// <param name="bytesOldIndex">旧位置</param>
-        protected virtual void ResetSatrtIndex(int bytesOldIndex) { }
+        protected virtual void ResetStartIndex(int bytesOldIndex) { }
 
         /// <summary>
         /// 能否找新的结束位置
