@@ -1,6 +1,7 @@
 ﻿using Communication.Exceptions;
 using Communication.Interfaces;
 using LogInterface;
+using System.Threading.Channels;
 
 namespace Communication.Bus
 {
@@ -15,8 +16,9 @@ namespace Communication.Bus
         private const int BUFFER_SIZE = 8192;
         private CancellationTokenSource? _closeCts;
         private TaskCompletionSource<bool>? _closeTcs;
+        private Task? _sendTask;
         private volatile bool _isActiveClose = true;//是否主动断开
-        private readonly SemaphoreSlim _semaphore4Write = new(1, 1);
+        private readonly Channel<(byte[] data, int timeInterval, TaskCompletionSource<bool> tsc)> _channel = Channel.CreateUnbounded<(byte[] data, int timeInterval, TaskCompletionSource<bool> tsc)>();
         private IPhysicalPort _physicalPort = physicalPort ?? throw new NullReferenceException("physicalPort is null");
         private bool IsOpen { get => _physicalPort.IsOpen; }
 
@@ -59,6 +61,24 @@ namespace Communication.Bus
             });
         }
 
+        private async Task SendProcessDataAsync()
+        {
+            await foreach (var (data, timeInterval, tsc) in _channel.Reader.ReadAllAsync(_closeCts!.Token))
+            {
+                try
+                {
+                    await _physicalPort.SendDataAsync(data, _closeCts!.Token);
+                    if (OnSentData is not null) await OnSentData.Invoke(data);
+                    if (timeInterval > 0) await Task.Delay(timeInterval);
+                    tsc.TrySetResult(true);
+                }
+                catch (Exception e)
+                {
+                    tsc.TrySetException(e);
+                }
+            }
+        }
+
         /// <inheritdoc/>
         public async Task CloseAsync()
         {
@@ -67,6 +87,7 @@ namespace Communication.Bus
             _closeCts?.Cancel();
             if (IsOpen)
                 await _physicalPort.CloseAsync();
+            if (_sendTask is not null) await _sendTask;
             if (_closeTcs is not null && _closeCts is not null && (!_closeCts.IsCancellationRequested))
                 if (await Task.WhenAny(_closeTcs.Task, Task.Delay(2000)) != _closeTcs.Task)
                 {
@@ -81,24 +102,9 @@ namespace Communication.Bus
             {
                 throw new NotConnectedException("Bus is not connected!");
             }
-            try
-            {
-                try
-                {
-                    await _semaphore4Write.WaitAsync();
-                    await _physicalPort.SendDataAsync(data, _closeCts!.Token);
-                    if (OnSentData is not null) await OnSentData.Invoke(data);
-                    if (timeInterval > 0) await Task.Delay(timeInterval);
-                }
-                finally
-                {
-                    _semaphore4Write.Release();
-                }
-            }
-            catch (Exception e)
-            {
-                throw new SendException("send failed", e);
-            }
+            var tcs = new TaskCompletionSource<bool>();
+            await _channel.Writer.WriteAsync((data, timeInterval, tcs));
+            await tcs.Task;
         }
 
         private async Task ReadBusAsync()
@@ -143,6 +149,7 @@ namespace Communication.Bus
                     await _physicalPort.OpenAsync();
                     _closeCts = new CancellationTokenSource();
                     _closeTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    _sendTask = Task.Run(SendProcessDataAsync, _closeCts.Token);
                     if (OnConnect is not null)
                     {
                         await OnConnect.Invoke();

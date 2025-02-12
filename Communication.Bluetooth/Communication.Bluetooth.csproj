@@ -7,12 +7,12 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>9.4.0</Version>
+		<Version>9.5.0</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-		<PackageReleaseNotes>UDP重构</PackageReleaseNotes>
+		<PackageReleaseNotes>提升PhysicalPort发送效率</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 	</PropertyGroup>
 
