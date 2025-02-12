@@ -41,22 +41,20 @@ namespace Communication.Bus.PhysicalPort
         {
             get
             {
-                if (_client == null)
-                    return false;
-
+                if (_client == null) return false;
                 if (!_client.Connected) return false;
                 // 另外说明：tcpc.Connected同tcpc.Client.Connected；
                 // tcpc.Client.Connected只能表示Socket上次操作(send,recieve,connect等)时是否能正确连接到资源,
                 // 不能用来表示Socket的实时连接状态。
-                try
-                {
-                    if (_client.Client.Poll(1, SelectMode.SelectRead) && (_client.Available == 0))
-                        return false;
-                }
-                catch
-                {
-                    return false;
-                }
+                //try
+                //{
+                //    if (_client.Client.Poll(1, SelectMode.SelectRead) && (_client.Available == 0))
+                //        return false;
+                //}
+                //catch
+                //{
+                //    return false;
+                //}
                 return true;
             }
         }
@@ -84,7 +82,7 @@ namespace Communication.Bus.PhysicalPort
                         File.WriteAllText(Path.Combine(procPath, "tcp_keepalive_probes"), keepAliveRetryCount.ToString());
                     }
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime , keepAliveInterval ), null);
+                        _ = socket.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime, keepAliveInterval), null);
 #else
                     try
                     {

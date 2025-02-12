@@ -11,9 +11,11 @@
 /Parser/obj
 /TopPortLib/bin
 /TopPortLib/obj
+/Communication.Bluetooth/bin
+/Communication.Bluetooth/obj
+/packages
 /TestDemo/MockTcpClient/bin
 /TestDemo/MockTcpClient/obj
-/packages
 /TestDemo/PigeonPortDemo/bin
 /TestDemo/PigeonPortDemo/obj
 /TestDemo/Test/bin
@@ -42,9 +44,11 @@
 /TestDemo/TestUdp/obj
 /TestDemo/TestUdp1/bin
 /TestDemo/TestUdp1/obj
-/Communication.Bluetooth/bin
-/Communication.Bluetooth/obj
 /TestDemo/Bluetooth/TestClient/bin
 /TestDemo/Bluetooth/TestClient/obj
 /TestDemo/Bluetooth/TestServer/bin
 /TestDemo/Bluetooth/TestServer/obj
+/TestDemo/Client/bin
+/TestDemo/Client/obj
+/TestDemo/Server/bin
+/TestDemo/Server/obj

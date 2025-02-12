@@ -5,7 +5,7 @@ namespace Communication.Interfaces
     /// <summary>
     /// 总线接口
     /// </summary>
-    public interface IBusPort : IDisposable
+    public interface IBusPort : IAsyncDisposable
     {
         /// <summary>
         /// 物理口
