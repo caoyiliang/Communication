@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSoft.TopPortLib" Version="9.7.1" />
+    <ProjectReference Include="..\..\TopPortLib\TopPortLib.csproj" />
   </ItemGroup>
 
 </Project>
