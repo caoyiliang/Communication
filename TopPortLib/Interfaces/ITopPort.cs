@@ -38,8 +38,9 @@ namespace TopPortLib.Interfaces
         /// <summary>
         /// 打开通讯口
         /// </summary>
+        /// <param name="reconnectAfterInitialFailure">首次连接失败后是否重连</param>
         /// <exception cref="ConnectFailedException"></exception>
-        Task OpenAsync();
+        Task OpenAsync(bool reconnectAfterInitialFailure = false);
 
         /// <summary>
         /// 关闭通讯口

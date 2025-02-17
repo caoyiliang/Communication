@@ -32,7 +32,7 @@ namespace Communication.Bus
         public event SentDataEventHandler<byte[]>? OnSentData;
 
         /// <inheritdoc/>
-        public async Task OpenAsync()
+        public async Task OpenAsync(bool reconnectAfterInitialFailure = false)
         {
             if (!_isActiveClose) return;
             _isActiveClose = false;
@@ -42,21 +42,27 @@ namespace Communication.Bus
             }
             catch (ConnectFailedException)
             {
-                _isActiveClose = true;
+                if (!reconnectAfterInitialFailure)
+                {
+                    _isActiveClose = true;
+                }
                 throw;
             }
-            _ = Task.Run(async () =>
+            finally
             {
-                while (!_isActiveClose)
+                _ = Task.Run(async () =>
                 {
-                    await OpenAsync_();
-                    await ReadBusAsync();
-                    if (OnDisconnect is not null)
+                    while (!_isActiveClose)
                     {
-                        await OnDisconnect.Invoke();
+                        await OpenAsync_();
+                        await ReadBusAsync();
+                        if (OnDisconnect is not null)
+                        {
+                            await OnDisconnect.Invoke();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         /// <inheritdoc/>

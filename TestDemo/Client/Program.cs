@@ -7,16 +7,33 @@ using TopPortLib;
 
 Console.WriteLine("Hello, World!");
 long totalBytesReceived = 0;
+var isConnected = false;
 
 var _tcpClient = new TopPort(new TcpClient("192.168.18.200", 7778), new NoParser());
-
+_tcpClient.OnConnect += () =>
+{
+    isConnected = true;
+    return Task.CompletedTask;
+};
 //_tcpClient.OnReceiveParsedData += (data) =>
 //{
 //    totalBytesReceived += data.Length;
 //    return Task.CompletedTask;
 //};
 
-await _tcpClient.OpenAsync();
+try
+{
+    await _tcpClient.OpenAsync(true);
+}
+catch
+{
+
+}
+
+while(!isConnected)
+{
+    await Task.Delay(1000);
+}
 
 //var _tcpClient = new TcpClient("192.168.18.200", 7778);
 //await _tcpClient.OpenAsync();

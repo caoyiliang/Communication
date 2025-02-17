@@ -45,9 +45,9 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
-        public async Task OpenAsync()
+        public async Task OpenAsync(bool reconnectAfterInitialFailure = false)
         {
-            await _port.OpenAsync();
+            await _port.OpenAsync(reconnectAfterInitialFailure);
         }
 
         /// <inheritdoc/>
