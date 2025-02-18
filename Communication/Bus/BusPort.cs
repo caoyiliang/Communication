@@ -8,8 +8,9 @@ namespace Communication.Bus
     /// 处理总线
     /// </summary>
     /// <param name="physicalPort">物理口</param>
+    /// <param name="isDisconnectedWhenZero">读到字节数为0是否认为断连</param>
     /// <exception cref="NullReferenceException"></exception>
-    public class BusPort(IPhysicalPort physicalPort) : IBusPort
+    public class BusPort(IPhysicalPort physicalPort, bool isDisconnectedWhenZero = true) : IBusPort
     {
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<BusPort>();
         private const int BUFFER_SIZE = 8192;
@@ -114,7 +115,18 @@ namespace Communication.Bus
                 while (!_closeCts!.IsCancellationRequested)
                 {
                     var result = await _physicalPort.ReadDataAsync(BUFFER_SIZE, _closeCts.Token);
-                    if (result.Length <= 0) break;
+                    if (result.Length <= 0)
+                    {
+                        if (isDisconnectedWhenZero)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
                     try
                     {
                         if (OnReceiveOriginalData is not null)
