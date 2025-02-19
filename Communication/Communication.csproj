@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>9.6.1</Version>
+    <Version>9.6.2</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>
-		新增 `isDisconnectedWhenZero` 参数，控制读取到字节数为0时的连接断开行为
+		构造函数移除了 `isDisconnectedWhenZero` 参数，并简化了数据读取逻辑
 	</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>

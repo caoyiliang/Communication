@@ -7,12 +7,12 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>9.7.1</Version>
+		<Version>9.7.2</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-		<PackageReleaseNotes>新增 `isDisconnectedWhenZero` 参数，控制读取到字节数为0时的连接断开行为</PackageReleaseNotes>
+		<PackageReleaseNotes>构造函数移除了 `isDisconnectedWhenZero` 参数，并简化了数据读取逻辑</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 	</PropertyGroup>
 

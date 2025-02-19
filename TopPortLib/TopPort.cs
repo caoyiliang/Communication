@@ -31,11 +31,10 @@ namespace TopPortLib
         /// </summary>
         /// <param name="physicalPort">物理口</param>
         /// <param name="parser">解析器</param>
-        /// <param name="isDisconnectedWhenZero">读到字节数为0是否认为断连</param>
-        public TopPort(IPhysicalPort physicalPort, IParser parser, bool isDisconnectedWhenZero = true)
+        public TopPort(IPhysicalPort physicalPort, IParser parser)
         {
             _parser = parser;
-            _port = new BusPort(physicalPort, isDisconnectedWhenZero);
+            _port = new BusPort(physicalPort);
             _port.OnReceiveOriginalData += parser.ReceiveOriginalDataAsync;
         }
 
