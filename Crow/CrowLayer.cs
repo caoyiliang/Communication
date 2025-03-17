@@ -102,9 +102,11 @@ namespace Crow
                     }
                     if (data.NeedRsp)
                     {
-                        var timeOut = Task.Delay(data.Time);
+                        var cts = new CancellationTokenSource();
+                        var timeOut = Task.Delay(data.Time, cts.Token);
                         var tasks = new List<Task>() { _rsp.Task, _startStop!.Task, timeOut };
                         var task = await Task.WhenAny(tasks);
+                        cts.Cancel();
                         if (task == _startStop.Task)
                         {
                             data.Rsp.TrySetException(new CrowStopWorkingException());

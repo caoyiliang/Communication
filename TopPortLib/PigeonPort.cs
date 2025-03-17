@@ -164,7 +164,8 @@ namespace TopPortLib
                 _reqInfos.Add(reqInfo);
             }
             var bytes = req.ToBytes();
-            var timeoutTask = Task.Delay(to);
+            var cts = new CancellationTokenSource();
+            var timeoutTask = Task.Delay(to, cts.Token);
             try
             {
                 var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
@@ -172,6 +173,7 @@ namespace TopPortLib
                     throw new TimeoutException($"send timeout={to}");
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"timeout={to}");
+                cts.Cancel();
                 return (TRsp)await tcs.Task;
             }
             finally
@@ -201,19 +203,23 @@ namespace TopPortLib
             var bytes = req.ToBytes();
             try
             {
-                var timeoutTask = Task.Delay(to);
+                var cts = new CancellationTokenSource();
+                var timeoutTask = Task.Delay(to, cts.Token);
                 var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                     throw new TimeoutException($"send timeout={to}");
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"rec timeout={to}");
+                cts.Cancel();
                 var rs1 = (TRsp1)await tcs.Task;
-                var timeoutTask1 = Task.Delay(to);
+                cts = new CancellationTokenSource();
+                var timeoutTask1 = Task.Delay(to, cts.Token);
                 tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
                 reqInfo.RspType = typeof(TRsp2);
                 reqInfo.TaskCompletionSource = tcs;
                 if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
                     throw new TimeoutException($"exe time out={to}");
+                cts.Cancel();
                 var rs2 = (TRsp2)await tcs.Task;
                 return (rs1, rs2);
             }
@@ -230,11 +236,13 @@ namespace TopPortLib
         public async Task SendAsync<TReq>(TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var timeoutTask = Task.Delay(to);
+            var cts = new CancellationTokenSource();
+            var timeoutTask = Task.Delay(to, cts.Token);
             var bytes = req.ToBytes();
             var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
             if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                 throw new TimeoutException($"timeout={to}");
+            cts.Cancel();
         }
 
         private async Task RespondedDataAsync(byte[] data)
