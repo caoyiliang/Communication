@@ -7,12 +7,12 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>9.7.2</Version>
+		<Version>9.7.3</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-		<PackageReleaseNotes>构造函数移除了 `isDisconnectedWhenZero` 参数，并简化了数据读取逻辑</PackageReleaseNotes>
+		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 	</PropertyGroup>
 
@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.1.44" />
+		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
