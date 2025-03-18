@@ -83,10 +83,6 @@ namespace Communication.Bus
         /// <inheritdoc/>
         public async Task SendAsync(byte[] data, int timeInterval = 0)
         {
-            if (!IsOpen)
-            {
-                throw new NotConnectedException("Bus is not connected!");
-            }
             try
             {
                 try

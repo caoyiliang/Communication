@@ -46,15 +46,15 @@ namespace Communication.Bus.PhysicalPort
                 // 另外说明：tcpc.Connected同tcpc.Client.Connected；
                 // tcpc.Client.Connected只能表示Socket上次操作(send,recieve,connect等)时是否能正确连接到资源,
                 // 不能用来表示Socket的实时连接状态。
-                //try
-                //{
-                //    if (_client.Client.Poll(1, SelectMode.SelectRead) && (_client.Available == 0))
-                //        return false;
-                //}
-                //catch
-                //{
-                //    return false;
-                //}
+                try
+                {
+                    if (_client.Client.Poll(1, SelectMode.SelectRead) && (_client.Available == 0))
+                        return false;
+                }
+                catch
+                {
+                    return false;
+                }
                 return true;
             }
         }
