@@ -3,6 +3,7 @@ using LogInterface;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using Utils;
 
 namespace Communication.Bus
 {
@@ -88,7 +89,7 @@ namespace Communication.Bus
                 _logger.Error("Client not found");
                 return;
             }
-            await _client!.SendAsync(data, data.Length, Dns.GetHostEntry(remoteEndPoint.EndPoint.Address).HostName, remoteEndPoint.EndPoint.Port);
+            await _client!.SendAsync(data, data.Length, new IPEndPoint(remoteEndPoint.EndPoint.Address, remoteEndPoint.EndPoint.Port));
         }
 
         /// <inheritdoc/>
@@ -98,7 +99,7 @@ namespace Communication.Bus
             var clientId = Guid.NewGuid();
             if (remoteEndPoint.Value.EndPoint == null)
             {
-                _dicClients.TryAdd(clientId, (new IPEndPoint(IPAddress.Parse(hostName), port), DateTime.UtcNow));
+                _dicClients.TryAdd(clientId, (new IPEndPoint(await hostName.ResolveHostAsync(), port), DateTime.UtcNow));
                 try
                 {
                     if (OnClientConnect is not null)
@@ -123,7 +124,7 @@ namespace Communication.Bus
         public async Task StartAsync()
         {
             if (this.IsActive) return;
-            _client = new UdpClient(new IPEndPoint(IPAddress.Parse(hostName), port));
+            _client = new UdpClient(new IPEndPoint(await hostName.ResolveHostAsync(), port));
             this.IsActive = true;
             _stopCts = new CancellationTokenSource();
             _ = Task.Run(RemoveInactiveClientsAsync);

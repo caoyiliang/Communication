@@ -4,7 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>9.1.5</Version>
+		<Version>9.1.6</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
@@ -19,7 +19,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CSoft.LogInterface" Version="9.0.0" />
-		<PackageReference Include="CSoft.Utils" Version="9.1.5" />
+		<PackageReference Include="CSoft.Utils" Version="9.1.6" />
 		<PackageReference Include="System.Threading.Channels" Version="9.0.3" />
 	</ItemGroup>
 
