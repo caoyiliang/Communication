@@ -41,13 +41,19 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            var data = new byte[count];
-            int length = await BaseStream.ReadAsync(data, 0, count, cancellationToken);
-            return new ReadDataResult
+            while (true)
             {
-                Length = length,
-                Data = data
-            };
+                if (BytesToRead > 0)
+                {
+                    var data = new byte[BytesToRead];
+                    int length = await BaseStream.ReadAsync(data, 0, BytesToRead, cancellationToken);
+                    return new ReadDataResult
+                    {
+                        Length = length,
+                        Data = data
+                    };
+                }
+            }
         }
 
         /// <inheritdoc/>

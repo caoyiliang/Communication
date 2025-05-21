@@ -2,11 +2,11 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
-		<Version>9.10.2</Version>
+		<Version>9.11.0</Version>
 		<Description>通讯口使用类库</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes>
-			简化连接状态检查和错误处理
+			更新 串口读取方式
 		</PackageReleaseNotes>
 		<PackageId>CSoft.TopPortLib</PackageId>
 		<Authors>CSoft</Authors>
