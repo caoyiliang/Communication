@@ -43,10 +43,11 @@ namespace Communication.Bus.PhysicalPort
         {
             while (true)
             {
-                if (BytesToRead > 0)
+                int available = BytesToRead;
+                if (available > 0)
                 {
-                    var data = new byte[BytesToRead];
-                    int length = await BaseStream.ReadAsync(data, 0, BytesToRead, cancellationToken);
+                    var data = new byte[available];
+                    int length = await BaseStream.ReadAsync(data, 0, available, cancellationToken);
                     return new ReadDataResult
                     {
                         Length = length,
