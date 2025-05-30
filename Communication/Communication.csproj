@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>9.8.1</Version>
+    <Version>9.8.3</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>
-		更新 串口读取方式
+		优化 串口读取方式
 	</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>
