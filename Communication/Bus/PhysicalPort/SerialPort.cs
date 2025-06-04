@@ -9,83 +9,87 @@ namespace Communication.Bus.PhysicalPort
     /// </summary>
     public class SerialPort : System.IO.Ports.SerialPort, IPhysicalPort, IDisposable
     {
-        private TaskCompletionSource<bool> _dataReceivedTcs = new();
+        private volatile TaskCompletionSource<bool> _dataReceivedTcs = CreateTaskCompletionSource();
 
         /// <summary>物理串口</summary>
         public SerialPort() : base()
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(IContainer container) : base(container)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(string portName) : base(portName)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(string portName, int baudRate) : base(portName, baudRate)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(string portName, int baudRate, Parity parity) : base(portName, baudRate, parity)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(string portName, int baudRate, Parity parity, int dataBits) : base(portName, baudRate, parity, dataBits)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
         /// <summary>物理串口</summary>
         public SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits)
         {
-            DataReceived += OnDataReceived;
+            Initialize();
         }
 
         /// <inheritdoc/>
-        public async Task OpenAsync()
+        public Task OpenAsync()
         {
             Open();
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc/>
-        public async Task CloseAsync()
+        public Task CloseAsync()
         {
             Close();
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                // 等待数据到达
-                await WaitForDataAsync(cancellationToken);
-
-                int available = BytesToRead;
-                if (available > 0)
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    var data = new byte[Math.Min(available, count)];
-                    int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
-                    return new ReadDataResult
+                    // 等待数据到达
+                    await WaitForDataAsync(cancellationToken);
+
+                    int available = BytesToRead;
+                    if (available > 0)
                     {
-                        Length = length,
-                        Data = data
-                    };
+                        var data = new byte[Math.Min(available, count)];
+                        int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
+                        return new ReadDataResult
+                        {
+                            Length = length,
+                            Data = data
+                        };
+                    }
                 }
 
-                // 重置 TaskCompletionSource
+                throw new OperationCanceledException("读取操作被取消");
+            }
+            finally
+            {
                 ResetDataReceivedTcs();
             }
-
-            throw new OperationCanceledException("读取操作被取消");
         }
 
         /// <inheritdoc/>
@@ -107,7 +111,7 @@ namespace Communication.Bus.PhysicalPort
         {
             using (cancellationToken.Register(() => _dataReceivedTcs.TrySetCanceled()))
             {
-                await _dataReceivedTcs.Task;
+                await _dataReceivedTcs.Task.ConfigureAwait(false);
             }
         }
 
@@ -116,10 +120,23 @@ namespace Communication.Bus.PhysicalPort
         /// </summary>
         private void ResetDataReceivedTcs()
         {
-            if (_dataReceivedTcs.Task.IsCompleted)
-            {
-                _dataReceivedTcs = new TaskCompletionSource<bool>();
-            }
+            Interlocked.Exchange(ref _dataReceivedTcs, CreateTaskCompletionSource());
+        }
+
+        /// <summary>
+        /// 创建新的 TaskCompletionSource
+        /// </summary>
+        private static TaskCompletionSource<bool> CreateTaskCompletionSource()
+        {
+            return new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        private void Initialize()
+        {
+            DataReceived += OnDataReceived;
         }
 
         /// <summary>
@@ -131,6 +148,7 @@ namespace Communication.Bus.PhysicalPort
             if (disposing)
             {
                 DataReceived -= OnDataReceived;
+                _dataReceivedTcs.TrySetCanceled();
             }
             base.Dispose(disposing);
         }
