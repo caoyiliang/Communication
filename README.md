@@ -48,10 +48,10 @@ tcpServer.StartAsync();
 
 ### 1. 本地源码集成
 
-因未发现Nuget等包管理发布信息（以源码集成和项目引用为主），请直接下载 [GitHub项目](https://github.com/caoyiliang/Communication) 源码或将其作为子模块导入。
+提供Nuget包管理发布下载，也可直接下载 [GitHub项目](https://github.com/caoyiliang/Communication) 源码或将其作为子模块导入。
 
 ```shell
-git clone https://github.com/caoyiliang/Communication.git
+NuGet\Install-Package CSoft.TopPortLib -Version 9.12.0
 ```
 
 将 `/Communication`、`/TopPortLib`、`/Crow`、`/Parser` 等核心目录作为项目引用即可。
