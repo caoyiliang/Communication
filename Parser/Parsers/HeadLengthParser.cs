@@ -10,10 +10,21 @@ namespace Parser.Parsers
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger<HeadLengthParser>();
         private int _startIndex = -1;
         private int _length = -1;
+        
+        private byte[] _head;
         /// <summary>
         /// 帧头
         /// </summary>
-        private readonly byte[] _head;
+        public byte[] Head
+        {
+            get => _head;
+            set
+            {
+                if (value == null || value.Length == 0)
+                    throw new Exception("帧头不能为空或空数组");
+                _head = value;
+            }
+        }
         private readonly GetDataLengthEventHandler OnGetDataLength;
 
         /// <summary>
