@@ -166,7 +166,7 @@ public class MyParser : IParser
 
 ```csharp
 public class CustomParser : IParser { ... }
-IBusPort port = new TcpServer("127.0.0.1", 9000, new CustomParser());
+ITopPort port = new TopPort(new TcpServer("127.0.0.1", 9000), new CustomParser());
 ```
 
 ### 上层协议栈封装
