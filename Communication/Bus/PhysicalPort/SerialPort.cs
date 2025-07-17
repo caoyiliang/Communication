@@ -70,9 +70,14 @@ namespace Communication.Bus.PhysicalPort
                 {
                     _ = Task.Run(async () =>
                     {
-                        while (IsOpen && _dataReceivedTcs.Task.Status == TaskStatus.WaitingForActivation && !cancellationToken.IsCancellationRequested)
+                        while (IsOpen && !cancellationToken.IsCancellationRequested)
                         {
-                            await Task.Delay(10, cancellationToken);
+                            if (_dataReceivedTcs.Task.Status == TaskStatus.RanToCompletion) return;
+                            try
+                            {
+                                await Task.Delay(10, cancellationToken);
+                            }
+                            catch { return; }
                         }
                         _dataReceivedTcs.TrySetCanceled();
                     }, cancellationToken);
