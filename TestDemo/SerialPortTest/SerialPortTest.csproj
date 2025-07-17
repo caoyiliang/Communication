@@ -8,10 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Communication\Communication.csproj" />
-    <ProjectReference Include="..\Crow\Crow.csproj" />
-    <ProjectReference Include="..\Parser\Parser.csproj" />
-    <ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
+    <ProjectReference Include="..\..\Communication\Communication.csproj" />
+    <ProjectReference Include="..\..\Crow\Crow.csproj" />
+    <ProjectReference Include="..\..\Parser\Parser.csproj" />
+    <ProjectReference Include="..\..\TopPortLib\TopPortLib.csproj" />
   </ItemGroup>
+
 
 </Project>
