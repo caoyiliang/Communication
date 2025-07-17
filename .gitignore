@@ -52,3 +52,5 @@
 /TestDemo/Client/obj
 /TestDemo/Server/bin
 /TestDemo/Server/obj
+/SerialPortTest/bin
+/SerialPortTest/obj
