@@ -7,7 +7,7 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>9.9.4</Version>
+		<Version>9.10.1</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.2.1" />
+		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.2.2" />
 	</ItemGroup>
 
 	<ItemGroup>

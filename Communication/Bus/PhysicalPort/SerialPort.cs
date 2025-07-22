@@ -72,30 +72,26 @@ namespace Communication.Bus.PhysicalPort
                     {
                         while (IsOpen && !cancellationToken.IsCancellationRequested)
                         {
-                            if (_dataReceivedTcs.Task.Status == TaskStatus.RanToCompletion) return;
-                            try
+                            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                            var delayTask = Task.Delay(10, cts.Token);
+                            await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
+                            cts.Cancel();
+                            if (_dataReceivedTcs.Task.IsCompleted)
                             {
-                                await Task.Delay(10, cancellationToken);
+                                return;
                             }
-                            catch { return; }
                         }
                         _dataReceivedTcs.TrySetCanceled();
                     }, cancellationToken);
 
-                    // 等待数据到达
-                    await WaitForDataAsync(cancellationToken);
-
-                    int available = BytesToRead;
-                    if (available > 0)
+                    if (BytesToRead == 0) await WaitForDataAsync(cancellationToken);
+                    var data = new byte[Math.Min(BytesToRead, count)];
+                    int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
+                    return new ReadDataResult
                     {
-                        var data = new byte[Math.Min(available, count)];
-                        int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
-                        return new ReadDataResult
-                        {
-                            Length = length,
-                            Data = data
-                        };
-                    }
+                        Length = length,
+                        Data = data
+                    };
                 }
 
                 throw new OperationCanceledException("读取操作被取消");
