@@ -64,26 +64,26 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            try
+            while (!cancellationToken.IsCancellationRequested)
             {
-                while (!cancellationToken.IsCancellationRequested)
+                Task backgroundTask = Task.Run(async () =>
                 {
-                    _ = Task.Run(async () =>
+                    while (IsOpen && !cancellationToken.IsCancellationRequested)
                     {
-                        while (IsOpen && !cancellationToken.IsCancellationRequested)
+                        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                        var delayTask = Task.Delay(10, cts.Token);
+                        var task = await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
+                        if (task != delayTask)
                         {
-                            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                            var delayTask = Task.Delay(10, cts.Token);
-                            await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
                             cts.Cancel();
-                            if (_dataReceivedTcs.Task.IsCompleted)
-                            {
-                                return;
-                            }
+                            return;
                         }
-                        _dataReceivedTcs.TrySetCanceled();
-                    }, cancellationToken);
+                    }
+                    _dataReceivedTcs.TrySetCanceled();
+                }, cancellationToken);
 
+                try
+                {
                     if (BytesToRead == 0) await WaitForDataAsync(cancellationToken);
                     var data = new byte[Math.Min(BytesToRead, count)];
                     int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
@@ -93,13 +93,14 @@ namespace Communication.Bus.PhysicalPort
                         Data = data
                     };
                 }
+                finally
+                {
+                    await backgroundTask;
+                    ResetDataReceivedTcs();
+                }
+            }
 
-                throw new OperationCanceledException("读取操作被取消");
-            }
-            finally
-            {
-                ResetDataReceivedTcs();
-            }
+            throw new OperationCanceledException("读取操作被取消");
         }
 
         /// <inheritdoc/>
