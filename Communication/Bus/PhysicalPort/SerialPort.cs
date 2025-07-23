@@ -110,8 +110,19 @@ namespace Communication.Bus.PhysicalPort
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            // 当有数据到达时，设置 TaskCompletionSource 为完成状态
-            _dataReceivedTcs.TrySetResult(true);
+            try
+            {
+                if (!IsOpen)
+                {
+                    return;
+                }
+
+                if (BytesToRead > 0)
+                {
+                    _dataReceivedTcs.TrySetResult(true);
+                }
+            }
+            catch { }
         }
 
         /// <summary>
