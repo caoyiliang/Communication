@@ -9,7 +9,7 @@ namespace Communication.Bus.PhysicalPort
     /// </summary>
     public class SerialPort : System.IO.Ports.SerialPort, IPhysicalPort, IDisposable
     {
-        private volatile TaskCompletionSource<bool> _dataReceivedTcs = CreateTaskCompletionSource();
+        private TaskCompletionSource<bool> _dataReceivedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         /// <summary>物理串口</summary>
         public SerialPort() : base()
@@ -64,38 +64,36 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            Task backgroundTask = Task.Run(async () =>
+            if (BytesToRead == 0)
             {
-                while (IsOpen && !cancellationToken.IsCancellationRequested)
+                _dataReceivedTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                Task backgroundTask = Task.Run(async () =>
                 {
-                    using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    var delayTask = Task.Delay(10, cts.Token);
-                    var task = await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
-                    if (task != delayTask)
+                    while (IsOpen && !cancellationToken.IsCancellationRequested)
                     {
-                        cts.Cancel();
-                        return;
+                        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                        var delayTask = Task.Delay(10, cts.Token);
+                        var task = await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
+                        if (task != delayTask)
+                        {
+                            cts.Cancel();
+                            return;
+                        }
                     }
-                }
-                _dataReceivedTcs.TrySetCanceled();
-            }, cancellationToken);
-
-            try
-            {
-                if (BytesToRead == 0) await WaitForDataAsync(cancellationToken);
-                var data = new byte[Math.Min(BytesToRead, count)];
-                int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
-                return new ReadDataResult
-                {
-                    Length = length,
-                    Data = data
-                };
-            }
-            finally
-            {
+                    _dataReceivedTcs.TrySetCanceled();
+                }, cancellationToken);
+                using var ct = cancellationToken.Register(() => _dataReceivedTcs.TrySetCanceled());
+                await _dataReceivedTcs.Task;
                 await backgroundTask;
-                ResetDataReceivedTcs();
             }
+
+            var data = new byte[Math.Min(BytesToRead, count)];
+            int length = await BaseStream.ReadAsync(data, 0, data.Length, cancellationToken);
+            return new ReadDataResult
+            {
+                Length = length,
+                Data = data
+            };
         }
 
         /// <inheritdoc/>
@@ -119,33 +117,6 @@ namespace Communication.Bus.PhysicalPort
                 }
             }
             catch { }
-        }
-
-        /// <summary>
-        /// 等待数据到达
-        /// </summary>
-        private async Task WaitForDataAsync(CancellationToken cancellationToken)
-        {
-            using (cancellationToken.Register(() => _dataReceivedTcs.TrySetCanceled()))
-            {
-                await _dataReceivedTcs.Task.ConfigureAwait(false);
-            }
-        }
-
-        /// <summary>
-        /// 重置 TaskCompletionSource
-        /// </summary>
-        private void ResetDataReceivedTcs()
-        {
-            Interlocked.Exchange(ref _dataReceivedTcs, CreateTaskCompletionSource());
-        }
-
-        /// <summary>
-        /// 创建新的 TaskCompletionSource
-        /// </summary>
-        private static TaskCompletionSource<bool> CreateTaskCompletionSource()
-        {
-            return new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
         /// <summary>

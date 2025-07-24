@@ -125,7 +125,7 @@ namespace Communication.Bus
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
             }
