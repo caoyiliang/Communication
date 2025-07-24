@@ -9,13 +9,15 @@ namespace Communication.Bus.PhysicalPort
     /// </summary>
     public class SerialPort : System.IO.Ports.SerialPort, IPhysicalPort, IDisposable
     {
-        private TaskCompletionSource<bool> _dataReceivedTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly SemaphoreSlim _dataAvailableSemaphore = new(0);
+        private CancellationTokenSource? _backgroundTaskCts;
 
         /// <summary>物理串口</summary>
         public SerialPort() : base()
         {
             Initialize();
         }
+
         /// <summary>物理串口</summary>
         public SerialPort(IContainer container) : base(container)
         {
@@ -47,6 +49,31 @@ namespace Communication.Bus.PhysicalPort
             Initialize();
         }
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        private void Initialize()
+        {
+            DataReceived += OnDataReceived;
+        }
+
+        private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            try
+            {
+                if (!IsOpen)
+                {
+                    return;
+                }
+
+                if (BytesToRead > 0)
+                {
+                    _dataAvailableSemaphore.Release();
+                }
+            }
+            catch { }
+        }
+
         /// <inheritdoc/>
         public Task OpenAsync()
         {
@@ -64,27 +91,21 @@ namespace Communication.Bus.PhysicalPort
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
         {
-            if (BytesToRead == 0)
+            while (BytesToRead == 0)
             {
-                _dataReceivedTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-                Task backgroundTask = Task.Run(async () =>
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!IsOpen)
                 {
-                    while (IsOpen && !cancellationToken.IsCancellationRequested)
-                    {
-                        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                        var delayTask = Task.Delay(10, cts.Token);
-                        var task = await Task.WhenAny(_dataReceivedTcs.Task, delayTask);
-                        if (task != delayTask)
-                        {
-                            cts.Cancel();
-                            return;
-                        }
-                    }
-                    _dataReceivedTcs.TrySetCanceled();
-                }, cancellationToken);
-                using var ct = cancellationToken.Register(() => _dataReceivedTcs.TrySetCanceled());
-                await _dataReceivedTcs.Task;
-                await backgroundTask;
+                    throw new InvalidOperationException("Serial port is not open.");
+                }
+                try
+                {
+                    await _dataAvailableSemaphore.WaitAsync(10, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new OperationCanceledException("Read operation was canceled.");
+                }
             }
 
             var data = new byte[Math.Min(BytesToRead, count)];
@@ -100,48 +121,6 @@ namespace Communication.Bus.PhysicalPort
         public async Task SendDataAsync(byte[] data, CancellationToken cancellationToken)
         {
             await BaseStream.WriteAsync(data, 0, data.Length, cancellationToken);
-        }
-
-        private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            try
-            {
-                if (!IsOpen)
-                {
-                    return;
-                }
-
-                if (BytesToRead > 0)
-                {
-                    _dataReceivedTcs.TrySetResult(true);
-                }
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        private void Initialize()
-        {
-            DataReceived += OnDataReceived;
-        }
-
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        /// <param name="disposing">是否释放托管资源</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                DataReceived -= OnDataReceived;
-                if (!_dataReceivedTcs.Task.IsCompleted)
-                {
-                    _dataReceivedTcs.TrySetCanceled();
-                }
-            }
-            base.Dispose(disposing);
         }
     }
 }
