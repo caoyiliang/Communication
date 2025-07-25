@@ -94,8 +94,15 @@ namespace Parser.Parsers
             }
             if (_head.Length + _length > _bytes.Count - (_startIndex - _bytes.StartIndex))
             {
-                _bytes.SetCurrentMessageLength(_head.Length + _length);
-                if (!_haveHeadOfData) _length = -1;
+                if (_haveHeadOfData)
+                {
+                    _bytes.SetCurrentMessageLength(_head.Length + _length);
+                }
+                else
+                {
+                    _length = -1;
+                    _bytes.SetCurrentMessageLength(-1);
+                }
                 return false;
             }
             return true;
