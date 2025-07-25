@@ -82,7 +82,8 @@ namespace Parser.Parsers
             }
             if (_head.Length + _length > _bytes.Count - (_startIndex - _bytes.StartIndex))
             {
-                _bytes.SetCurrentMessageLength(_head.Length + _length);
+                _length = -1;
+                _bytes.SetCurrentMessageLength(-1);
                 return FrameEndStatusCode.Fail;
             }
             return FrameEndStatusCode.Success;
