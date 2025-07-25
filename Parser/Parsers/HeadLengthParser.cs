@@ -15,6 +15,10 @@ namespace Parser.Parsers
         /// </summary>
         private readonly byte[] _head;
         private readonly GetDataLengthEventHandler OnGetDataLength;
+        /// <summary>
+        /// 是否数据区含帧头
+        /// </summary>
+        private bool _haveHeadOfData;
 
         /// <summary>
         /// 长度为除了帧头之外的所有数据的长度
@@ -22,12 +26,14 @@ namespace Parser.Parsers
         /// <param name="head">帧头</param>
         /// <param name="getDataLength">获取数据包长度</param>
         /// <param name="useChannel">是否启用内置处理队列</param>
+        /// <param name="haveHeadOfData">是否数据区含帧头</param>
         /// <exception cref="Exception"></exception>
-        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength, bool useChannel = true) : base(useChannel)
+        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength, bool useChannel = true, bool haveHeadOfData = true) : base(useChannel)
         {
             if (head == null || head.Length == 0) throw new Exception("必须传入帧头");
             _head = head;
             OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
+            _haveHeadOfData = haveHeadOfData;
         }
 
         /// <summary>
@@ -82,8 +88,15 @@ namespace Parser.Parsers
             }
             if (_head.Length + _length > _bytes.Count - (_startIndex - _bytes.StartIndex))
             {
-                _length = -1;
-                _bytes.SetCurrentMessageLength(-1);
+                if (!_haveHeadOfData)
+                {
+                    _length = -1;
+                    _bytes.SetCurrentMessageLength(-1);
+                }
+                else
+                {
+                    _bytes.SetCurrentMessageLength(_head.Length + _length);
+                }
                 return FrameEndStatusCode.Fail;
             }
             return FrameEndStatusCode.Success;
