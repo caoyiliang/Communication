@@ -21,20 +21,9 @@ namespace Parser.Parsers
         /// </summary>
         /// <param name="head">帧头</param>
         /// <param name="getDataLength">获取数据包长度</param>
-        /// <param name="processFrameBreak">
-        /// 是否断帧处理
-        /// <para>
-        /// <b>
-        /// 注意：<br/>
-        /// 若启用断帧处理功能则数据帧拆包速率会降低。<br/><br/>
-        /// 断帧数据示例（数据帧头为D4 F3 CC EC，2个字节的数据长度）：<br/>
-        /// D4 F3 CC EC D4 F3 CC EC 00 17 00 03 06 00 C2 00 02 00 04 66 66 02 41 BD C5 BB AA
-        /// </b>
-        /// </para>
-        /// </param>
         /// <param name="useChannel">是否启用内置处理队列</param>
         /// <exception cref="Exception"></exception>
-        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength, bool useChannel = true, bool processFrameBreak = true) : base(useChannel, processFrameBreak)
+        public HeadLengthParser(byte[] head, GetDataLengthEventHandler getDataLength, bool useChannel = true) : base(useChannel)
         {
             if (head == null || head.Length == 0) throw new Exception("必须传入帧头");
             _head = head;
@@ -45,20 +34,9 @@ namespace Parser.Parsers
         /// 以特定字节数组为数据包头，数特定长度分包
         /// </summary>
         /// <param name="getDataLength">获取数据包长度</param>
-        /// <param name="processFrameBreak">
-        /// 是否断帧处理
-        /// <para>
-        /// <b>
-        /// 注意：<br/>
-        /// 若启用断帧处理功能则数据帧拆包速率会降低。<br/><br/>
-        /// 断帧数据示例（数据帧头为D4 F3 CC EC，2个字节的数据长度）：<br/>
-        /// D4 F3 CC EC D4 F3 CC EC 00 17 00 03 06 00 C2 00 02 00 04 66 66 02 41 BD C5 BB AA
-        /// </b>
-        /// </para>
-        /// </param>
         /// <param name="useChannel">是否启用内置处理队列</param>
         /// <exception cref="Exception"></exception>
-        public HeadLengthParser(GetDataLengthEventHandler getDataLength, bool useChannel = true, bool processFrameBreak = true) : base(useChannel, processFrameBreak)
+        public HeadLengthParser(GetDataLengthEventHandler getDataLength, bool useChannel = true) : base(useChannel)
         {
             _head = [];
             OnGetDataLength = getDataLength ?? throw new Exception("必须要getDataLength");
@@ -79,6 +57,19 @@ namespace Parser.Parsers
                     {
                         return FrameEndStatusCode.Fail;
                     }
+                    var rspNext = FindIndex(_startIndex + _head.Length, _head);
+                    if (rspNext.Code == StateCode.Success)
+                    {
+                        int dataLength = rspNext.Index - _startIndex;
+                        if (rsp.Length < 0 || dataLength < _head.Length + rsp.Length)
+                        {
+                            _bytes.RemoveHeader(dataLength);
+                            _startIndex = -1;
+                            _length = -1;
+                            _bytes.SetCurrentMessageLength(-1);
+                            return FrameEndStatusCode.ResearchHead;
+                        }
+                    }
                     _length = rsp.Length;
                 }
                 catch (Exception ex)
@@ -95,49 +86,6 @@ namespace Parser.Parsers
                 return FrameEndStatusCode.Fail;
             }
             return FrameEndStatusCode.Success;
-        }
-
-        /// <inheritdoc/>
-        protected override async Task<FrameEndStatusCode> CanFindEndIndexWithFrameBreakAsync()
-        {
-            try
-            {
-                byte[] temp = new byte[_bytes.Count - (_startIndex - _bytes.StartIndex)];
-                Array.Copy(_bytes.Bytes, _startIndex, temp, 0, temp.Length);
-
-                var rsp = await OnGetDataLength(temp);
-                if (rsp.StateCode != Parser.StateCode.Success)
-                {
-                    return FrameEndStatusCode.Fail;
-                }
-
-                var rspNext = FindIndex(_startIndex + _head.Length, _head);
-                if (rspNext.Code == Parser.Parsers.StateCode.Success)
-                {
-                    int dataLength = rspNext.Index - _startIndex;
-                    if (dataLength < rsp.Length)
-                    {
-                        _bytes.RemoveHeader(dataLength);
-                        return FrameEndStatusCode.ResearchHead;
-                    }
-
-                    _length = rsp.Length;
-                    return FrameEndStatusCode.Success;
-                }
-
-                if (_bytes.Count - (_startIndex - _bytes.StartIndex) >= rsp.Length)
-                {
-                    _length = rsp.Length;
-                    return FrameEndStatusCode.Success;
-                }
-
-                return FrameEndStatusCode.Fail;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Get data length error");
-                return FrameEndStatusCode.Fail;
-            }
         }
 
         /// <inheritdoc/>
@@ -173,21 +121,13 @@ namespace Parser.Parsers
         }
 
         /// <inheritdoc/>
-        protected override async Task ResetResearchHead()
-        {
-            _startIndex = -1;
-            _length = -1;
-            _bytes.SetCurrentMessageLength(-1);
-
-            await Task.CompletedTask;
-        }
-
-        /// <inheritdoc/>
         protected override async Task<bool> ReceiveOneFrameAsync()
         {
             if (await base.ReceiveOneFrameAsync())
             {
-                await ResetResearchHead();
+                _startIndex = -1;
+                _length = -1;
+                _bytes.SetCurrentMessageLength(-1);
                 return true;
             }
             return false;

@@ -13,7 +13,6 @@ namespace Parser.Parsers
         private static readonly ILogger _logger = Logs.LogFactory.GetLogger("BaseParser");
         private readonly bool _useChannel = true;
         private readonly Channel<byte[]> _channel = Channel.CreateUnbounded<byte[]>();
-        private readonly bool isProcessFrameBreak = false;
 
         /// <summary>
         /// 解析器中的数据
@@ -26,21 +25,9 @@ namespace Parser.Parsers
         /// <summary>
         /// 解析器基类
         /// </summary>
-        /// <param name="processFrameBreak">
-        /// 是否断帧处理
-        /// <para>
-        /// <b>
-        /// 注意：<br/>
-        /// 若启用断帧处理功能则数据帧拆包速率会降低。<br/><br/>
-        /// 断帧数据示例（数据帧头为D4 F3 CC EC，2个字节的数据长度）：<br/>
-        /// D4 F3 CC EC D4 F3 CC EC 00 17 00 03 06 00 C2 00 02 00 04 66 66 02 41 BD C5 BB AA
-        /// </b>
-        /// </para>
-        /// </param>
         /// <param name="useChannel">是否启用内置处理队列</param>
-        protected BaseParser(bool useChannel = true, bool processFrameBreak = true)
+        protected BaseParser(bool useChannel = true)
         {
-            isProcessFrameBreak = processFrameBreak;
             _useChannel = useChannel;
             if (_useChannel) _ = Task.Run(ParseAndProcessDataAsync);
         }
@@ -81,18 +68,6 @@ namespace Parser.Parsers
         protected virtual async Task<FrameEndStatusCode> CanFindEndIndexAsync() => await Task.FromResult(FrameEndStatusCode.Success);
 
         /// <summary>
-        /// 能否找新的结束位置（含断帧处理功能）
-        /// </summary>
-        /// <returns></returns>
-        protected virtual async Task<FrameEndStatusCode> CanFindEndIndexWithFrameBreakAsync() => await Task.FromResult(FrameEndStatusCode.Success);
-
-        /// <summary>
-        /// 重新寻找包头时重置参数
-        /// </summary>
-        /// <returns></returns>
-        protected virtual async Task ResetResearchHead() { await Task.CompletedTask; }
-
-        /// <summary>
         /// 返回解析完成的包
         /// </summary>
         /// <returns>是否有解析成功的包</returns>
@@ -103,15 +78,13 @@ namespace Parser.Parsers
             {
                 return false;
             }
-            FrameEndStatusCode endStatusCode = isProcessFrameBreak ? await CanFindEndIndexWithFrameBreakAsync() : await CanFindEndIndexAsync();
+            FrameEndStatusCode endStatusCode = await CanFindEndIndexAsync();
             if (endStatusCode == FrameEndStatusCode.Fail)
             {
                 return false;
             }
             if (endStatusCode == FrameEndStatusCode.ResearchHead)
             {
-                /* 移除前面的断帧（不完整数据帧）后需要重新寻找包头 */
-                await ResetResearchHead();
                 return await ReceiveOneFrameAsync();
             }
 
