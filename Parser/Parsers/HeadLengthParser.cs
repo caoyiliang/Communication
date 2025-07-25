@@ -18,7 +18,7 @@ namespace Parser.Parsers
         /// <summary>
         /// 是否数据区含帧头
         /// </summary>
-        private bool _haveHeadOfData;
+        private readonly bool _haveHeadOfData;
 
         /// <summary>
         /// 长度为除了帧头之外的所有数据的长度
@@ -49,9 +49,9 @@ namespace Parser.Parsers
         }
 
         /// <inheritdoc/>
-        protected override async Task<FrameEndStatusCode> CanFindEndIndexAsync()
+        protected override async Task<bool> CanFindEndIndexAsync()
         {
-            if (_bytes.Count - (_startIndex - _bytes.StartIndex) < _bytes.GetCurrentMessageLength()) return FrameEndStatusCode.Fail;
+            if (_bytes.Count - (_startIndex - _bytes.StartIndex) < _bytes.GetCurrentMessageLength()) return false;
             if (_length == -1)
             {
                 byte[] temp = new byte[_bytes.Count - (_startIndex - _bytes.StartIndex)];
@@ -61,7 +61,7 @@ namespace Parser.Parsers
                     var rsp = await OnGetDataLength(temp);
                     if (rsp.StateCode != Parser.StateCode.Success)
                     {
-                        return FrameEndStatusCode.Fail;
+                        return false;
                     }
                     var rspNext = FindIndex(_startIndex + _head.Length, _head);
                     if (rspNext.Code == StateCode.Success)
@@ -87,7 +87,7 @@ namespace Parser.Parsers
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "Get data length error");
-                    return FrameEndStatusCode.Fail;
+                    return false;
                 }
                 if (_length <= 0)
                     throw new Exception("数据长度必须大于0");
@@ -96,9 +96,9 @@ namespace Parser.Parsers
             {
                 _bytes.SetCurrentMessageLength(_head.Length + _length);
                 if (!_haveHeadOfData) _length = -1;
-                return FrameEndStatusCode.Fail;
+                return false;
             }
-            return FrameEndStatusCode.Success;
+            return true;
         }
 
         /// <inheritdoc/>

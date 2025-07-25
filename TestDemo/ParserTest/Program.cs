@@ -23,7 +23,7 @@ Console.WriteLine("Hello, World!");
 //    }
 //});
 
-IParser parser = new HeadLengthParser([0xD4, 0xF3, 0xCC, 0xEC], async data =>
+var parser = new HeadLengthParser([0xD4, 0xF3, 0xCC, 0xEC], async data =>
 {
     if (data.Length < 2) return new GetDataLengthRsp() { StateCode = Parser.StateCode.LengthNotEnough };
     return await Task.FromResult(new GetDataLengthRsp() { Length = Utils.StringByteUtils.ToInt16(data, 4, true), StateCode = Parser.StateCode.Success });

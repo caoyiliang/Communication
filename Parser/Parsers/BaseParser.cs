@@ -65,7 +65,7 @@ namespace Parser.Parsers
         /// 能否找新的结束位置
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task<FrameEndStatusCode> CanFindEndIndexAsync() => await Task.FromResult(FrameEndStatusCode.Success);
+        protected virtual async Task<bool> CanFindEndIndexAsync() => await Task.FromResult(true);
 
         /// <summary>
         /// 返回解析完成的包
@@ -78,15 +78,7 @@ namespace Parser.Parsers
             {
                 return false;
             }
-            FrameEndStatusCode endStatusCode = await CanFindEndIndexAsync();
-            if (endStatusCode == FrameEndStatusCode.Fail)
-            {
-                return false;
-            }
-            if (endStatusCode == FrameEndStatusCode.ResearchHead)
-            {
-                return await ReceiveOneFrameAsync();
-            }
+            if (!await CanFindEndIndexAsync()) return false;
             startIndex = FindStartIndex();
             int endIndex = FindEndIndex();
             if (endIndex < 0)
@@ -199,24 +191,4 @@ namespace Parser.Parsers
         /// </summary>
         NotFound
     }
-
-    /// <summary>
-    /// 数据帧搜寻结束状态码
-    /// </summary>
-    public enum FrameEndStatusCode
-    {
-        /// <summary>
-        /// 成功
-        /// </summary>
-        Success,
-        /// <summary>
-        /// 重新搜寻数据帧头
-        /// </summary>
-        ResearchHead,
-        /// <summary>
-        /// 失败
-        /// </summary>
-        Fail
-    }
-
 }
