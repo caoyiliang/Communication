@@ -66,16 +66,22 @@ namespace Parser.Parsers
                     var rspNext = FindIndex(_startIndex + _head.Length, _head);
                     if (rspNext.Code == StateCode.Success)
                     {
-                        int dataLength = rspNext.Index - _startIndex;
-                        if (rsp.Length < 0 || dataLength < _head.Length + rsp.Length)
+                        if (rspNext.Index - _startIndex == _head.Length)
                         {
-                            _bytes.RemoveHeader(dataLength);
-                            _startIndex = -1;
-                            _length = -1;
-                            _bytes.SetCurrentMessageLength(-1);
-                            return FrameEndStatusCode.ResearchHead;
+                            _startIndex = rspNext.Index;
+                            return await CanFindEndIndexAsync();
+                        }
+                        int dataLength = rspNext.Index - _startIndex;
+                        if (dataLength < _head.Length + rsp.Length)
+                        {
+                            if (!_haveHeadOfData)
+                            {
+                                _startIndex = rspNext.Index;
+                                return await CanFindEndIndexAsync();
+                            }
                         }
                     }
+
                     _length = rsp.Length;
                 }
                 catch (Exception ex)
@@ -88,15 +94,8 @@ namespace Parser.Parsers
             }
             if (_head.Length + _length > _bytes.Count - (_startIndex - _bytes.StartIndex))
             {
-                if (!_haveHeadOfData)
-                {
-                    _length = -1;
-                    _bytes.SetCurrentMessageLength(-1);
-                }
-                else
-                {
-                    _bytes.SetCurrentMessageLength(_head.Length + _length);
-                }
+                _bytes.SetCurrentMessageLength(_head.Length + _length);
+                if (!_haveHeadOfData) _length = -1;
                 return FrameEndStatusCode.Fail;
             }
             return FrameEndStatusCode.Success;

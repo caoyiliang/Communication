@@ -87,7 +87,7 @@ namespace Parser.Parsers
             {
                 return await ReceiveOneFrameAsync();
             }
-
+            startIndex = FindStartIndex();
             int endIndex = FindEndIndex();
             if (endIndex < 0)
             {
