@@ -115,7 +115,7 @@ namespace Parser.Parsers
                 if (rspNext.Code == Parser.Parsers.StateCode.Success)
                 {
                     int dataLength = rspNext.Index - _startIndex;
-                    if (dataLength < rsp.Length)
+                    if (dataLength < _head.Length + rsp.Length)
                     {
                         _bytes.RemoveHeader(dataLength);
                         return FrameEndStatusCode.ResearchHead;
@@ -125,7 +125,7 @@ namespace Parser.Parsers
                     return FrameEndStatusCode.Success;
                 }
 
-                if (_bytes.Count - (_startIndex - _bytes.StartIndex) >= rsp.Length)
+                if (_bytes.Count - (_startIndex - _bytes.StartIndex) >= _head.Length + rsp.Length)
                 {
                     _length = rsp.Length;
                     return FrameEndStatusCode.Success;
