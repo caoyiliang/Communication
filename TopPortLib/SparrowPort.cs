@@ -211,6 +211,55 @@ namespace TopPortLib
         }
 
         /// <inheritdoc/>
+        public async Task<IEnumerable<TRsp>> RequestEnumerableAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1)
+            where TReq : IAsyncRequest
+            where TRsp : IRspEnumerable
+        {
+            var to = timeout == -1 ? _defaultTimeout : timeout;
+            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var reqInfo = new ReqInfo()
+            {
+                ClientId = clientId,
+                CheckBytes = req.Check(),
+                RspType = [typeof(TRsp)],
+                TaskCompletionSource = tcs,
+            };
+            lock (_reqInfos)
+            {
+                _reqInfos.Add(reqInfo);
+            }
+            var bytes = req.ToBytes();
+            try
+            {
+                CancellationTokenSource cts;
+                var rs = new List<TRsp>();
+                TRsp trs;
+                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
+                do
+                {
+                    cts = new CancellationTokenSource();
+                    var timeoutTask1 = Task.Delay(to, cts.Token);
+                    tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+                    reqInfo.TaskCompletionSource = tcs;
+                    if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
+                        throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rspEnumerable time out={to}");
+                    cts.Cancel();
+                    trs = (TRsp)await tcs.Task;
+                    rs.Add(trs);
+                } while (!await trs.IsFinish());
+
+                return rs;
+            }
+            finally
+            {
+                lock (_reqInfos)
+                {
+                    _reqInfos.Remove(reqInfo);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
