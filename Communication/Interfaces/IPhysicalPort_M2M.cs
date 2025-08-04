@@ -16,7 +16,7 @@
         event ReceiveOriginalDataFromClientEventHandler? OnReceiveOriginalDataFromClient;
 
         /// <summary>
-        /// 服务端有新客户端连接
+        /// 收到有新客户端消息或者手动添加客户端
         /// </summary>
         event ClientConnectEventHandler? OnClientConnect;
 
@@ -31,10 +31,18 @@
         Task StopAsync();
 
         /// <summary>
-        /// 断开客户端
+        /// 移除客户端
         /// </summary>
         /// <param name="clientId">客户端ID</param>
-        Task DisconnectClientAsync(Guid clientId);
+        Task RemoveClientAsync(Guid clientId);
+
+        /// <summary>
+        /// 添加客户端
+        /// </summary>
+        /// <param name="hostName">目标地址</param>
+        /// <param name="port">目标端口</param>
+        /// <returns>客户端ID</returns>
+        Task<Guid> AddClientAsync(string hostName, int port);
 
         /// <summary>
         /// 向客户端发送数据

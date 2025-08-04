@@ -93,5 +93,17 @@ namespace TopPortLib
         {
             return await PhysicalPort.GetClientInfos(clientId);
         }
+
+        /// <inheritdoc/>
+        public async Task RemoveClientAsync(Guid clientId)
+        {
+            await PhysicalPort.RemoveClientAsync(clientId);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Guid> AddClientAsync(string hostName, int port)
+        {
+            return await PhysicalPort.AddClientAsync(hostName, port);
+        }
     }
 }

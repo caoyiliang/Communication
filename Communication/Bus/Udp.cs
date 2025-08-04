@@ -27,13 +27,6 @@ namespace Communication.Bus
         /// <inheritdoc/>
         public event ClientConnectEventHandler? OnClientConnect;
 
-        /// <inheritdoc/>
-        public async Task DisconnectClientAsync(Guid clientId)
-        {
-            _ = _dicClients.TryRemove(clientId, out _);
-            await Task.CompletedTask;
-        }
-
         /// <summary>
         /// 获取客户端信息
         /// </summary>
@@ -95,6 +88,14 @@ namespace Communication.Bus
         /// <inheritdoc/>
         public async Task<Guid> SendDataAsync(string hostName, int port, byte[] data)
         {
+            Guid clientId = await AddClientAsync(hostName, port);
+            await SendDataAsync(clientId, data);
+            return clientId;
+        }
+
+        /// <inheritdoc/>
+        public async Task<Guid> AddClientAsync(string hostName, int port)
+        {
             var remoteEndPoint = _dicClients.SingleOrDefault(p => p.Value.EndPoint.Address.ToString() == hostName && p.Value.EndPoint.Port == port);
             var clientId = Guid.NewGuid();
             if (remoteEndPoint.Value.EndPoint == null)
@@ -116,8 +117,15 @@ namespace Communication.Bus
             {
                 clientId = remoteEndPoint.Key;
             }
-            await SendDataAsync(clientId, data);
+
             return clientId;
+        }
+
+        /// <inheritdoc/>
+        public async Task RemoveClientAsync(Guid clientId)
+        {
+            _ = _dicClients.TryRemove(clientId, out _);
+            await Task.CompletedTask;
         }
 
         /// <inheritdoc/>

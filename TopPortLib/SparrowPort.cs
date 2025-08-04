@@ -410,6 +410,18 @@ namespace TopPortLib
             return await PhysicalPort.GetClientInfos(clientId);
         }
 
+        /// <inheritdoc/>
+        public async Task RemoveClientAsync(Guid clientId)
+        {
+            await _topPortM2M.RemoveClientAsync(clientId);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Guid> AddClientAsync(string hostName, int port)
+        {
+            return await _topPortM2M.AddClientAsync(hostName, port);
+        }
+
         class ReqInfo
         {
             public Guid ClientId;
