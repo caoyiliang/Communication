@@ -19,7 +19,7 @@ namespace SerialPortTest
 
         public PortTest()
         {
-            parsedPort = new TopPort(new SerialPort("COM38", 115200), new HeadLengthParser(Head, GetDataLength));
+            parsedPort = new TopPort(new SerialPort("COM1", 115200), new HeadLengthParser(Head, GetDataLength));
             parsedPort.OnReceiveParsedData += ReceiverDataEventAsync;
             parsedPort.OnConnect += ParsedPort_OnConnect;
             parsedPort.OnDisconnect += ParsedPort_OnDisconnect;

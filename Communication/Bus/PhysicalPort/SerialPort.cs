@@ -9,53 +9,33 @@ namespace Communication.Bus.PhysicalPort
     /// </summary>
     public class SerialPort : System.IO.Ports.SerialPort, IPhysicalPort, IDisposable
     {
-        private readonly SemaphoreSlim _dataAvailableSemaphore = new(0);
-        private CancellationTokenSource? _backgroundTaskCts;
+        private readonly AutoResetEvent _dataAvailableEvent = new(false);
 
         /// <summary>物理串口</summary>
-        public SerialPort() : base()
-        {
-            Initialize();
-        }
+        public SerialPort() : base() => Initialize();
 
         /// <summary>物理串口</summary>
-        public SerialPort(IContainer container) : base(container)
-        {
-            Initialize();
-        }
+        public SerialPort(IContainer container) : base(container) => Initialize();
+
         /// <summary>物理串口</summary>
-        public SerialPort(string portName) : base(portName)
-        {
-            Initialize();
-        }
+        public SerialPort(string portName) : base(portName) => Initialize();
+
         /// <summary>物理串口</summary>
-        public SerialPort(string portName, int baudRate) : base(portName, baudRate)
-        {
-            Initialize();
-        }
+        public SerialPort(string portName, int baudRate) : base(portName, baudRate) => Initialize();
+
         /// <summary>物理串口</summary>
-        public SerialPort(string portName, int baudRate, Parity parity) : base(portName, baudRate, parity)
-        {
-            Initialize();
-        }
+        public SerialPort(string portName, int baudRate, Parity parity) : base(portName, baudRate, parity) => Initialize();
+
         /// <summary>物理串口</summary>
-        public SerialPort(string portName, int baudRate, Parity parity, int dataBits) : base(portName, baudRate, parity, dataBits)
-        {
-            Initialize();
-        }
+        public SerialPort(string portName, int baudRate, Parity parity, int dataBits) : base(portName, baudRate, parity, dataBits) => Initialize();
+
         /// <summary>物理串口</summary>
-        public SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits)
-        {
-            Initialize();
-        }
+        public SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits) => Initialize();
 
         /// <summary>
         /// 初始化
         /// </summary>
-        private void Initialize()
-        {
-            DataReceived += OnDataReceived;
-        }
+        private void Initialize() => DataReceived += OnDataReceived;
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
@@ -68,7 +48,7 @@ namespace Communication.Bus.PhysicalPort
 
                 if (BytesToRead > 0)
                 {
-                    _dataAvailableSemaphore.Release();
+                    _dataAvailableEvent.Set();
                 }
             }
             catch { }
@@ -98,14 +78,7 @@ namespace Communication.Bus.PhysicalPort
                 {
                     throw new InvalidOperationException("Serial port is not open.");
                 }
-                try
-                {
-                    await _dataAvailableSemaphore.WaitAsync(10, cancellationToken);
-                }
-                catch (OperationCanceledException)
-                {
-                    throw new OperationCanceledException("Read operation was canceled.");
-                }
+                _dataAvailableEvent.WaitOne(10);
             }
 
             var data = new byte[Math.Min(BytesToRead, count)];
