@@ -15,34 +15,13 @@ namespace SerialPortTest
     public class PortTest
     {
         private ITopPort parsedPort;
-        private readonly byte[] Head = new byte[] { 0xD4, 0xF3, 0xCC, 0xEC };
 
         public PortTest()
         {
-            parsedPort = new TopPort(new SerialPort("COM1", 115200), new HeadLengthParser(Head, GetDataLength));
+            parsedPort = new TopPort(new SerialPort("COM3", 115200), new TimeParser());
             parsedPort.OnReceiveParsedData += ReceiverDataEventAsync;
             parsedPort.OnConnect += ParsedPort_OnConnect;
             parsedPort.OnDisconnect += ParsedPort_OnDisconnect;
-        }
-
-        private async Task<GetDataLengthRsp> GetDataLength(byte[] data)
-        {
-            int headCount = Head.Length;
-            int lengthCount = 2;
-
-            if (data.Length < headCount + lengthCount)
-            {
-                return new GetDataLengthRsp() { StateCode = Parser.StateCode.LengthNotEnough };
-            }
-
-            byte[] lengthArray = new byte[lengthCount];
-            Array.Copy(data, headCount, lengthArray, 0, lengthCount);
-            Array.Reverse(lengthArray);
-
-            int length = BitConverter.ToUInt16(lengthArray, 0);
-            length -= headCount;
-
-            return await Task.FromResult(new GetDataLengthRsp() { Length = length, StateCode = Parser.StateCode.Success });
         }
 
         public async Task Open()
