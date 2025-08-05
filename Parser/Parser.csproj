@@ -4,10 +4,10 @@
 		<TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>9.4.2</Version>
+		<Version>9.4.3</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
-		<PackageReleaseNotes>修复头长度分包器，并在构造中新增数据包中是否包含头字节</PackageReleaseNotes>
+		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
 		<PackageIcon>logo.png</PackageIcon>
@@ -20,7 +20,7 @@
 	<ItemGroup>
 		<PackageReference Include="CSoft.LogInterface" Version="9.0.0" />
 		<PackageReference Include="CSoft.Utils" Version="9.1.7" />
-		<PackageReference Include="System.Threading.Channels" Version="9.0.7" />
+		<PackageReference Include="System.Threading.Channels" Version="9.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
