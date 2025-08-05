@@ -55,7 +55,6 @@ namespace Communication.Bus.PhysicalPort
                 {
                     throw new InvalidOperationException("Serial port is not open.");
                 }
-                System.Diagnostics.Debug.WriteLine(DateTime.Now);
                 if (BytesToRead == 0)
                 {
                     await Task.Delay(10, cancellationToken);
