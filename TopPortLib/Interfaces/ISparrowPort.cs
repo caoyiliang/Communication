@@ -81,6 +81,19 @@ namespace TopPortLib.Interfaces
         Task<TRsp> RequestAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest;
 
         /// <summary>
+        /// 队列请求接收(多次返回)
+        /// </summary>
+        /// <typeparam name="TReq">请求类型</typeparam>
+        /// <typeparam name="TRsp">接收类型</typeparam>
+        /// <param name="clientId">客户端ID</param>
+        /// <param name="req">请求处理</param>
+        /// <param name="timeout">超时，默认使用构造传入</param>
+        /// <returns>结果集</returns>
+        Task<IEnumerable<TRsp>> RequestEnumerableAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1)
+            where TReq : IAsyncRequest
+            where TRsp : IRspEnumerable;
+
+        /// <summary>
         /// 队列请求接收(2次返回)
         /// </summary>
         /// <typeparam name="TReq">请求类型</typeparam>
