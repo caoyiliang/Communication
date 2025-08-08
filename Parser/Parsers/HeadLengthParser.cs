@@ -63,21 +63,25 @@ namespace Parser.Parsers
                     {
                         return false;
                     }
-                    var rspNext = FindIndex(_startIndex + _head.Length, _head);
-                    if (rspNext.Code == StateCode.Success)
+
+                    if (_head.Length > 0)
                     {
-                        if (rspNext.Index - _startIndex == _head.Length)
+                        var rspNext = FindIndex(_startIndex + _head.Length, _head);
+                        if (rspNext.Code == StateCode.Success)
                         {
-                            _startIndex = rspNext.Index;
-                            return await CanFindEndIndexAsync();
-                        }
-                        int dataLength = rspNext.Index - _startIndex;
-                        if (dataLength < _head.Length + rsp.Length)
-                        {
-                            if (!_haveHeadOfData)
+                            if (rspNext.Index - _startIndex == _head.Length)
                             {
                                 _startIndex = rspNext.Index;
                                 return await CanFindEndIndexAsync();
+                            }
+                            int dataLength = rspNext.Index - _startIndex;
+                            if (dataLength < _head.Length + rsp.Length)
+                            {
+                                if (!_haveHeadOfData)
+                                {
+                                    _startIndex = rspNext.Index;
+                                    return await CanFindEndIndexAsync();
+                                }
                             }
                         }
                     }
