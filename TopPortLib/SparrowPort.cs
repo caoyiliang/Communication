@@ -1,6 +1,7 @@
 ﻿using Communication;
 using Communication.Interfaces;
 using System.Reflection;
+using System.Threading.Channels;
 using TopPortLib.Exceptions;
 using TopPortLib.Interfaces;
 using Utils;
@@ -126,7 +127,14 @@ namespace TopPortLib
             }
             if (reqInfo != null)
             {
-                reqInfo.TaskCompletionSource.TrySetResult(rsp);
+                if (reqInfo.ResponseChannel != null)
+                {
+                    reqInfo.ResponseChannel.Writer.TryWrite(rsp);
+                }
+                else
+                {
+                    reqInfo.TaskCompletionSource.TrySetResult(rsp);
+                }
                 return;
             }
             InitActivelyPush(_instance, rspType, rsp, clientId);
@@ -263,46 +271,61 @@ namespace TopPortLib
         public async Task<IEnumerable<TRsp>> RequestEnumerableWithTimeOutAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp)],
-                TaskCompletionSource = tcs,
+                TaskCompletionSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously),
+                ResponseChannel = Channel.CreateUnbounded<object>()
             };
             lock (_reqInfos)
             {
                 _reqInfos.Add(reqInfo);
             }
             var bytes = req.ToBytes();
+            var results = new List<TRsp>();
+            var cts = new CancellationTokenSource();
+
             try
             {
-                CancellationTokenSource cts;
-                var rs = new List<TRsp>();
-                TRsp trs;
                 var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-                do
+                var sendTimeoutTask = Task.Delay(to);
+                if (sendTimeoutTask == await Task.WhenAny(sendTimeoutTask, sendTask))
                 {
-                    cts = new CancellationTokenSource();
-                    var timeoutTask1 = Task.Delay(to, cts.Token);
-                    tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                    reqInfo.TaskCompletionSource = tcs;
-                    if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
-                        return rs;
-                    cts.Cancel();
-                    trs = (TRsp)await tcs.Task;
-                    rs.Add(trs);
-                } while (true);
+                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
+                }
+                await sendTask;
 
+                while (true)
+                {
+                    var receiveTimeoutTask = Task.Delay(to, cts.Token);
+
+                    if (receiveTimeoutTask == await Task.WhenAny(receiveTimeoutTask, Task.Run(async () =>
+                    {
+                        while (await reqInfo.ResponseChannel.Reader.WaitToReadAsync(cts.Token))
+                        {
+                            if (reqInfo.ResponseChannel.Reader.TryRead(out var response))
+                            {
+                                results.Add((TRsp)response);
+                            }
+                        }
+                    }, cts.Token)))
+                    {
+                        break;
+                    }
+                }
             }
             finally
             {
+                cts.Cancel();
                 lock (_reqInfos)
                 {
                     _reqInfos.Remove(reqInfo);
                 }
             }
+
+            return results;
         }
 
         /// <inheritdoc/>
@@ -474,6 +497,7 @@ namespace TopPortLib
             public byte[]? CheckBytes { get; set; }
             public List<Type> RspType { get; set; } = [];
             public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
+            public Channel<object> ResponseChannel { get; set; } = Channel.CreateUnbounded<object>(); // 替换为 Channel
         }
     }
 }

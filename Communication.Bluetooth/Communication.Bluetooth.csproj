@@ -7,12 +7,12 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>9.13.3</Version>
+		<Version>9.13.4</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
+		<PackageReleaseNotes>麻雀RequestEnumerableWithTimeOutAsync增强</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
 	</PropertyGroup>
 
