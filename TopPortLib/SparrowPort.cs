@@ -303,12 +303,19 @@ namespace TopPortLib
 
                     if (receiveTimeoutTask == await Task.WhenAny(receiveTimeoutTask, Task.Run(async () =>
                     {
-                        while (await reqInfo.ResponseChannel.Reader.WaitToReadAsync(cts.Token))
+                        try
                         {
-                            if (reqInfo.ResponseChannel.Reader.TryRead(out var response))
+                            while (await reqInfo.ResponseChannel.Reader.WaitToReadAsync(cts.Token))
                             {
-                                results.Add((TRsp)response);
+                                if (reqInfo.ResponseChannel.Reader.TryRead(out var response))
+                                {
+                                    results.Add((TRsp)response);
+                                }
                             }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Suppress the cancellation exception
                         }
                     }, cts.Token)))
                     {
