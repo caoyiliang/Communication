@@ -35,7 +35,6 @@ namespace Crow.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
         /// <exception cref="CrowStopWorkingException">乌鸦停止工作异常</exception>
-        /// <exception cref="CrowBusyException">乌鸦正忙异常</exception>
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         /// <returns>接收类型</returns>
@@ -47,7 +46,6 @@ namespace Crow.Interfaces
         /// <param name="req">请求处理</param>
         /// <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
         /// <exception cref="CrowStopWorkingException">乌鸦停止工作异常</exception>
-        /// <exception cref="CrowBusyException">乌鸦正忙异常</exception>
         /// <exception cref="TilesSendException">瓦片发送异常</exception>
         /// <exception cref="TimeoutException">超时异常</exception>
         Task SendAsync(TReq req, int timeout = -1);

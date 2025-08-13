@@ -162,7 +162,6 @@ namespace Crow
         private async Task<TRsp?> RequestAsync(TReq req, bool needRsp, int timeout)
         {
             if (!_isActive) throw new CrowStopWorkingException();
-            if (_channel!.Reader.Count > 10) throw new CrowBusyException();
             var rsp = new TaskCompletionSource<TRsp?>(TaskCreationOptions.RunContinuationsAsynchronously);
             var tm = timeout == -1 ? _defaultTimeout : timeout;
             var data = new ReqInfo() { NeedRsp = needRsp, Req = req, Rsp = rsp, Time = tm };

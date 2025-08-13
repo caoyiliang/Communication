@@ -26,10 +26,6 @@ namespace TopPortLibIntTest
             {
 
             }
-            catch (CrowBusyException)
-            {
-
-            }
         }
     }
 }
