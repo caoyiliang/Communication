@@ -38,7 +38,14 @@ namespace Parser.Parsers
             {
                 if (OnReceiveParsedData is not null)
                 {
-                    await OnReceiveParsedData.Invoke(data);
+                    try
+                    {
+                        await OnReceiveParsedData.Invoke(data);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e);
+                    }
                 }
             }
         }
