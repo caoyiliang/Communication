@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net9.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>9.5.0</Version>
+		<Version>10.0.0</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
@@ -18,9 +18,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CSoft.LogInterface" Version="9.0.0" />
-		<PackageReference Include="CSoft.Utils" Version="9.2.0" />
-		<PackageReference Include="System.Threading.Channels" Version="9.0.10" />
+		<PackageReference Include="CSoft.LogInterface" Version="10.0.0" />
+		<PackageReference Include="CSoft.Utils" Version="10.0.0" />
+		<PackageReference Include="System.Threading.Channels" Version="10.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

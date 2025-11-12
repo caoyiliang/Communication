@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parser</name>
+    </assembly>
+    <members>
+        <member name="T:Parser.ReceiveParsedDataEventHandler">
+            <summary>
+            推送解析结果
+            </summary>
+            <param name="data">数据包</param>
+        </member>
+        <member name="T:Parser.GetDataLengthEventHandler">
+            <summary>
+            获取命令长度
+            </summary>
+            <param name="data">当前收到的字节</param>
+            <returns cref="T:Parser.GetDataLengthRsp">数据长度解析回复</returns>
+        </member>
+        <member name="T:Parser.GetDataLengthRsp">
+            <summary>
+            数据长度解析回复
+            </summary>
+        </member>
+        <member name="P:Parser.GetDataLengthRsp.Length">
+            <summary>
+            除了帧头之外的字节数
+            </summary>
+        </member>
+        <member name="P:Parser.GetDataLengthRsp.StateCode">
+            <summary>
+            状态码
+            </summary>
+        </member>
+        <member name="T:Parser.StateCode">
+            <summary>
+            状态码
+            </summary>
+        </member>
+        <member name="F:Parser.StateCode.Success">
+            <summary>
+            成功解析长度
+            </summary>
+        </member>
+        <member name="F:Parser.StateCode.LengthNotEnough">
+            <summary>
+            长度不够
+            </summary>
+        </member>
+        <member name="T:Parser.Interfaces.IParser">
+            <summary>
+            解析器
+            </summary>
+        </member>
+        <member name="E:Parser.Interfaces.IParser.OnReceiveParsedData">
+            <summary>
+            推送解析结果
+            </summary>
+        </member>
+        <member name="M:Parser.Interfaces.IParser.ReceiveOriginalDataAsync(System.Byte[],System.Int32)">
+            <summary>
+            将数据放入解析器
+            </summary>
+            <param name="data">待解析数据</param>
+            <param name="size">待解析数据有效长度</param>
+        </member>
+        <member name="T:Parser.Parsers.BaseParser">
+            <summary>
+            解析器基类
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.BaseParser._bytes">
+            <summary>
+            解析器中的数据
+            </summary>
+        </member>
+        <member name="E:Parser.Parsers.BaseParser.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.#ctor(System.Boolean)">
+            <summary>
+            解析器基类
+            </summary>
+            <param name="useChannel">是否启用内置处理队列</param>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.ReceiveOriginalDataAsync(System.Byte[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.ResetStartIndex(System.Int32)">
+            <summary>
+            设置新的起始位置
+            </summary>
+            <param name="bytesOldIndex">旧位置</param>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.CanFindEndIndexAsync">
+            <summary>
+            能否找新的结束位置
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.ReceiveOneFrameAsync">
+            <summary>
+            返回解析完成的包
+            </summary>
+            <returns>是否有解析成功的包</returns>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.FindStartIndex">
+            <summary>
+            找起始位置
+            </summary>
+            <returns>起始位置</returns>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.FindEndIndex">
+            <summary>
+            找结束位置
+            </summary>
+            <returns>结束位置</returns>
+        </member>
+        <member name="M:Parser.Parsers.BaseParser.FindIndex(System.Int32,System.Byte[])">
+            <summary>
+            找指定数组所在位置
+            </summary>
+            <param name="startIndex">查找起点</param>
+            <param name="block">指定数组</param>
+            <returns>指定数组位置</returns>
+        </member>
+        <member name="T:Parser.Parsers.FindIndexRsp">
+            <summary>
+            查找位置结果
+            </summary>
+        </member>
+        <member name="P:Parser.Parsers.FindIndexRsp.Index">
+            <summary>
+            找到的位置信息
+            </summary>
+        </member>
+        <member name="P:Parser.Parsers.FindIndexRsp.Code">
+            <summary>
+            查找结果
+            </summary>
+        </member>
+        <member name="T:Parser.Parsers.StateCode">
+            <summary>
+            查找结果
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.StateCode.Success">
+            <summary>
+            找到位置
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.StateCode.LengthNotEnough">
+            <summary>
+            长度不足
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.StateCode.NotFound">
+            <summary>
+            没找到
+            </summary>
+        </member>
+        <member name="T:Parser.Parsers.FootParser">
+            <summary>
+            帧尾以特定字节数组结尾
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.FootParser._foot">
+            <summary>
+            帧尾
+            </summary>
+        </member>
+        <member name="M:Parser.Parsers.FootParser.#ctor(System.Byte[],System.Boolean)">
+            <summary>
+            帧尾以特定字节数组结尾
+            </summary>
+            <param name="foot">帧尾</param>
+            <param name="useChannel">是否启用内置处理队列</param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:Parser.Parsers.FootParser.FindStartIndex">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.FootParser.FindEndIndex">
+            <inheritdoc/>
+        </member>
+        <member name="T:Parser.Parsers.HeadFootParser">
+            <summary>
+            以特定字节数组的开头和结尾来分数据包
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.HeadFootParser._head">
+            <summary>
+            帧头
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.HeadFootParser._foot">
+            <summary>
+            帧尾
+            </summary>
+        </member>
+        <member name="M:Parser.Parsers.HeadFootParser.#ctor(System.Byte[],System.Byte[],System.Boolean)">
+            <summary>
+            以特定字节数组的开头和结尾来分数据包
+            </summary>
+            <param name="head">帧头</param>
+            <param name="foot">帧尾</param>
+            <param name="useChannel">是否启用内置处理队列</param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:Parser.Parsers.HeadFootParser.ReceiveOneFrameAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadFootParser.FindStartIndex">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadFootParser.FindEndIndex">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadFootParser.ResetStartIndex(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Parser.Parsers.HeadLengthParser">
+            <summary>
+            以特定字节数组为数据包头，数特定长度分包
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.HeadLengthParser._head">
+            <summary>
+            帧头
+            </summary>
+        </member>
+        <member name="F:Parser.Parsers.HeadLengthParser._haveHeadOfData">
+            <summary>
+            是否数据区含帧头
+            </summary>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.#ctor(System.Byte[],Parser.GetDataLengthEventHandler,System.Boolean,System.Boolean)">
+            <summary>
+            长度为除了帧头之外的所有数据的长度
+            </summary>
+            <param name="head">帧头</param>
+            <param name="getDataLength">获取数据包长度</param>
+            <param name="useChannel">是否启用内置处理队列</param>
+            <param name="haveHeadOfData">是否数据区含帧头</param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.#ctor(Parser.GetDataLengthEventHandler,System.Boolean)">
+            <summary>
+            以特定字节数组为数据包头，数特定长度分包
+            </summary>
+            <param name="getDataLength">获取数据包长度</param>
+            <param name="useChannel">是否启用内置处理队列</param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.CanFindEndIndexAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.FindStartIndex">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.FindEndIndex">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.ResetStartIndex(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.HeadLengthParser.ReceiveOneFrameAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:Parser.Parsers.NoParser">
+            <summary>
+            无解析器
+            </summary>
+        </member>
+        <member name="E:Parser.Parsers.NoParser.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.NoParser.ReceiveOriginalDataAsync(System.Byte[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Parser.Parsers.TimeParser">
+            <summary>
+            以时间来分割数据包
+            </summary>
+        </member>
+        <member name="P:Parser.Parsers.TimeParser.TimeInterval">
+            <summary>
+            时间间隔
+            </summary>
+        </member>
+        <member name="E:Parser.Parsers.TimeParser.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.TimeParser.#ctor(System.Int32)">
+            <summary>
+            以时间来分割数据包
+            </summary>
+            <param name="timeInterval">时间间隔，默认20ms</param>
+        </member>
+        <member name="M:Parser.Parsers.TimeParser.ReceiveOriginalDataAsync(System.Byte[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Parsers.TimeParser.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Parser.Timers.ITimer.Wait(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="timeout"></param>
+            <returns>false:超时</returns>
+        </member>
+    </members>
+</doc>

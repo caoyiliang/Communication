@@ -1,0 +1,1187 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TopPortLib</name>
+    </assembly>
+    <members>
+        <member name="T:TopPortLib.CondorPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.CondorPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CondorPort.OnReceivedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CondorPort.OnReceiveActivelyPushData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CondorPort.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CondorPort.OnClientDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.CondorPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.CondorPort.CheckEvent">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.#ctor(System.Object,TopPortLib.Interfaces.ITopPort_Server,System.Int32)">
+            <summary>
+            队列通讯口
+            </summary>
+            <param name="instance">主动推出事件所在实体</param>
+            <param name="topPortServer">通讯口</param>
+            <param name="defaultTimeout">超时时间，默认5秒</param>
+        </member>
+        <member name="M:TopPortLib.CondorPort.RequestAsync``2(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.RequestAsync``3(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.RequestAsync``4(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.SendAsync``1(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CondorPort.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.CrowPort">
+            <summary>
+            带队列的通讯口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.CrowPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CrowPort.OnReceivedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CrowPort.OnDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.CrowPort.OnConnect">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.CrowPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.#ctor(TopPortLib.Interfaces.ITopPort,System.Int32,System.Int32)">
+            <summary>
+            带队列的通讯口
+            </summary>
+            <param name="topPort">通讯口</param>
+            <param name="defaultTimeout">默认超时时间，默认为5秒</param>
+            <param name="timeDelayAfterSending">防止数据黏在一起，设置一个发送时间间隔</param>
+        </member>
+        <member name="M:TopPortLib.CrowPort.#ctor(Communication.Interfaces.IPhysicalPort,Parser.Interfaces.IParser,System.Int32,System.Int32)">
+            <summary>
+            带队列的通讯口
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <param name="parser">解析器</param>
+            <param name="defaultTimeout">默认超时时间，默认为5秒</param>
+            <param name="timeDelayAfterSending">防止数据黏在一起，设置一个发送时间间隔</param>
+        </member>
+        <member name="M:TopPortLib.CrowPort.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.RequestAsync``2(``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.RequestAsync``2(``0,System.Func{System.Byte[],``1},System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.RequestAsync``1(``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.RequestAsync``2(``0,System.Func{System.Byte[],System.Byte[],``1},System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.RequestAsync``2(``0,System.Func{System.String,System.Byte[],``1},System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.CrowPort.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.RequestedLogEventHandler">
+            <summary>
+            请求日志推送
+            </summary>
+            <param name="data">请求字节数组</param>
+        </member>
+        <member name="T:TopPortLib.RespondedLogEventHandler">
+            <summary>
+            接收日志推送
+            </summary>
+            <param name="data">接收字节数组</param>
+        </member>
+        <member name="T:TopPortLib.ReceiveActivelyPushDataEventHandler">
+            <summary>
+            接收到主动上传数据推送
+            </summary>
+            <param name="type">接收数据类型</param>
+            <param name="data">接收数据</param>
+        </member>
+        <member name="T:TopPortLib.RequestedLogServerEventHandler">
+            <summary>
+            请求日志推送
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">请求字节数组</param>
+        </member>
+        <member name="T:TopPortLib.RespondedLogServerEventHandler">
+            <summary>
+            接收日志推送
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">接收字节数组</param>
+        </member>
+        <member name="T:TopPortLib.ReceiveActivelyPushDataServerEventHandler">
+            <summary>
+            接收到主动上传数据推送
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="type">接收数据类型</param>
+            <param name="data">接收数据</param>
+        </member>
+        <member name="T:TopPortLib.GetParserEventHandler">
+            <summary>
+            设置解析器
+            </summary>
+            <returns>解析器</returns>
+        </member>
+        <member name="T:TopPortLib.ReceiveParsedDataFromClientEventHandler">
+            <summary>
+            服务端解析数据推送
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">收到字节数组</param>
+        </member>
+        <member name="T:TopPortLib.CheckEventHandler">
+            <summary>
+            校验接收数据是否正确
+            </summary>
+            <param name="data">待校验数据</param>
+            <returns>接收是否正确</returns>
+        </member>
+        <member name="T:TopPortLib.Exceptions.CheckMethodNotFoundException">
+            <summary>Check方法不存在</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.CheckMethodNotFoundException.#ctor">
+            <summary>Check方法不存在</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.CheckMethodNotFoundException.#ctor(System.String)">
+            <summary>Check方法不存在</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.CheckMethodNotFoundException.#ctor(System.String,System.Exception)">
+            <summary>Check方法不存在</summary>
+        </member>
+        <member name="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">
+            <summary>
+            请求转字节数组失败
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.RequestParameterToBytesFailedException.#ctor">
+            <summary>请求转字节数组失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.RequestParameterToBytesFailedException.#ctor(System.String)">
+            <summary>请求转字节数组失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.RequestParameterToBytesFailedException.#ctor(System.String,System.Exception)">
+            <summary>请求转字节数组失败</summary>
+        </member>
+        <member name="T:TopPortLib.Exceptions.ResponseCreateFailedException">
+            <summary>
+            接收处理创建失败
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseCreateFailedException.#ctor">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseCreateFailedException.#ctor(System.String)">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseCreateFailedException.#ctor(System.String,System.Exception)">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="T:TopPortLib.Exceptions.ResponseParameterCreateFailedException">
+            <summary>
+            接收处理创建失败
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseParameterCreateFailedException.#ctor">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseParameterCreateFailedException.#ctor(System.String)">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="M:TopPortLib.Exceptions.ResponseParameterCreateFailedException.#ctor(System.String,System.Exception)">
+            <summary>接收处理创建失败</summary>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IAsyncRequest">
+            <summary>
+            异步请求接口
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncRequest.Check">
+            <summary>
+            取请求包中的某些字节和返回包中的某些字节进行比对，从而确定返回是否是对应包
+            </summary>
+            <returns>请求包中的待校字节</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IAsyncResponse`1">
+            <summary>
+            返回约束
+            </summary>
+            <typeparam name="T">返回类型</typeparam>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse`1.Check(System.Byte[])">
+            <summary>
+            检测命令是否是该返回
+            </summary>
+            <param name="bytes">收到的命令</param>
+            <returns>是否是该返回</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse`1.AnalyticalData(System.Byte[])">
+            <summary>
+            从命令中解析有用数据
+            </summary>
+            <param name="bytes">收到的命令</param>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse`1.GetResult">
+            <summary>
+            获取返回数据
+            </summary>
+            <returns>返回数据</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IAsyncResponse_Server`1">
+            <summary>
+            返回约束
+            </summary>
+            <typeparam name="T">返回类型</typeparam>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse_Server`1.Check(System.String,System.Byte[])">
+            <summary>
+            检测命令是否是该返回
+            </summary>
+            <param name="clientInfo">客户端信息</param>
+            <param name="bytes">收到的命令</param>
+            <returns>是否是该返回</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse_Server`1.AnalyticalData(System.String,System.Byte[])">
+            <summary>
+            从命令中解析有用数据
+            </summary>
+            <param name="clientInfo">客户端信息</param>
+            <param name="bytes">收到的命令</param>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IAsyncResponse_Server`1.GetResult">
+            <summary>
+            获取返回数据
+            </summary>
+            <returns>返回数据</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IByteStream">
+            <summary>
+            字节数组流
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IByteStream.ToBytes">
+            <summary>
+            转成字节数组
+            </summary>
+            <returns>字节数组</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ICondorPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ICondorPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ICondorPort.CheckEvent">
+            <summary>
+            设置校验接收数据方法
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICondorPort.OnSentData">
+            <summary>
+            请求数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICondorPort.OnReceivedData">
+            <summary>
+            接收数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICondorPort.OnReceiveActivelyPushData">
+            <summary>
+            接收到主动上传的数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICondorPort.OnClientConnect">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICondorPort.OnClientDisconnect">
+            <summary>
+            服务端有客户端断线
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.StartAsync">
+            <summary>
+            开启监听
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.StopAsync">
+            <summary>
+            停止监听
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.RequestAsync``2(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.RequestAsync``3(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收(2次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp1">接收类型1</typeparam>
+            <typeparam name="TRsp2">接收类型2</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型元组</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.RequestAsync``4(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收(多次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp1">接收类型1</typeparam>
+            <typeparam name="TRsp2">接收队列类型2</typeparam>
+            <typeparam name="TRsp3">接收类型3</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型元组</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICondorPort.SendAsync``1(System.Guid,``0,System.Int32)">
+            <summary>
+            队列只发
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ICrowPort">
+            <summary>
+            带队列的通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ICrowPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICrowPort.OnSentData">
+            <summary>
+            发送的数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICrowPort.OnReceivedData">
+            <summary>
+            接收的数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICrowPort.OnDisconnect">
+            <summary>
+            对端掉线
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ICrowPort.OnConnect">
+            <summary>
+            对端连接成功
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.OpenAsync">
+            <summary>
+            打开
+            </summary>
+            <exception cref="T:Communication.Exceptions.ConnectFailedException"></exception>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.CloseAsync">
+            <summary>
+            关闭
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.RequestAsync``2(``0,System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
+            <exception cref="T:Crow.Exceptions.CrowStopWorkingException">乌鸦停止工作异常</exception>
+            <exception cref="T:Crow.Exceptions.TilesSendException">瓦片发送异常</exception>
+            <exception cref="T:System.TimeoutException">超时异常</exception>
+            <exception cref="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
+            <exception cref="T:TopPortLib.Exceptions.ResponseParameterCreateFailedException">Response parameter create failed</exception>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.RequestAsync``2(``0,System.Func{System.Byte[],``1},System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="makeRsp">接收处理</param>
+            <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
+            <exception cref="T:Crow.Exceptions.CrowStopWorkingException">乌鸦停止工作异常</exception>
+            <exception cref="T:Crow.Exceptions.TilesSendException">瓦片发送异常</exception>
+            <exception cref="T:System.TimeoutException">超时异常</exception>
+            <exception cref="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
+            <exception cref="T:TopPortLib.Exceptions.ResponseParameterCreateFailedException">Response parameter create failed</exception>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.RequestAsync``2(``0,System.Func{System.Byte[],System.Byte[],``1},System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="makeRsp">接收处理</param>
+            <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
+            <exception cref="T:Crow.Exceptions.CrowStopWorkingException">乌鸦停止工作异常</exception>
+            <exception cref="T:Crow.Exceptions.TilesSendException">瓦片发送异常</exception>
+            <exception cref="T:System.TimeoutException">超时异常</exception>
+            <exception cref="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
+            <exception cref="T:TopPortLib.Exceptions.ResponseParameterCreateFailedException">Response parameter create failed</exception>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.RequestAsync``2(``0,System.Func{System.String,System.Byte[],``1},System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="makeRsp">接收处理</param>
+            <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
+            <exception cref="T:Crow.Exceptions.CrowStopWorkingException">乌鸦停止工作异常</exception>
+            <exception cref="T:Crow.Exceptions.TilesSendException">瓦片发送异常</exception>
+            <exception cref="T:System.TimeoutException">超时异常</exception>
+            <exception cref="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
+            <exception cref="T:TopPortLib.Exceptions.ResponseParameterCreateFailedException">Response parameter create failed</exception>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ICrowPort.RequestAsync``1(``0,System.Int32)">
+            <summary>
+            队列只发不收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时时间，当==-1时，使用构造器传入的defaultTimeout</param>
+            <exception cref="T:Crow.Exceptions.CrowStopWorkingException">乌鸦停止工作异常</exception>
+            <exception cref="T:Crow.Exceptions.TilesSendException">瓦片发送异常</exception>
+            <exception cref="T:System.TimeoutException">超时异常</exception>
+            <exception cref="T:TopPortLib.Exceptions.RequestParameterToBytesFailedException">Request parameter to bytes failed</exception>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IPigeonPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.IPigeonPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.IPigeonPort.CheckEvent">
+            <summary>
+            设置校验接收数据方法
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.IPigeonPort.OnSentData">
+            <summary>
+            请求数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.IPigeonPort.OnReceivedData">
+            <summary>
+            接收数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.IPigeonPort.OnReceiveActivelyPushData">
+            <summary>
+            接收到主动上传的数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.IPigeonPort.OnDisconnect">
+            <summary>
+            对端掉线
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.IPigeonPort.OnConnect">
+            <summary>
+            对端连接成功
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IPigeonPort.StartAsync">
+            <summary>
+            开启
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IPigeonPort.StopAsync">
+            <summary>
+            停止
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IPigeonPort.RequestAsync``2(``0,System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IPigeonPort.RequestAsync``3(``0,System.Int32)">
+            <summary>
+            队列请求接收(2次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp1">接收类型1</typeparam>
+            <typeparam name="TRsp2">接收类型2</typeparam>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型元组</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IPigeonPort.SendAsync``1(``0,System.Int32)">
+            <summary>
+            队列只发
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+        </member>
+        <member name="T:TopPortLib.Interfaces.IRspEnumerable">
+            <summary>
+            返回队列
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IRspEnumerable.IsFinish">
+            <summary>
+            是否是队列最后一个回复
+            </summary>
+            <returns>是则表示该返回类型队列结束</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.IRspEnumerable.NeedCheck">
+            <summary>
+            是否和请求校验
+            </summary>
+            <returns>是否和请求校验</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ISparrowPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ISparrowPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ISparrowPort.CheckEvent">
+            <summary>
+            设置校验接收数据方法
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ISparrowPort.OnSentData">
+            <summary>
+            请求数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ISparrowPort.OnReceivedData">
+            <summary>
+            接收数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ISparrowPort.OnReceiveActivelyPushData">
+            <summary>
+            接收到主动上传的数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ISparrowPort.OnClientConnect">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.StartAsync">
+            <summary>
+            开启监听
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.StopAsync">
+            <summary>
+            停止监听
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RemoveClientAsync(System.Guid)">
+            <summary>
+            移除客户端
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.AddClientAsync(System.String,System.Int32)">
+            <summary>
+            添加客户端
+            </summary>
+            <param name="hostName">目标地址</param>
+            <param name="port">目标端口</param>
+            <returns>客户端ID</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RequestAsync``2(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RequestEnumerableAsync``2(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收(多次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>结果集</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RequestEnumerableWithTimeOutAsync``2(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收超时结束版(多次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp">接收类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>结果集</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RequestAsync``3(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收(2次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp1">接收类型1</typeparam>
+            <typeparam name="TRsp2">接收类型2</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型元组</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.RequestAsync``4(System.Guid,``0,System.Int32)">
+            <summary>
+            队列请求接收(多次返回)
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <typeparam name="TRsp1">接收类型1</typeparam>
+            <typeparam name="TRsp2">接收队列类型2</typeparam>
+            <typeparam name="TRsp3">接收类型3</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+            <returns>接收类型元组</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ISparrowPort.SendAsync``1(System.Guid,``0,System.Int32)">
+            <summary>
+            队列只发
+            </summary>
+            <typeparam name="TReq">请求类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="req">请求处理</param>
+            <param name="timeout">超时，默认使用构造传入</param>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ITopPort">
+            <summary>
+            通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ITopPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort.OnSentData">
+            <summary>
+            请求数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort.OnReceiveParsedData">
+            <summary>
+            数据接收
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort.OnDisconnect">
+            <summary>
+            对端掉线
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort.OnConnect">
+            <summary>
+            对端连接成功
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort.OpenAsync(System.Boolean)">
+            <summary>
+            打开通讯口
+            </summary>
+            <param name="reconnectAfterInitialFailure">首次连接失败后是否重连</param>
+            <exception cref="T:Communication.Exceptions.ConnectFailedException"></exception>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort.CloseAsync">
+            <summary>
+            关闭通讯口
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort.SendAsync(System.Byte[],System.Int32)">
+            <summary>
+            发送数据
+            </summary>
+            <param name="data">要发送的字节数组</param>
+            <param name="timeInterval">发送后强制间隔时间(单位毫秒)</param>
+            <returns></returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ITopPort_M2M">
+            <summary>
+            多对对通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ITopPort_M2M.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_M2M.OnSentData">
+            <summary>
+            发送数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_M2M.OnReceiveParsedData">
+            <summary>
+            推送解析数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_M2M.OnClientConnect">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.OpenAsync">
+            <summary>
+            打开通讯口
+            </summary>
+            <exception cref="T:Communication.Exceptions.ConnectFailedException"></exception>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.CloseAsync">
+            <summary>
+            关闭通讯口
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.RemoveClientAsync(System.Guid)">
+            <summary>
+            移除客户端
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.AddClientAsync(System.String,System.Int32)">
+            <summary>
+            添加客户端
+            </summary>
+            <param name="hostName">目标地址</param>
+            <param name="port">目标端口</param>
+            <returns>客户端ID</returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.SendAsync(System.Guid,System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">要发送的字节数组</param>
+            <exception cref="T:System.IO.DriveNotFoundException">未找到clientId对应设备</exception>
+            <returns></returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.SendAsync(System.String,System.Int32,System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="hostName">目标地址</param>
+            <param name="port">目标端口</param>
+            <param name="data">目标数据</param>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_M2M.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+        <member name="T:TopPortLib.Interfaces.ITopPort_Server">
+            <summary>
+            通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.Interfaces.ITopPort_Server.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_Server.OnSentData">
+            <summary>
+            发送数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_Server.OnReceiveParsedData">
+            <summary>
+            推送解析数据
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_Server.OnClientConnect">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+        </member>
+        <member name="E:TopPortLib.Interfaces.ITopPort_Server.OnClientDisconnect">
+            <summary>
+            服务端有客户端断线
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_Server.OpenAsync">
+            <summary>
+            打开通讯口
+            </summary>
+            <exception cref="T:Communication.Exceptions.ConnectFailedException"></exception>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_Server.CloseAsync">
+            <summary>
+            关闭通讯口
+            </summary>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_Server.SendAsync(System.Guid,System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">要发送的字节数组</param>
+            <exception cref="T:System.IO.DriveNotFoundException">未找到clientId对应设备</exception>
+            <returns></returns>
+        </member>
+        <member name="M:TopPortLib.Interfaces.ITopPort_Server.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+        <member name="T:TopPortLib.PigeonPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.PigeonPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.PigeonPort.OnReceivedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.PigeonPort.OnReceiveActivelyPushData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.PigeonPort.OnDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.PigeonPort.OnConnect">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.PigeonPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.PigeonPort.CheckEvent">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.#ctor(System.Object,TopPortLib.Interfaces.ITopPort,System.Int32,System.Int32)">
+            <summary>
+            队列通讯口
+            </summary>
+            <param name="instance">主动推出事件所在实体</param>
+            <param name="topPort">通讯口</param>
+            <param name="defaultTimeout">超时时间，默认5秒</param>
+            <param name="timeDelayAfterSending">发送后强制延时，默认20ms</param>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.RequestAsync``2(``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.RequestAsync``3(``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.SendAsync``1(``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.PigeonPort.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.SparrowPort">
+            <summary>
+            队列通讯口
+            </summary>
+        </member>
+        <member name="E:TopPortLib.SparrowPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.SparrowPort.OnReceivedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.SparrowPort.OnReceiveActivelyPushData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.SparrowPort.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.SparrowPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="P:TopPortLib.SparrowPort.CheckEvent">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.#ctor(System.Object,TopPortLib.Interfaces.ITopPort_M2M,System.Int32)">
+            <summary>
+            队列通讯口
+            </summary>
+            <param name="instance">主动推出事件所在实体</param>
+            <param name="topPortM2M">通讯口</param>
+            <param name="defaultTimeout">超时时间，默认5秒</param>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RequestAsync``2(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RequestEnumerableAsync``2(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RequestEnumerableWithTimeOutAsync``2(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RequestAsync``3(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RequestAsync``4(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.SendAsync``1(System.Guid,``0,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.RemoveClientAsync(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.SparrowPort.AddClientAsync(System.String,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.TopPort_M2M">
+            <summary>
+            多对对通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.TopPort_M2M.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_M2M.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_M2M.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_M2M.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_M2M.OnClientDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.#ctor(Communication.Interfaces.IPhysicalPort_M2M,TopPortLib.GetParserEventHandler)">
+            <summary>
+            顶层通讯口
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <param name="getParser">获取解析器</param>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.SendAsync(System.Guid,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.SendAsync(System.String,System.Int32,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.RemoveClientAsync(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_M2M.AddClientAsync(System.String,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.TopPort_Server">
+            <summary>
+            顶层通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.TopPort_Server.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_Server.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_Server.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_Server.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort_Server.OnClientDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.#ctor(Communication.Interfaces.IPhysicalPort_Server,TopPortLib.GetParserEventHandler)">
+            <summary>
+            顶层通讯口
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <param name="getParser">获取解析器</param>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.SendAsync(System.Guid,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort_Server.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="T:TopPortLib.TopPort">
+            <summary>
+            顶层通讯口
+            </summary>
+        </member>
+        <member name="P:TopPortLib.TopPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort.OnReceiveParsedData">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort.OnDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:TopPortLib.TopPort.OnConnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort.#ctor(Communication.Interfaces.IPhysicalPort,Parser.Interfaces.IParser)">
+            <summary>
+            顶层通讯口
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <param name="parser">解析器</param>
+        </member>
+        <member name="M:TopPortLib.TopPort.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort.OpenAsync(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort.SendAsync(System.Byte[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TopPortLib.TopPort.Dispose">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

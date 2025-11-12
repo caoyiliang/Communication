@@ -1,0 +1,689 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Communication</name>
+    </assembly>
+    <members>
+        <member name="T:Communication.Bus.BusPort">
+            <summary>
+            处理总线
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="M:Communication.Bus.BusPort.#ctor(Communication.Interfaces.IPhysicalPort)">
+            <summary>
+            处理总线
+            </summary>
+            <param name="physicalPort">物理口</param>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="P:Communication.Bus.BusPort.PhysicalPort">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.BusPort.OnReceiveOriginalData">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.BusPort.OnDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.BusPort.OnConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.BusPort.OnSentData">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.BusPort.OpenAsync(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.BusPort.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.BusPort.SendAsync(System.Byte[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.BusPort.DisposeAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.NamedPipeServer">
+            <summary>
+            命名管道服务端
+            </summary>
+            <param name="pipeName">名称</param>
+            <param name="maxNumberOfServerInstances">最大服务数</param>
+            <param name="bufferSize">读缓存</param>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.#ctor(System.String,System.Int32,System.Int32)">
+            <summary>
+            命名管道服务端
+            </summary>
+            <param name="pipeName">名称</param>
+            <param name="maxNumberOfServerInstances">最大服务数</param>
+            <param name="bufferSize">读缓存</param>
+        </member>
+        <member name="P:Communication.Bus.NamedPipeServer.IsActive">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.NamedPipeServer.OnReceiveOriginalDataFromClient">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.NamedPipeServer.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.NamedPipeServer.OnClientDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.SendDataAsync(System.Guid,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.DisconnectClientAsync(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.NamedPipeServer.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.PhysicalPort.NamedPipeClient">
+            <summary>
+            命名管道客户端
+            </summary>
+            <param name="pipeName">名称</param>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.#ctor(System.String)">
+            <summary>
+            命名管道客户端
+            </summary>
+            <param name="pipeName">名称</param>
+        </member>
+        <member name="P:Communication.Bus.PhysicalPort.NamedPipeClient.IsOpen">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.ReadDataAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.SendDataAsync(System.Byte[],System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.Dispose(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.NamedPipeClient.Finalize">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.PhysicalPort.SerialPort">
+            <summary>
+            物理串口
+            </summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.ComponentModel.IContainer)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.String)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.String,System.Int32)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.String,System.Int32,System.IO.Ports.Parity)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.String,System.Int32,System.IO.Ports.Parity,System.Int32)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.#ctor(System.String,System.Int32,System.IO.Ports.Parity,System.Int32,System.IO.Ports.StopBits)">
+            <summary>物理串口</summary>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.ReadDataAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.SerialPort.SendDataAsync(System.Byte[],System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.PhysicalPort.TcpClient">
+            <summary>
+            TCP客户端
+            </summary>
+            <param name="hostName">域名/IP</param>
+            <param name="port">端口</param>
+            <param name="keepAlive">是否启用KeepAlive，默认true</param>
+            <param name="keepAliveTime">正常心跳时间，默认3s(3000ms)</param>
+            <param name="keepAliveInterval">异常心跳间隔，默认2s(2000ms)</param>
+            <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+            <param name="noDelay">是否禁用Nagle算法，默认true</param>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.#ctor(System.String,System.Int32,System.Boolean,System.Int32,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            TCP客户端
+            </summary>
+            <param name="hostName">域名/IP</param>
+            <param name="port">端口</param>
+            <param name="keepAlive">是否启用KeepAlive，默认true</param>
+            <param name="keepAliveTime">正常心跳时间，默认3s(3000ms)</param>
+            <param name="keepAliveInterval">异常心跳间隔，默认2s(2000ms)</param>
+            <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+            <param name="noDelay">是否禁用Nagle算法，默认true</param>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.CloseAsync">
+            <inheritdoc/>
+        </member>
+        <member name="P:Communication.Bus.PhysicalPort.TcpClient.IsOpen">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.OpenAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.ReadDataAsync(System.Int32,System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.SendDataAsync(System.Byte[],System.Threading.CancellationToken)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.Dispose(System.Boolean)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.PhysicalPort.TcpClient.Finalize">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.TcpServer">
+            <summary>
+            TCP服务端
+            </summary>
+            <param name="hostName">服务端IP</param>
+            <param name="port">服务端端口</param>
+            <param name="keepAlive">是否启用KeepAlive，默认true</param>
+            <param name="keepAliveTime">正常心跳时间，默认5s(5000ms)</param>
+            <param name="keepAliveInterval">异常心跳间隔，默认3s(3000ms)</param>
+            <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+            <param name="noDelay">是否禁用Nagle算法，默认true</param>
+            <param name="reuseAddress">是否允许端口复用，默认true</param>
+            <param name="bufferSize">缓存默认8192</param>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.#ctor(System.String,System.Int32,System.Boolean,System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean,System.Int32)">
+            <summary>
+            TCP服务端
+            </summary>
+            <param name="hostName">服务端IP</param>
+            <param name="port">服务端端口</param>
+            <param name="keepAlive">是否启用KeepAlive，默认true</param>
+            <param name="keepAliveTime">正常心跳时间，默认5s(5000ms)</param>
+            <param name="keepAliveInterval">异常心跳间隔，默认3s(3000ms)</param>
+            <param name="keepAliveRetryCount">异常心跳重试次数，默认1次</param>
+            <param name="noDelay">是否禁用Nagle算法，默认true</param>
+            <param name="reuseAddress">是否允许端口复用，默认true</param>
+            <param name="bufferSize">缓存默认8192</param>
+        </member>
+        <member name="P:Communication.Bus.TcpServer.IsActive">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.TcpServer.OnReceiveOriginalDataFromClient">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.TcpServer.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.TcpServer.OnClientDisconnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.SendDataAsync(System.Guid,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.GetClientInfo(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>(IP,端口)</returns>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.GetClientId(System.String,System.Int32)">
+            <summary>
+            获取客户端ID
+            </summary>
+            <param name="ip">ip</param>
+            <param name="port">端口</param>
+            <returns>客户端ID</returns>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.GetClientsByIp(System.String)">
+            <summary>
+            获取IP下所有客户端
+            </summary>
+            <param name="ip">查询ip</param>
+            <returns>IP下所有客户端</returns>
+        </member>
+        <member name="M:Communication.Bus.TcpServer.DisconnectClientAsync(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.Bus.Udp">
+            <summary>
+            UDP
+            </summary>
+            <param name="hostName"></param>
+            <param name="port"></param>
+        </member>
+        <member name="M:Communication.Bus.Udp.#ctor(System.String,System.Int32)">
+            <summary>
+            UDP
+            </summary>
+            <param name="hostName"></param>
+            <param name="port"></param>
+        </member>
+        <member name="P:Communication.Bus.Udp.IsActive">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.Udp.OnReceiveOriginalDataFromClient">
+            <inheritdoc/>
+        </member>
+        <member name="E:Communication.Bus.Udp.OnClientConnect">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.GetClientInfo(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>(IP,端口)</returns>
+        </member>
+        <member name="M:Communication.Bus.Udp.GetClientInfos(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.GetClientId(System.String,System.Int32)">
+            <summary>
+            获取客户端ID
+            </summary>
+            <param name="ip">ip</param>
+            <param name="port">端口</param>
+            <returns>客户端ID</returns>
+        </member>
+        <member name="M:Communication.Bus.Udp.GetClientsByIp(System.String)">
+            <summary>
+            获取IP下所有客户端
+            </summary>
+            <param name="ip">查询ip</param>
+            <returns>IP下所有客户端</returns>
+        </member>
+        <member name="M:Communication.Bus.Udp.SendDataAsync(System.Guid,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.SendDataAsync(System.String,System.Int32,System.Byte[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.AddClientAsync(System.String,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.RemoveClientAsync(System.Guid)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.StartAsync">
+            <inheritdoc/>
+        </member>
+        <member name="M:Communication.Bus.Udp.StopAsync">
+            <inheritdoc/>
+        </member>
+        <member name="T:Communication.SentDataEventHandler`1">
+            <summary>
+            发出的数据
+            </summary>
+            <typeparam name="T">数据类型</typeparam>
+            <param name="data">发出的数据</param>
+        </member>
+        <member name="T:Communication.ReceiveOriginalDataEventHandler">
+            <summary>
+            接收数据推送
+            </summary>
+            <param name="data">收到字节数组</param>
+            <param name="size">收到字节个数</param>
+        </member>
+        <member name="T:Communication.SentDataToClientEventHandler`1">
+            <summary>
+            服务端发出的数据
+            </summary>
+            <typeparam name="T">数据类型</typeparam>
+            <param name="data">发出的数据</param>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="T:Communication.ReceiveOriginalDataFromClientEventHandler">
+            <summary>
+            服务端接收数据推送
+            </summary>
+            <param name="data">收到字节数组</param>
+            <param name="size">收到字节个数</param>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="T:Communication.ClientConnectEventHandler">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="T:Communication.ClientDisconnectEventHandler">
+            <summary>
+            服务端有客户端断线
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="T:Communication.DisconnectEventHandler">
+            <summary>
+            对端断线
+            </summary>
+        </member>
+        <member name="T:Communication.ConnectEventHandler">
+            <summary>
+            对端连接成功
+            </summary>
+        </member>
+        <member name="T:Communication.ActivelyPushDataEventHandler`1">
+            <summary>
+            接收到主动推送的数据
+            </summary>
+            <typeparam name="T">数据类型</typeparam>
+            <param name="objects">数据</param>
+        </member>
+        <member name="T:Communication.ActivelyPushDataServerEventHandler`1">
+            <summary>
+            接收到主动推送的数据
+            </summary>
+            <typeparam name="T">数据类型</typeparam>
+            <param name="clientId">客户端ID</param>
+            <param name="objects">数据</param>
+        </member>
+        <member name="T:Communication.Exceptions.ConnectFailedException">
+            <summary>
+            连接失败
+            </summary>
+        </member>
+        <member name="M:Communication.Exceptions.ConnectFailedException.#ctor">
+            <summary>连接失败</summary>
+        </member>
+        <member name="M:Communication.Exceptions.ConnectFailedException.#ctor(System.String)">
+            <summary>连接失败</summary>
+        </member>
+        <member name="M:Communication.Exceptions.ConnectFailedException.#ctor(System.String,System.Exception)">
+            <summary>连接失败</summary>
+        </member>
+        <member name="T:Communication.Exceptions.NotConnectedException">
+            <summary>
+            未连接
+            </summary>
+        </member>
+        <member name="M:Communication.Exceptions.NotConnectedException.#ctor">
+            <summary>未连接</summary>
+        </member>
+        <member name="M:Communication.Exceptions.NotConnectedException.#ctor(System.String)">
+            <summary>未连接</summary>
+        </member>
+        <member name="M:Communication.Exceptions.NotConnectedException.#ctor(System.String,System.Exception)">
+            <summary>未连接</summary>
+        </member>
+        <member name="T:Communication.Exceptions.SendException">
+            <summary>
+            发送失败
+            </summary>
+        </member>
+        <member name="M:Communication.Exceptions.SendException.#ctor">
+            <summary>发送失败</summary>
+        </member>
+        <member name="M:Communication.Exceptions.SendException.#ctor(System.String)">
+            <summary>发送失败</summary>
+        </member>
+        <member name="M:Communication.Exceptions.SendException.#ctor(System.String,System.Exception)">
+            <summary>发送失败</summary>
+        </member>
+        <member name="T:Communication.Interfaces.IBusPort">
+            <summary>
+            总线接口
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.IBusPort.PhysicalPort">
+            <summary>
+            物理口
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IBusPort.OnSentData">
+            <summary>
+            发出的数据
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IBusPort.OnReceiveOriginalData">
+            <summary>
+            数据接收
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IBusPort.OnDisconnect">
+            <summary>
+            对端掉线
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IBusPort.OnConnect">
+            <summary>
+            对端连接成功
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IBusPort.OpenAsync(System.Boolean)">
+            <summary>
+            打开
+            </summary>
+            <param name="reconnectAfterInitialFailure">首次连接失败后是否重连</param>
+            <exception cref="T:Communication.Exceptions.ConnectFailedException"></exception>
+        </member>
+        <member name="M:Communication.Interfaces.IBusPort.CloseAsync">
+            <summary>
+            关闭
+            </summary>
+            <exception cref="T:System.TimeoutException"></exception>
+        </member>
+        <member name="M:Communication.Interfaces.IBusPort.SendAsync(System.Byte[],System.Int32)">
+            <summary>
+            数据发送
+            </summary>
+            <param name="data">要发送的字节数组</param>
+            <param name="timeInterval">发送后强制间隔时间(单位毫秒)</param>
+        </member>
+        <member name="T:Communication.Interfaces.IPhysicalPort">
+            <summary>
+            物理口接口
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.IPhysicalPort.IsOpen">
+            <summary>
+            是否开启
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort.OpenAsync">
+            <summary>
+            打开
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort.CloseAsync">
+            <summary>
+            关闭
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort.SendDataAsync(System.Byte[],System.Threading.CancellationToken)">
+            <summary>
+            发送数据
+            </summary>
+            <param name="data">要发送的字节数组</param>
+            <param name="cancellationToken">取消令牌</param>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort.ReadDataAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            接收数据
+            </summary>
+            <param name="count">收到字节个数</param>
+            <param name="cancellationToken">取消令牌</param>
+            <returns cref="T:Communication.Interfaces.ReadDataResult">接收到的数据</returns>
+        </member>
+        <member name="T:Communication.Interfaces.ReadDataResult">
+            <summary>
+            接收到的数据
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.ReadDataResult.Data">
+            <summary>
+            收到字节数组
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.ReadDataResult.Length">
+            <summary>
+            收到字节个数
+            </summary>
+        </member>
+        <member name="T:Communication.Interfaces.IPhysicalPort_M2M">
+            <summary>
+            多对多通讯接口
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.IPhysicalPort_M2M.IsActive">
+            <summary>
+            服务器的状态，true表示启动
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IPhysicalPort_M2M.OnReceiveOriginalDataFromClient">
+            <summary>
+            服务端接收数据推送
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IPhysicalPort_M2M.OnClientConnect">
+            <summary>
+            收到有新客户端消息或者手动添加客户端
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.StartAsync">
+            <summary>
+            启动Server，以监听客户端的连接
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.StopAsync">
+            <summary>
+            停止接收客户端的连接
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.RemoveClientAsync(System.Guid)">
+            <summary>
+            移除客户端
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.AddClientAsync(System.String,System.Int32)">
+            <summary>
+            添加客户端
+            </summary>
+            <param name="hostName">目标地址</param>
+            <param name="port">目标端口</param>
+            <returns>客户端ID</returns>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.SendDataAsync(System.Guid,System.Byte[])">
+            <summary>
+            向客户端发送数据
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">发送字节数组</param>
+            <exception cref="T:System.IO.DriveNotFoundException">未找到clientId对应设备</exception>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.SendDataAsync(System.String,System.Int32,System.Byte[])">
+            <summary>
+            发送数据
+            </summary>
+            <param name="hostName">目标地址</param>
+            <param name="port">目标端口</param>
+            <param name="data">目标数据</param>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_M2M.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+        <member name="T:Communication.Interfaces.IPhysicalPort_Server">
+            <summary>
+            服务端物理口接口
+            </summary>
+        </member>
+        <member name="P:Communication.Interfaces.IPhysicalPort_Server.IsActive">
+            <summary>
+            服务器的状态，true表示启动
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IPhysicalPort_Server.OnReceiveOriginalDataFromClient">
+            <summary>
+            服务端接收数据推送
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IPhysicalPort_Server.OnClientConnect">
+            <summary>
+            服务端有新客户端连接
+            </summary>
+        </member>
+        <member name="E:Communication.Interfaces.IPhysicalPort_Server.OnClientDisconnect">
+            <summary>
+            服务端有客户端断线
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_Server.StartAsync">
+            <summary>
+            启动Server，以监听客户端的连接
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_Server.StopAsync">
+            <summary>
+            停止接收客户端的连接
+            </summary>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_Server.DisconnectClientAsync(System.Guid)">
+            <summary>
+            断开客户端
+            </summary>
+            <param name="clientId">客户端ID</param>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_Server.SendDataAsync(System.Guid,System.Byte[])">
+            <summary>
+            向客户端发送数据
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <param name="data">发送字节数组</param>
+            <exception cref="T:System.IO.DriveNotFoundException">未找到clientId对应设备</exception>
+        </member>
+        <member name="M:Communication.Interfaces.IPhysicalPort_Server.GetClientInfos(System.Guid)">
+            <summary>
+            获取客户端信息
+            </summary>
+            <param name="clientId">客户端ID</param>
+            <returns>客户端信息</returns>
+        </member>
+    </members>
+</doc>
