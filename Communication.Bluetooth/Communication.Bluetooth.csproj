@@ -7,7 +7,7 @@
 		<LangVersion>default</LangVersion>
 		<PackageId>CSoft.Communication.Bluetooth</PackageId>
 		<Title>通讯库蓝牙拓展</Title>
-		<Version>10.0.1</Version>
+		<Version>10.0.2</Version>
 		<Authors>CSoft</Authors>
 		<PackageIcon>logo.png</PackageIcon>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
