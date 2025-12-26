@@ -4,6 +4,8 @@ using Communication.Interfaces;
 using Parser;
 using Parser.Interfaces;
 using TopPortLib.Interfaces;
+using System.Collections.Generic;
+using System;
 
 namespace TopPortLib
 {
@@ -14,6 +16,8 @@ namespace TopPortLib
     {
         private readonly IBusPort _port;
         private IParser _parser;
+        // 存储OnReceiveParsedData的订阅者
+        private readonly List<ReceiveParsedDataEventHandler> _receiveParsedDataHandlers = new();
 
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
@@ -27,11 +31,19 @@ namespace TopPortLib
                 if (_parser != null)
                 {
                     _port.OnReceiveOriginalData -= _parser.ReceiveOriginalDataAsync;
+                    foreach (var handler in _receiveParsedDataHandlers)
+                    {
+                        _parser.OnReceiveParsedData -= handler;
+                    }
                 }
                 _parser = value;
                 if (_parser != null)
                 {
                     _port.OnReceiveOriginalData += _parser.ReceiveOriginalDataAsync;
+                    foreach (var handler in _receiveParsedDataHandlers)
+                    {
+                        _parser.OnReceiveParsedData += handler;
+                    }
                 }
             }
         }
@@ -39,7 +51,25 @@ namespace TopPortLib
         /// <inheritdoc/>
         public event SentDataEventHandler<byte[]>? OnSentData { add => _port.OnSentData += value; remove => _port.OnSentData -= value; }
         /// <inheritdoc/>
-        public event ReceiveParsedDataEventHandler? OnReceiveParsedData { add => _parser.OnReceiveParsedData += value; remove => _parser.OnReceiveParsedData -= value; }
+        public event ReceiveParsedDataEventHandler? OnReceiveParsedData
+        {
+            add
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+                _receiveParsedDataHandlers.Add(value);
+                if (_parser != null)
+                    _parser.OnReceiveParsedData += value;
+            }
+            remove
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+                _receiveParsedDataHandlers.Remove(value);
+                if (_parser != null)
+                    _parser.OnReceiveParsedData -= value;
+            }
+        }
         /// <inheritdoc/>
         public event DisconnectEventHandler? OnDisconnect { add => _port.OnDisconnect += value; remove => _port.OnDisconnect -= value; }
         /// <inheritdoc/>

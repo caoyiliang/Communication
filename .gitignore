@@ -54,6 +54,8 @@
 /TestDemo/Server/obj
 /SerialPortTest/bin
 /SerialPortTest/obj
-/TestDemo/SerialPortTest/bin/Debug/net8.0
+/TestDemo/SerialPortTest/bin
 /TestDemo/SerialPortTest/obj
 /TestDemo/SerialPortTest/bin
+/TestDemo/TestChangeParser/bin
+/TestDemo/TestChangeParser/obj
