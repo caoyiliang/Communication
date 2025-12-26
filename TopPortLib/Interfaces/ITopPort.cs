@@ -2,6 +2,7 @@
 using Communication.Exceptions;
 using Communication.Interfaces;
 using Parser;
+using Parser.Interfaces;
 
 namespace TopPortLib.Interfaces
 {
@@ -14,6 +15,11 @@ namespace TopPortLib.Interfaces
         /// 物理口
         /// </summary>
         IPhysicalPort PhysicalPort { get; set; }
+
+        /// <summary>
+        /// 解析器
+        /// </summary>
+        IParser Parser { get; set; }
 
         /// <summary>
         /// 请求数据

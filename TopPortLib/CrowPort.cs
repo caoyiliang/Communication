@@ -26,6 +26,8 @@ namespace TopPortLib
         public event ConnectEventHandler? OnConnect { add => _topPort.OnConnect += value; remove => _topPort.OnConnect -= value; }
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _topPort.PhysicalPort; set => _topPort.PhysicalPort = value; }
+        /// <inheritdoc/>
+        public IParser Parser { get => _topPort.Parser; set => _topPort.Parser = value; }
         /// <summary>
         /// 带队列的通讯口
         /// </summary>

@@ -13,10 +13,29 @@ namespace TopPortLib
     public class TopPort : ITopPort, IDisposable
     {
         private readonly IBusPort _port;
-        private readonly IParser _parser;
+        private IParser _parser;
 
         /// <inheritdoc/>
         public IPhysicalPort PhysicalPort { get => _port.PhysicalPort; set => _port.PhysicalPort = value; }
+
+        /// <inheritdoc/>
+        public IParser Parser
+        {
+            get => _parser;
+            set
+            {
+                if (_parser != null)
+                {
+                    _port.OnReceiveOriginalData -= _parser.ReceiveOriginalDataAsync;
+                }
+                _parser = value;
+                if (_parser != null)
+                {
+                    _port.OnReceiveOriginalData += _parser.ReceiveOriginalDataAsync;
+                }
+            }
+        }
+
         /// <inheritdoc/>
         public event SentDataEventHandler<byte[]>? OnSentData { add => _port.OnSentData += value; remove => _port.OnSentData -= value; }
         /// <inheritdoc/>

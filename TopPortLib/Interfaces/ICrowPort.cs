@@ -3,6 +3,7 @@ using Communication.Exceptions;
 using Communication.Interfaces;
 using Crow;
 using Crow.Exceptions;
+using Parser.Interfaces;
 using TopPortLib.Exceptions;
 
 namespace TopPortLib.Interfaces
@@ -16,6 +17,11 @@ namespace TopPortLib.Interfaces
         /// 物理口
         /// </summary>
         IPhysicalPort PhysicalPort { get; set; }
+
+        /// <summary>
+        /// 解析器
+        /// </summary>
+        IParser Parser { get; set; }
 
         /// <summary>
         /// 发送的数据
