@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>10.0.3</Version>
+    <Version>10.0.4</Version>
     <Description>通讯物理口封装</Description>
     <PackageReleaseNotes>
-		改进异步支持
+		修复bug
 	</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageId>CSoft.Communication</PackageId>

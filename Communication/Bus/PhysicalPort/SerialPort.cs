@@ -31,10 +31,18 @@ namespace Communication.Bus.PhysicalPort
         public SerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits) { }
 
         /// <inheritdoc/>
-        public Task OpenAsync() => OpenAsync();
+        public Task OpenAsync()
+        {
+            Open();
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc/>
-        public Task CloseAsync() => CloseAsync();
+        public Task CloseAsync()
+        {
+            Close();
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc/>
         public async Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken)
