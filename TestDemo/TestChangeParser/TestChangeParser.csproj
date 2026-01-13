@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
+    <ProjectReference Include="..\..\TopPortLib\TopPortLib.csproj" />
   </ItemGroup>
 
 </Project>

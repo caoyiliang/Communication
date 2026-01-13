@@ -103,7 +103,7 @@ namespace Communication.Bluetooth
                         BluetoothClient client;
                         try
                         {
-                            client = _listener!.AcceptBluetoothClient();
+                            client =await _listener!.AcceptBluetoothClientAsync();
                         }
                         catch (SocketException)
                         {

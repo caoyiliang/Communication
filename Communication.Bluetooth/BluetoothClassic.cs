@@ -71,5 +71,10 @@ namespace Communication.Bluetooth
         {
             Dispose(false);
         }
+
+        public override string ToString()
+        {
+            return address;
+        }
     }
 }

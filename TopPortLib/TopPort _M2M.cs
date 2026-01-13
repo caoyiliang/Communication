@@ -33,7 +33,7 @@ namespace TopPortLib
         public TopPort_M2M(IPhysicalPort_M2M physicalPort, GetParserEventHandler getParser)
         {
             PhysicalPort = physicalPort;
-            PhysicalPort.OnReceiveOriginalDataFromClient += async (byte[] data, int size, Guid clientId) =>
+            PhysicalPort.OnReceiveOriginalDataFromClient += async (data, size, clientId) =>
             {
                 if (_dicParsers.ContainsKey(clientId))
                 {

@@ -166,5 +166,11 @@ namespace Communication.Bus.PhysicalPort
         {
             Dispose(false);
         }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return $"{hostName}:{port}";
+        }
     }
 }

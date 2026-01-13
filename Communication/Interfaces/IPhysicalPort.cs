@@ -34,6 +34,12 @@
         /// <param name="cancellationToken">取消令牌</param>
         /// <returns cref="ReadDataResult">接收到的数据</returns>
         Task<ReadDataResult> ReadDataAsync(int count, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// 信息打印
+        /// </summary>
+        /// <returns>唯一识别信息</returns>
+        string ToString();
     }
 
     /// <summary>
