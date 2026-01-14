@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>10.0.2</Version>
+		<Version>10.0.3</Version>
 		<Description>数据收发队列</Description>
 		<PackageId>CSoft.Crow</PackageId>
 		<Authors>CSoft</Authors>
@@ -26,8 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CSoft.Utils" Version="10.0.2" />
-		<PackageReference Include="System.Threading.Channels" Version="10.0.1" />
+		<PackageReference Include="CSoft.Utils" Version="10.0.3" />
+		<PackageReference Include="System.Threading.Channels" Version="10.0.2" />
 	</ItemGroup>
 
 </Project>

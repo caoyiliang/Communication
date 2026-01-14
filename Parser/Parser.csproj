@@ -4,7 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>数据分帧解析器</Description>
-		<Version>10.0.2</Version>
+		<Version>10.0.3</Version>
 		<Authors>CSoft</Authors>
 		<PackageId>CSoft.Parser</PackageId>
 		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
@@ -19,8 +19,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="CSoft.LogInterface" Version="10.0.0" />
-		<PackageReference Include="CSoft.Utils" Version="10.0.2" />
-		<PackageReference Include="System.Threading.Channels" Version="10.0.1" />
+		<PackageReference Include="CSoft.Utils" Version="10.0.3" />
+		<PackageReference Include="System.Threading.Channels" Version="10.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
