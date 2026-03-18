@@ -1,10 +1,10 @@
 ﻿using Communication.Interfaces;
-using LogInterface;
 using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
-using System.Net.Sockets;
-using System.Net;
+using LogInterface;
 using System.Collections.Concurrent;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Communication.Bluetooth
 {
@@ -103,7 +103,7 @@ namespace Communication.Bluetooth
                         BluetoothClient client;
                         try
                         {
-                            client =await _listener!.AcceptBluetoothClientAsync();
+                            client = await _listener!.AcceptBluetoothClientAsync();
                         }
                         catch (SocketException)
                         {

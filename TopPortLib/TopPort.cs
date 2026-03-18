@@ -4,8 +4,6 @@ using Communication.Interfaces;
 using Parser;
 using Parser.Interfaces;
 using TopPortLib.Interfaces;
-using System.Collections.Generic;
-using System;
 
 namespace TopPortLib
 {

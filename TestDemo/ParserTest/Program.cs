@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Parser;
-using Parser.Interfaces;
 using Parser.Parsers;
 
 Console.WriteLine("Hello, World!");

@@ -1,6 +1,4 @@
 ﻿using Communication.Bus.PhysicalPort;
-using Crow.Exceptions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parser.Parsers;
 using TopPortLib;
 using TopPortLib.Interfaces;

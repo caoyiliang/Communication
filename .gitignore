@@ -59,3 +59,7 @@
 /TestDemo/SerialPortTest/bin
 /TestDemo/TestChangeParser/bin
 /TestDemo/TestChangeParser/obj
+/CommBuilder/bin
+/CommBuilder/obj
+/TestDemo/CommBuilderDemo/bin
+/TestDemo/CommBuilderDemo/obj

@@ -1,12 +1,6 @@
 ﻿using Communication.Bus.PhysicalPort;
-using Parser;
 using Parser.Parsers;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TopPortLib;
 using TopPortLib.Interfaces;
 

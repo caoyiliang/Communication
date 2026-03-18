@@ -67,7 +67,7 @@ namespace Communication.Bus
                 }
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime , keepAliveInterval ), null);
+                    _ = _listener.Server.IOControl(IOControlCode.KeepAliveValues, KeepAlive(1, keepAliveTime, keepAliveInterval), null);
                 }
 #else
                 try

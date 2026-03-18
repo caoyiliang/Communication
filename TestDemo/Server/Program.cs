@@ -15,7 +15,8 @@ async Task Server_OnReceiveParsedData(Guid clientId, byte[] data)
 {
     totalBytesReceived += data.Length;
     await Task.CompletedTask;
-};
+}
+;
 
 async Task Server_OnClientConnect(Guid clientId)
 {

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace TopPortLib.Exceptions
+﻿namespace TopPortLib.Exceptions
 {
     /// <summary>
     /// 请求转字节数组失败

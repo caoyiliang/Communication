@@ -9,7 +9,7 @@ topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
 
 async Task TopPort_OnReceiveParsedData(byte[] data)
 {
-    
+
 }
 
 await topPort.OpenAsync();

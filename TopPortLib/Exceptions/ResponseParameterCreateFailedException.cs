@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace TopPortLib.Exceptions
+﻿namespace TopPortLib.Exceptions
 {
     /// <summary>
     /// 接收处理创建失败

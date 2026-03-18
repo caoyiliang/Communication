@@ -22,7 +22,51 @@
 
 ## ⚡️ 30秒快速体验
 
-以TCP服务器接入为例，轻松几步即可启动一个异步通讯服务器（具体API见后文详解）：
+### 使用 Fluent Builder API（推荐）
+
+```csharp
+using CommBuilder;
+
+// 乌鸦场景 - RS485 主从通讯
+var crow = CommBuilder.Crow()
+    .UseSerial("COM3", 9600)
+    .WithHeadFootParser([0xAA], [0x55])
+    .Timeout(5000)
+    .SendInterval(20)
+    .Build();
+
+await crow.OpenAsync();
+var response = await crow.RequestAsync<ReadCmd, ReadRsp>(new ReadCmd(1, 0x03));
+
+// 鸽子场景 - TCP 全双工
+var pigeon = CommBuilder.Pigeon(this)
+    .UseTcp("192.168.1.100", 9000)
+    .WithHeadLengthParser([0xAA], data => data[2])
+    .Timeout(3000)
+    .Build();
+
+await pigeon.StartAsync();
+
+// 老鹰场景 - TCP Server
+var eagle = CommBuilder.Eagle(this)
+    .UseTcpServer("0.0.0.0", 9000)
+    .WithHeadFootParser([0xAA], [0x55])
+    .Build();
+
+await eagle.StartAsync();
+
+// 麻雀场景 - UDP 多对多
+var sparrow = CommBuilder.Sparrow(this)
+    .UseUdp("0.0.0.0", 9000)
+    .WithTimeParser(50)
+    .Build();
+
+await sparrow.StartAsync();
+```
+
+### 传统方式
+
+以TCP服务器接入为例：
 
 ```csharp
 using Communication.Bus;
@@ -46,15 +90,21 @@ tcpServer.StartAsync();
 
 ## 📦 安装方式
 
-### 1. 本地源码集成
-
-提供Nuget包管理发布下载，也可直接下载 [GitHub项目](https://github.com/caoyiliang/Communication) 源码或将其作为子模块导入。
+### 1. NuGet 包安装
 
 ```shell
+# 核心库
 NuGet\Install-Package CSoft.TopPortLib -Version 9.12.0
+
+# Fluent Builder API（推荐）
+NuGet\Install-Package CSoft.CommBuilder -Version 1.0.0
 ```
 
-将 `/Communication`、`/TopPortLib`、`/Crow`、`/Parser` 等核心目录作为项目引用即可。
+### 2. 本地源码集成
+
+下载 [GitHub项目](https://github.com/caoyiliang/Communication) 源码或将其作为子模块导入。
+
+将 `/Communication`、`/TopPortLib`、`/Crow`、`/Parser`、`/CommBuilder` 等核心目录作为项目引用即可。
 
 ### 2. .NET平台兼容矩阵
 
@@ -159,6 +209,39 @@ public class MyParser : IParser
 ---
 
 ## 🎯 进阶用法
+
+### 使用 Fluent Builder API
+
+CommBuilder 提供了简洁的 Fluent API，大幅降低入门门槛：
+
+#### 四种场景
+
+| 场景 | 适用协议 | 特点 |
+|------|----------|------|
+| **乌鸦 (Crow)** | RS485/串口 | 主从队列，请求-响应模式 |
+| **鸽子 (Pigeon)** | TCP 全双工 | 支持被动推送，实时通讯 |
+| **老鹰 (Eagle)** | TCP Server | 服务端多客户端管理 |
+| **麻雀 (Sparrow)** | UDP | 多对多广播通讯 |
+
+#### 连接字符串支持
+
+```csharp
+// 支持连接字符串快速创建
+var crow = CommBuilder.Crow()
+    .FromConnectionString("serial://COM3:9600:N:8:1")
+    .WithHeadFootParser([0xAA], [0x55])
+    .Build();
+
+var pigeon = CommBuilder.Pigeon(this)
+    .FromConnectionString("tcp://192.168.1.100:9000")
+    .WithHeadLengthParser([0xAA], data => data[2])
+    .Build();
+```
+
+连接字符串格式：
+- 串口: `serial://COM3:9600` 或 `serial://COM3:9600:N:8:1`
+- TCP: `tcp://192.168.1.100:9000`
+- 命名管道: `pipe://PipeName`
 
 ### 自定义分包协议接入
 

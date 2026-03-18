@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace TopPortLib.Exceptions;
+﻿namespace TopPortLib.Exceptions;
 
 /// <summary>Check方法不存在</summary>
 public class CheckMethodNotFoundException : Exception

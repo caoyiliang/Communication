@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace TopPortLib.Exceptions
+﻿namespace TopPortLib.Exceptions
 {
     [Serializable]
     internal class GetRspTypeByRspBytesFailedException : Exception

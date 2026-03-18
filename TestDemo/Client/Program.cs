@@ -30,7 +30,7 @@ catch
 
 }
 
-while(!isConnected)
+while (!isConnected)
 {
     await Task.Delay(1000);
 }
