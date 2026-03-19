@@ -10,6 +10,10 @@ namespace CommBuilder
     /// <para>使用场景说明：</para>
     /// <list type="bullet">
     ///   <item>
+    ///     <term>顶层 (Top)</term>
+    ///     <description>最简单的通讯方式，无队列，直接收发数据，适合简单场景</description>
+    ///   </item>
+    ///   <item>
     ///     <term>乌鸦 (Crow)</term>
     ///     <description>RS485 主从场景，请求-响应队列模式，适用于 Modbus RTU、串口设备通讯</description>
     ///   </item>
@@ -29,6 +33,15 @@ namespace CommBuilder
     /// </remarks>
     /// <example>
     /// <code>
+    /// // 顶层 - 最简单，无队列
+    /// var port = CommBuilder.Top()
+    ///     .UseSerial("COM3", 9600)
+    ///     .WithHeadFootParser([0xAA], [0x55])
+    ///     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
+    ///     .Build();
+    /// await port.OpenAsync();
+    /// await port.SendAsync([0x01, 0x02, 0x03]);
+    /// 
     /// // 乌鸦场景 - RS485 主从
     /// var crow = CommBuilder.Crow()
     ///     .UseSerial("COM3", 9600)
@@ -36,16 +49,70 @@ namespace CommBuilder
     ///     .Timeout(5000)
     ///     .SendInterval(20)
     ///     .Build();
-    /// 
-    /// // 或使用连接字符串
-    /// var crow = CommBuilder.Crow()
-    ///     .FromConnectionString("serial://COM3:9600")
-    ///     .WithHeadFootParser([0xAA], [0x55])
-    ///     .Build();
     /// </code>
     /// </example>
     public static class CommBuilder
     {
+        /// <summary>
+        /// 创建顶层通讯口 Builder（无队列，直接收发）
+        /// </summary>
+        /// <returns>顶层通讯口物理口选择步骤</returns>
+        /// <remarks>
+        /// 顶层通讯口是最简单的通讯方式，特点是：
+        /// <list type="bullet">
+        ///   <item><description>无队列，直接收发</description></item>
+        ///   <item><description>适合简单场景或自定义协议处理</description></item>
+        ///   <item><description>通过事件接收数据</description></item>
+        /// </list>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// var port = CommBuilder.Top()
+        ///     .UseSerial("COM3", 9600)
+        ///     .WithHeadFootParser([0xAA], [0x55])
+        ///     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
+        ///     .Build();
+        /// 
+        /// await port.OpenAsync();
+        /// await port.SendAsync([0x01, 0x02, 0x03]);
+        /// </code>
+        /// </example>
+        public static ITopPhysicalPortStep Top() => new TopBuilder();
+
+        /// <summary>
+        /// 创建顶层通讯口 Builder（服务端模式，TCP Server / UDP）
+        /// </summary>
+        /// <returns>顶层通讯口服务端物理口选择步骤</returns>
+        /// <remarks>
+        /// 适用于服务端模式，特点是：
+        /// <list type="bullet">
+        ///   <item><description>管理多个客户端连接</description></item>
+        ///   <item><description>每个客户端独立分包器</description></item>
+        ///   <item><description>支持 TCP Server 和 UDP 两种模式</description></item>
+        /// </list>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// // TCP Server
+        /// var server = CommBuilder.TopServer()
+        ///     .UseTcpServer("0.0.0.0", 9000)
+        ///     .WithHeadFootParser([0xAA], [0x55])
+        ///     .OnClientConnected(clientId => Console.WriteLine($"客户端连接: {clientId}"))
+        ///     .OnReceived((clientId, data) => Console.WriteLine($"收到: {BitConverter.ToString(data)}"))
+        ///     .Build();
+        /// 
+        /// await server.OpenAsync();
+        /// await server.SendAsync(clientId, [0x01, 0x02, 0x03]);
+        /// 
+        /// // UDP 多对多
+        /// var udp = CommBuilder.TopServer()
+        ///     .UseUdp("0.0.0.0", 9000)
+        ///     .WithTimeParser(50)
+        ///     .Build();
+        /// </code>
+        /// </example>
+        public static ITopServerPhysicalPortStep TopServer() => new TopServerBuilder();
+
         /// <summary>
         /// 创建乌鸦场景 Builder
         /// </summary>
