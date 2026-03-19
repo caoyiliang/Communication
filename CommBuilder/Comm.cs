@@ -14,6 +14,10 @@ namespace CommBuilder
     ///     <description>最简单的通讯方式，无队列，直接收发数据，适合简单场景</description>
     ///   </item>
     ///   <item>
+    ///     <term>顶层服务端 (TopServer)</term>
+    ///     <description>服务端模式，TCP Server / UDP 多对多，无队列，直接收发</description>
+    ///   </item>
+    ///   <item>
     ///     <term>乌鸦 (Crow)</term>
     ///     <description>RS485 主从场景，请求-响应队列模式，适用于 Modbus RTU、串口设备通讯</description>
     ///   </item>
@@ -34,7 +38,7 @@ namespace CommBuilder
     /// <example>
     /// <code>
     /// // 顶层 - 最简单，无队列
-    /// var port = CommBuilder.Top()
+    /// var port = Comm.Top()
     ///     .UseSerial("COM3", 9600)
     ///     .WithHeadFootParser([0xAA], [0x55])
     ///     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
@@ -42,8 +46,16 @@ namespace CommBuilder
     /// await port.OpenAsync();
     /// await port.SendAsync([0x01, 0x02, 0x03]);
     /// 
+    /// // 顶层服务端 - TCP Server，无队列
+    /// var server = Comm.TopServer()
+    ///     .UseTcpServer("0.0.0.0", 9000)
+    ///     .WithHeadFootParser([0xAA], [0x55])
+    ///     .OnClientConnected(id => Console.WriteLine($"客户端连接: {id}"))
+    ///     .Build();
+    /// await server.OpenAsync();
+    /// 
     /// // 乌鸦场景 - RS485 主从
-    /// var crow = CommBuilder.Crow()
+    /// var crow = Comm.Crow()
     ///     .UseSerial("COM3", 9600)
     ///     .WithHeadLengthParser([0xAA, 0x55], data => data[2])
     ///     .Timeout(5000)
@@ -51,7 +63,7 @@ namespace CommBuilder
     ///     .Build();
     /// </code>
     /// </example>
-    public static class CommBuilder
+    public static class Comm
     {
         /// <summary>
         /// 创建顶层通讯口 Builder（无队列，直接收发）
@@ -67,7 +79,7 @@ namespace CommBuilder
         /// </remarks>
         /// <example>
         /// <code>
-        /// var port = CommBuilder.Top()
+        /// var port = Comm.Top()
         ///     .UseSerial("COM3", 9600)
         ///     .WithHeadFootParser([0xAA], [0x55])
         ///     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
@@ -94,7 +106,7 @@ namespace CommBuilder
         /// <example>
         /// <code>
         /// // TCP Server
-        /// var server = CommBuilder.TopServer()
+        /// var server = Comm.TopServer()
         ///     .UseTcpServer("0.0.0.0", 9000)
         ///     .WithHeadFootParser([0xAA], [0x55])
         ///     .OnClientConnected(clientId => Console.WriteLine($"客户端连接: {clientId}"))
@@ -105,7 +117,7 @@ namespace CommBuilder
         /// await server.SendAsync(clientId, [0x01, 0x02, 0x03]);
         /// 
         /// // UDP 多对多
-        /// var udp = CommBuilder.TopServer()
+        /// var udp = Comm.TopServer()
         ///     .UseUdp("0.0.0.0", 9000)
         ///     .WithTimeParser(50)
         ///     .Build();
@@ -127,7 +139,7 @@ namespace CommBuilder
         /// </remarks>
         /// <example>
         /// <code>
-        /// var crow = CommBuilder.Crow()
+        /// var crow = Comm.Crow()
         ///     .UseSerial("COM3", 9600)
         ///     .WithHeadFootParser([0xAA], [0x55])
         ///     .Timeout(5000)
@@ -154,7 +166,7 @@ namespace CommBuilder
         /// </remarks>
         /// <example>
         /// <code>
-        /// var pigeon = CommBuilder.Pigeon(this)
+        /// var pigeon = Comm.Pigeon(this)
         ///     .UseTcp("192.168.1.100", 9000)
         ///     .WithHeadLengthParser([0xAA], data => data[2])
         ///     .Timeout(3000)
@@ -181,7 +193,7 @@ namespace CommBuilder
         /// </remarks>
         /// <example>
         /// <code>
-        /// var eagle = CommBuilder.Eagle(this)
+        /// var eagle = Comm.Eagle(this)
         ///     .UseTcpServer("0.0.0.0", 9000)
         ///     .WithHeadFootParser([0xAA], [0x55])
         ///     .OnClientConnected(clientId => Console.WriteLine($"客户端连接: {clientId}"))
@@ -207,7 +219,7 @@ namespace CommBuilder
         /// </remarks>
         /// <example>
         /// <code>
-        /// var sparrow = CommBuilder.Sparrow(this)
+        /// var sparrow = Comm.Sparrow(this)
         ///     .UseUdp("0.0.0.0", 9000)
         ///     .WithTimeParser(50)
         ///     .Timeout(3000)

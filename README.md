@@ -30,7 +30,7 @@ using CommBuilder;
 // ==================== 顶层通讯口（无队列） ====================
 
 // 1. 顶层点对点 - 串口
-var port = CommBuilder.Top()
+var port = Comm.Top()
     .UseSerial("COM3", 9600)
     .WithHeadFootParser([0xAA], [0x55])
     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
@@ -40,7 +40,7 @@ await port.OpenAsync();
 await port.SendAsync([0x01, 0x02, 0x03]);
 
 // 2. 顶层点对点 - TCP 客户端
-var tcp = CommBuilder.Top()
+var tcp = Comm.Top()
     .UseTcp("192.168.1.100", 9000)
     .WithHeadLengthParser([0xAA], data => data[2])
     .AutoReconnect()
@@ -49,7 +49,7 @@ var tcp = CommBuilder.Top()
 await tcp.OpenAsync();
 
 // 3. 顶层服务端 - TCP Server
-var server = CommBuilder.TopServer()
+var server = Comm.TopServer()
     .UseTcpServer("0.0.0.0", 9000)
     .WithHeadFootParser([0xAA], [0x55])
     .OnClientConnected(id => Console.WriteLine($"客户端连接: {id}"))
@@ -59,7 +59,7 @@ var server = CommBuilder.TopServer()
 await server.OpenAsync();
 
 // 4. 顶层服务端 - UDP 多对多
-var udp = CommBuilder.TopServer()
+var udp = Comm.TopServer()
     .UseUdp("0.0.0.0", 9000)
     .WithTimeParser(50)
     .Build();
@@ -67,7 +67,7 @@ var udp = CommBuilder.TopServer()
 // ==================== 队列版本 ====================
 
 // 乌鸦场景 - RS485 主从通讯（请求-响应队列）
-var crow = CommBuilder.Crow()
+var crow = Comm.Crow()
     .UseSerial("COM3", 9600)
     .WithHeadFootParser([0xAA], [0x55])
     .Timeout(5000)
@@ -78,7 +78,7 @@ await crow.OpenAsync();
 var response = await crow.RequestAsync<ReadCmd, ReadRsp>(new ReadCmd(1, 0x03));
 
 // 鸽子场景 - TCP 全双工（支持主动推送）
-var pigeon = CommBuilder.Pigeon(this)
+var pigeon = Comm.Pigeon(this)
     .UseTcp("192.168.1.100", 9000)
     .WithHeadLengthParser([0xAA], data => data[2])
     .Timeout(3000)
@@ -87,7 +87,7 @@ var pigeon = CommBuilder.Pigeon(this)
 await pigeon.StartAsync();
 
 // 老鹰场景 - TCP Server（队列版本）
-var eagle = CommBuilder.Eagle(this)
+var eagle = Comm.Eagle(this)
     .UseTcpServer("0.0.0.0", 9000)
     .WithHeadFootParser([0xAA], [0x55])
     .Build();
@@ -95,7 +95,7 @@ var eagle = CommBuilder.Eagle(this)
 await eagle.StartAsync();
 
 // 麻雀场景 - UDP 多对多（队列版本）
-var sparrow = CommBuilder.Sparrow(this)
+var sparrow = Comm.Sparrow(this)
     .UseUdp("0.0.0.0", 9000)
     .WithTimeParser(50)
     .Build();
@@ -311,7 +311,7 @@ CommBuilder 提供了简洁的 Fluent API，大幅降低入门门槛：
 using CommBuilder;
 
 // 串口 + 头尾分包
-var port = CommBuilder.Top()
+var port = Comm.Top()
     .UseSerial("COM3", 9600)
     .WithHeadFootParser([0xAA], [0x55])
     .OnReceived(data => Console.WriteLine(BitConverter.ToString(data)))
@@ -329,7 +329,7 @@ await port.SendAsync([0x01, 0x02, 0x03]);
 
 ```csharp
 // TCP + 头长度分包 + 自动重连
-var tcp = CommBuilder.Top()
+var tcp = Comm.Top()
     .UseTcp("192.168.1.100", 9000)
     .WithHeadLengthParser([0xAA, 0x55], data => data[2])  // 帧头 + 长度字段
     .AutoReconnect()  // 断线自动重连
@@ -345,7 +345,7 @@ await tcp.OpenAsync();
 using CommBuilder;
 
 // TCP Server，每个客户端独立分包器
-var server = CommBuilder.TopServer()
+var server = Comm.TopServer()
     .UseTcpServer("0.0.0.0", 9000)
     .WithHeadFootParser([0xAA], [0x55])
     .OnClientConnected(clientId => Console.WriteLine($"客户端连接: {clientId}"))
@@ -365,7 +365,7 @@ await server.OpenAsync();
 
 ```csharp
 // UDP 多对多
-var udp = CommBuilder.TopServer()
+var udp = Comm.TopServer()
     .UseUdp("0.0.0.0", 9000)
     .WithTimeParser(50)  // 定时分包
     .OnReceived((clientId, data) => Handle(data))
@@ -384,7 +384,7 @@ await udp.SendAsync(clientId, [0x01, 0x02, 0x03]);
 
 ```csharp
 // RS485 主从通讯，自动队列
-var crow = CommBuilder.Crow()
+var crow = Comm.Crow()
     .UseSerial("COM3", 9600)
     .WithHeadLengthParser([0xAA, 0x55], data => data[2])
     .Timeout(5000)     // 请求超时 5 秒
@@ -401,7 +401,7 @@ var response = await crow.RequestAsync<ReadCmd, ReadRsp>(new ReadCmd(1, 0x03));
 
 ```csharp
 // TCP 全双工，支持主动推送
-var pigeon = CommBuilder.Pigeon(this)
+var pigeon = Comm.Pigeon(this)
     .UseTcp("192.168.1.100", 9000)
     .WithHeadFootParser([0xAA], [0x55])
     .Timeout(3000)
@@ -420,12 +420,12 @@ var response = await pigeon.RequestAsync<QueryCmd, QueryRsp>(new QueryCmd());
 
 ```csharp
 // 支持连接字符串快速创建
-var crow = CommBuilder.Crow()
+var crow = Comm.Crow()
     .FromConnectionString("serial://COM3:9600:N:8:1")
     .WithHeadFootParser([0xAA], [0x55])
     .Build();
 
-var pigeon = CommBuilder.Pigeon(this)
+var pigeon = Comm.Pigeon(this)
     .FromConnectionString("tcp://192.168.1.100:9000")
     .WithHeadLengthParser([0xAA], data => data[2])
     .Build();
