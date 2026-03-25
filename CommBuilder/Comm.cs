@@ -15,7 +15,11 @@ namespace CommBuilder
     ///   </item>
     ///   <item>
     ///     <term>顶层服务端 (TopServer)</term>
-    ///     <description>服务端模式，TCP Server / UDP 多对多，无队列，直接收发</description>
+    ///     <description>TCP 服务端模式，管理多个客户端连接，无队列，直接收发</description>
+    ///   </item>
+    ///   <item>
+    ///     <term>顶层多对多 (TopM2M)</term>
+    ///     <description>UDP 多对多模式，无连接状态管理，无队列，直接收发</description>
     ///   </item>
     ///   <item>
     ///     <term>乌鸦 (Crow)</term>
@@ -92,21 +96,20 @@ namespace CommBuilder
         public static ITopPhysicalPortStep Top() => new TopBuilder();
 
         /// <summary>
-        /// 创建顶层通讯口 Builder（服务端模式，TCP Server / UDP）
+        /// 创建顶层通讯口 Builder（TCP 服务端模式）
         /// </summary>
-        /// <returns>顶层通讯口服务端物理口选择步骤</returns>
+        /// <returns>顶层通讯口 TCP 服务端物理口选择步骤</returns>
         /// <remarks>
-        /// 适用于服务端模式，特点是：
+        /// 适用于 TCP 服务端模式，特点是：
         /// <list type="bullet">
         ///   <item><description>管理多个客户端连接</description></item>
         ///   <item><description>每个客户端独立分包器</description></item>
-        ///   <item><description>支持 TCP Server 和 UDP 两种模式</description></item>
+        ///   <item><description>Build() 直接返回强类型 ITopPort_Server</description></item>
         /// </list>
         /// </remarks>
         /// <example>
         /// <code>
-        /// // TCP Server
-        /// var server = Comm.TopServer()
+        /// ITopPort_Server server = Comm.TopServer()
         ///     .UseTcpServer("0.0.0.0", 9000)
         ///     .WithHeadFootParser([0xAA], [0x55])
         ///     .OnClientConnected(clientId => Console.WriteLine($"客户端连接: {clientId}"))
@@ -115,15 +118,34 @@ namespace CommBuilder
         /// 
         /// await server.OpenAsync();
         /// await server.SendAsync(clientId, [0x01, 0x02, 0x03]);
-        /// 
-        /// // UDP 多对多
-        /// var udp = Comm.TopServer()
-        ///     .UseUdp("0.0.0.0", 9000)
-        ///     .WithTimeParser(50)
-        ///     .Build();
         /// </code>
         /// </example>
         public static ITopServerPhysicalPortStep TopServer() => new TopServerBuilder();
+
+        /// <summary>
+        /// 创建顶层通讯口 Builder（UDP 多对多模式）
+        /// </summary>
+        /// <returns>顶层通讯口 UDP 多对多物理口选择步骤</returns>
+        /// <remarks>
+        /// 适用于 UDP 多对多（M2M）模式，特点是：
+        /// <list type="bullet">
+        ///   <item><description>无连接状态管理，按对端地址区分</description></item>
+        ///   <item><description>每个对端独立分包器</description></item>
+        ///   <item><description>Build() 直接返回强类型 ITopPort_M2M</description></item>
+        /// </list>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// ITopPort_M2M udp = Comm.TopM2M()
+        ///     .UseUdp("0.0.0.0", 9000)
+        ///     .WithTimeParser(50)
+        ///     .OnReceived((clientId, data) => Console.WriteLine($"收到: {BitConverter.ToString(data)}"))
+        ///     .Build();
+        /// 
+        /// await udp.OpenAsync();
+        /// </code>
+        /// </example>
+        public static ITopM2MPhysicalPortStep TopM2M() => new TopM2MBuilder();
 
         /// <summary>
         /// 创建乌鸦场景 Builder

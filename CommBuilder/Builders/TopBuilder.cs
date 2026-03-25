@@ -159,42 +159,26 @@ namespace CommBuilder.Builders
 
             var topPort = new TopPort(_physicalPort, _parser);
 
-            // 注册同步回调
             if (_onReceived != null)
-            {
                 topPort.OnReceiveParsedData += data => { _onReceived(data); return Task.CompletedTask; };
-            }
-            // 注册异步回调
+
             if (_onReceivedAsync != null)
-            {
                 topPort.OnReceiveParsedData += async data => await _onReceivedAsync(data);
-            }
 
-            // 连接成功回调
             if (_onConnected != null)
-            {
                 topPort.OnConnect += () => { _onConnected(); return Task.CompletedTask; };
-            }
+
             if (_onConnectedAsync != null)
-            {
                 topPort.OnConnect += async () => await _onConnectedAsync();
-            }
 
-            // 断开连接回调
             if (_onDisconnected != null)
-            {
                 topPort.OnDisconnect += () => { _onDisconnected(); return Task.CompletedTask; };
-            }
-            if (_onDisconnectedAsync != null)
-            {
-                topPort.OnDisconnect += async () => await _onDisconnectedAsync();
-            }
 
-            // 发送数据回调
+            if (_onDisconnectedAsync != null)
+                topPort.OnDisconnect += async () => await _onDisconnectedAsync();
+
             if (_onSent != null)
-            {
                 topPort.OnSentData += data => { _onSent(data); return Task.CompletedTask; };
-            }
 
             return topPort;
         }
@@ -204,19 +188,16 @@ namespace CommBuilder.Builders
 
     #endregion
 
-    #region 顶层通讯口（服务端）
+    #region 顶层通讯口（TCP 服务端）
 
     /// <summary>
-    /// 顶层通讯口 Builder - 服务端模式（TCP Server / UDP M2M）
+    /// 顶层通讯口 Builder - TCP 服务端模式（一对多，管理多个客户端连接）
     /// </summary>
     public class TopServerBuilder : ITopServerPhysicalPortStep, ITopServerParserStep, ITopServerConfigStep
     {
         private IPhysicalPort_Server? _physicalPortServer;
-        private IPhysicalPort_M2M? _physicalPortM2M;
         private Func<IParser>? _parserFactory;
         private IParser? _sharedParser;
-        private bool _isServer;
-        private bool _isM2M;
         private int _sendInterval;
         private Action<Guid, byte[]>? _onReceived;
         private Func<Guid, byte[], Task>? _onReceivedAsync;
@@ -232,15 +213,6 @@ namespace CommBuilder.Builders
         public ITopServerParserStep UseTcpServer(string host, int port)
         {
             _physicalPortServer = new TcpServer(host, port);
-            _isServer = true;
-            return this;
-        }
-
-        /// <inheritdoc/>
-        public ITopServerParserStep UseUdp(string host, int port)
-        {
-            _physicalPortM2M = new Udp(host, port);
-            _isM2M = true;
             return this;
         }
 
@@ -319,119 +291,206 @@ namespace CommBuilder.Builders
         public ITopServerConfigStep OnReceived(Action<Guid, byte[]> handler) { _onReceived = handler; return this; }
 
         /// <inheritdoc/>
-        public ITopServerConfigStep OnReceived(Func<Guid, byte[], Task> handler)
-        {
-            _onReceivedAsync = handler;
-            return this;
-        }
+        public ITopServerConfigStep OnReceived(Func<Guid, byte[], Task> handler) { _onReceivedAsync = handler; return this; }
 
         /// <inheritdoc/>
         public ITopServerConfigStep OnClientConnected(Action<Guid> handler) { _onClientConnected = handler; return this; }
 
         /// <inheritdoc/>
-        public ITopServerConfigStep OnClientConnected(Func<Guid, Task> handler)
-        {
-            _onClientConnectedAsync = handler;
-            return this;
-        }
+        public ITopServerConfigStep OnClientConnected(Func<Guid, Task> handler) { _onClientConnectedAsync = handler; return this; }
 
         /// <inheritdoc/>
         public ITopServerConfigStep OnClientDisconnected(Action<Guid> handler) { _onClientDisconnected = handler; return this; }
 
         /// <inheritdoc/>
-        public ITopServerConfigStep OnClientDisconnected(Func<Guid, Task> handler)
-        {
-            _onClientDisconnectedAsync = handler;
-            return this;
-        }
+        public ITopServerConfigStep OnClientDisconnected(Func<Guid, Task> handler) { _onClientDisconnectedAsync = handler; return this; }
 
         /// <inheritdoc/>
         public ITopServerConfigStep OnSent(Action<byte[], Guid> handler) { _onSent = handler; return this; }
 
         /// <inheritdoc/>
-        public object Build()
+        public ITopPort_Server Build()
         {
-            if (_isServer && _physicalPortServer == null)
-                throw new InvalidOperationException("必须选择服务端物理口类型，请调用 UseTcpServer/UseUdp");
-
-            if (_isM2M && _physicalPortM2M == null)
-                throw new InvalidOperationException("必须选择服务端物理口类型，请调用 UseTcpServer/UseUdp");
+            if (_physicalPortServer == null)
+                throw new InvalidOperationException("必须选择服务端物理口类型，请调用 UseTcpServer");
 
             if (_parserFactory == null && _sharedParser == null)
                 throw new InvalidOperationException("必须选择分包器，请调用 WithHeadLengthParser/WithHeadFootParser/WithTimeParser/WithFootParser/WithParser/WithNoParser 或 WithParserFactory");
 
-            IParser CreateParser()
+            IParser CreateParser() => _parserFactory != null ? _parserFactory() : _sharedParser!;
+
+            var topPort = new TopPort_Server(_physicalPortServer, () => Task.FromResult(CreateParser()));
+
+            if (_onReceived != null)
+                topPort.OnReceiveParsedData += (clientId, data) => { _onReceived(clientId, data); return Task.CompletedTask; };
+
+            if (_onReceivedAsync != null)
+                topPort.OnReceiveParsedData += async (clientId, data) => await _onReceivedAsync(clientId, data);
+
+            if (_onClientConnected != null)
+                topPort.OnClientConnect += clientId => { _onClientConnected(clientId); return Task.CompletedTask; };
+
+            if (_onClientConnectedAsync != null)
+                topPort.OnClientConnect += async clientId => await _onClientConnectedAsync(clientId);
+
+            if (_onClientDisconnected != null)
+                topPort.OnClientDisconnect += clientId => { _onClientDisconnected(clientId); return Task.CompletedTask; };
+
+            if (_onClientDisconnectedAsync != null)
+                topPort.OnClientDisconnect += async clientId => await _onClientDisconnectedAsync(clientId);
+
+            if (_onSent != null)
+                topPort.OnSentData += (data, clientId) => { _onSent(data, clientId); return Task.CompletedTask; };
+
+            return topPort;
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    #region 顶层通讯口（UDP 多对多）
+
+    /// <summary>
+    /// 顶层通讯口 Builder - UDP 多对多模式（M2M，无连接状态管理）
+    /// </summary>
+    public class TopM2MBuilder : ITopM2MPhysicalPortStep, ITopM2MParserStep, ITopM2MConfigStep
+    {
+        private IPhysicalPort_M2M? _physicalPortM2M;
+        private Func<IParser>? _parserFactory;
+        private IParser? _sharedParser;
+        private int _sendInterval;
+        private Action<Guid, byte[]>? _onReceived;
+        private Func<Guid, byte[], Task>? _onReceivedAsync;
+        private Action<Guid>? _onClientConnected;
+        private Func<Guid, Task>? _onClientConnectedAsync;
+        private Action<byte[], Guid>? _onSent;
+
+        #region ITopM2MPhysicalPortStep
+
+        /// <inheritdoc/>
+        public ITopM2MParserStep UseUdp(string host, int port)
+        {
+            _physicalPortM2M = new Udp(host, port);
+            return this;
+        }
+
+        #endregion
+
+        #region ITopM2MParserStep
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithParserFactory(Func<IParser> parserFactory)
+        {
+            _parserFactory = parserFactory;
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithHeadLengthParser(byte[] head, Func<byte[], int> lengthGetter)
+        {
+            _parserFactory = () => new HeadLengthParser(head, data =>
             {
-                if (_parserFactory != null)
-                    return _parserFactory();
-                return _sharedParser!;
-            }
+                try
+                {
+                    var len = lengthGetter(data);
+                    return Task.FromResult(new GetDataLengthRsp { Length = len, StateCode = Parser.StateCode.Success });
+                }
+                catch
+                {
+                    return Task.FromResult(new GetDataLengthRsp { Length = 0, StateCode = Parser.StateCode.LengthNotEnough });
+                }
+            });
+            return this;
+        }
 
-            if (_isServer && _physicalPortServer != null)
-            {
-                var topPort = new TopPort_Server(_physicalPortServer, () => Task.FromResult(CreateParser()));
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithHeadFootParser(byte[] head, byte[] foot)
+        {
+            _parserFactory = () => new HeadFootParser(head, foot);
+            return this;
+        }
 
-                if (_onReceived != null)
-                {
-                    topPort.OnReceiveParsedData += (clientId, data) => { _onReceived(clientId, data); return Task.CompletedTask; };
-                }
-                if (_onReceivedAsync != null)
-                {
-                    topPort.OnReceiveParsedData += async (clientId, data) => await _onReceivedAsync(clientId, data);
-                }
-                if (_onClientConnected != null)
-                {
-                    topPort.OnClientConnect += clientId => { _onClientConnected(clientId); return Task.CompletedTask; };
-                }
-                if (_onClientConnectedAsync != null)
-                {
-                    topPort.OnClientConnect += async clientId => await _onClientConnectedAsync(clientId);
-                }
-                if (_onClientDisconnected != null)
-                {
-                    topPort.OnClientDisconnect += clientId => { _onClientDisconnected(clientId); return Task.CompletedTask; };
-                }
-                if (_onClientDisconnectedAsync != null)
-                {
-                    topPort.OnClientDisconnect += async clientId => await _onClientDisconnectedAsync(clientId);
-                }
-                if (_onSent != null)
-                {
-                    topPort.OnSentData += (data, clientId) => { _onSent(data, clientId); return Task.CompletedTask; };
-                }
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithTimeParser(int intervalMs = 50)
+        {
+            _parserFactory = () => new TimeParser(intervalMs);
+            return this;
+        }
 
-                return topPort;
-            }
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithFootParser(byte[] foot)
+        {
+            _parserFactory = () => new FootParser(foot);
+            return this;
+        }
 
-            if (_isM2M && _physicalPortM2M != null)
-            {
-                var topPort = new TopPort_M2M(_physicalPortM2M, () => Task.FromResult(CreateParser()));
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithParser(IParser parser)
+        {
+            _sharedParser = parser;
+            return this;
+        }
 
-                if (_onReceived != null)
-                {
-                    topPort.OnReceiveParsedData += (clientId, data) => { _onReceived(clientId, data); return Task.CompletedTask; };
-                }
-                if (_onReceivedAsync != null)
-                {
-                    topPort.OnReceiveParsedData += async (clientId, data) => await _onReceivedAsync(clientId, data);
-                }
-                if (_onClientConnected != null)
-                {
-                    topPort.OnClientConnect += clientId => { _onClientConnected(clientId); return Task.CompletedTask; };
-                }
-                if (_onClientConnectedAsync != null)
-                {
-                    topPort.OnClientConnect += async clientId => await _onClientConnectedAsync(clientId);
-                }
-                if (_onSent != null)
-                {
-                    topPort.OnSentData += (data, clientId) => { _onSent(data, clientId); return Task.CompletedTask; };
-                }
+        /// <inheritdoc/>
+        public ITopM2MConfigStep WithNoParser()
+        {
+            _parserFactory = () => new NoParser();
+            return this;
+        }
 
-                return topPort;
-            }
+        #endregion
 
-            throw new InvalidOperationException("无效的配置");
+        #region ITopM2MConfigStep
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep SendInterval(int ms) { _sendInterval = ms; return this; }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep OnReceived(Action<Guid, byte[]> handler) { _onReceived = handler; return this; }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep OnReceived(Func<Guid, byte[], Task> handler) { _onReceivedAsync = handler; return this; }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep OnClientConnected(Action<Guid> handler) { _onClientConnected = handler; return this; }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep OnClientConnected(Func<Guid, Task> handler) { _onClientConnectedAsync = handler; return this; }
+
+        /// <inheritdoc/>
+        public ITopM2MConfigStep OnSent(Action<byte[], Guid> handler) { _onSent = handler; return this; }
+
+        /// <inheritdoc/>
+        public ITopPort_M2M Build()
+        {
+            if (_physicalPortM2M == null)
+                throw new InvalidOperationException("必须选择多对多物理口类型，请调用 UseUdp");
+
+            if (_parserFactory == null && _sharedParser == null)
+                throw new InvalidOperationException("必须选择分包器，请调用 WithHeadLengthParser/WithHeadFootParser/WithTimeParser/WithFootParser/WithParser/WithNoParser 或 WithParserFactory");
+
+            IParser CreateParser() => _parserFactory != null ? _parserFactory() : _sharedParser!;
+
+            var topPort = new TopPort_M2M(_physicalPortM2M, () => Task.FromResult(CreateParser()));
+
+            if (_onReceived != null)
+                topPort.OnReceiveParsedData += (clientId, data) => { _onReceived(clientId, data); return Task.CompletedTask; };
+
+            if (_onReceivedAsync != null)
+                topPort.OnReceiveParsedData += async (clientId, data) => await _onReceivedAsync(clientId, data);
+
+            if (_onClientConnected != null)
+                topPort.OnClientConnect += clientId => { _onClientConnected(clientId); return Task.CompletedTask; };
+
+            if (_onClientConnectedAsync != null)
+                topPort.OnClientConnect += async clientId => await _onClientConnectedAsync(clientId);
+
+            if (_onSent != null)
+                topPort.OnSentData += (data, clientId) => { _onSent(data, clientId); return Task.CompletedTask; };
+
+            return topPort;
         }
 
         #endregion

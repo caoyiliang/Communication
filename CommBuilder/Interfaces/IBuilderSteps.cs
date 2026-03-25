@@ -388,10 +388,10 @@ namespace CommBuilder.Interfaces
     }
 
     /// <summary>
-    /// 顶层通讯口（服务端）- 物理口选择步骤
+    /// 顶层通讯口（TCP 服务端）- 物理口选择步骤
     /// </summary>
     /// <remarks>
-    /// 适用于服务端模式，管理多个客户端
+    /// 适用于 TCP 服务端模式，管理多个客户端连接
     /// </remarks>
     public interface ITopServerPhysicalPortStep
     {
@@ -401,13 +401,22 @@ namespace CommBuilder.Interfaces
         /// <param name="host">监听地址，如 0.0.0.0</param>
         /// <param name="port">监听端口</param>
         ITopServerParserStep UseTcpServer(string host, int port);
+    }
 
+    /// <summary>
+    /// 顶层通讯口（UDP 多对多）- 物理口选择步骤
+    /// </summary>
+    /// <remarks>
+    /// 适用于 UDP 多对多模式（M2M），无连接状态管理
+    /// </remarks>
+    public interface ITopM2MPhysicalPortStep
+    {
         /// <summary>
         /// 使用UDP（多对多）
         /// </summary>
         /// <param name="host">监听地址</param>
         /// <param name="port">监听端口</param>
-        ITopServerParserStep UseUdp(string host, int port);
+        ITopM2MParserStep UseUdp(string host, int port);
     }
 
     /// <summary>
@@ -454,7 +463,7 @@ namespace CommBuilder.Interfaces
     }
 
     /// <summary>
-    /// 顶层通讯口（服务端）- 分包器选择步骤
+    /// 顶层通讯口（TCP 服务端）- 分包器选择步骤
     /// </summary>
     public interface ITopServerParserStep
     {
@@ -569,7 +578,7 @@ namespace CommBuilder.Interfaces
     }
 
     /// <summary>
-    /// 顶层通讯口（服务端）- 配置步骤
+    /// 顶层通讯口（TCP 服务端）- 配置步骤
     /// </summary>
     public interface ITopServerConfigStep
     {
@@ -622,17 +631,107 @@ namespace CommBuilder.Interfaces
         ITopServerConfigStep OnSent(Action<byte[], Guid> handler);
 
         /// <summary>
-        /// 创建顶层通讯口（服务端）
+        /// 创建顶层通讯口（TCP 服务端）
         /// </summary>
-        /// <returns>返回 ITopPort_Server（TCP Server）或 ITopPort_M2M（UDP）实例</returns>
-        /// <remarks>
-        /// 返回类型为 <see cref="object"/>，实际返回：
-        /// <list type="bullet">
-        ///   <item>UseTcpServer → <see cref="TopPortLib.Interfaces.ITopPort_Server"/></item>
-        ///   <item>UseUdp → <see cref="TopPortLib.Interfaces.ITopPort_M2M"/></item>
-        /// </list>
-        /// </remarks>
-        object Build();
+        /// <returns>ITopPort_Server 实例</returns>
+        TopPortLib.Interfaces.ITopPort_Server Build();
+    }
+
+    /// <summary>
+    /// 顶层通讯口（UDP 多对多）- 分包器选择步骤
+    /// </summary>
+    public interface ITopM2MParserStep
+    {
+        /// <summary>
+        /// 设置分包器工厂（每个对端独立分包器）
+        /// </summary>
+        /// <param name="parserFactory">分包器工厂方法</param>
+        ITopM2MConfigStep WithParserFactory(Func<IParser> parserFactory);
+
+        /// <summary>
+        /// 头长度分包
+        /// </summary>
+        /// <param name="head">帧头字节</param>
+        /// <param name="lengthGetter">长度获取方法</param>
+        ITopM2MConfigStep WithHeadLengthParser(byte[] head, Func<byte[], int> lengthGetter);
+
+        /// <summary>
+        /// 头尾分包
+        /// </summary>
+        /// <param name="head">帧头字节</param>
+        /// <param name="foot">帧尾字节</param>
+        ITopM2MConfigStep WithHeadFootParser(byte[] head, byte[] foot);
+
+        /// <summary>
+        /// 定时分包
+        /// </summary>
+        /// <param name="intervalMs">时间间隔（毫秒）</param>
+        ITopM2MConfigStep WithTimeParser(int intervalMs = 50);
+
+        /// <summary>
+        /// 尾部分包
+        /// </summary>
+        /// <param name="foot">帧尾字节</param>
+        ITopM2MConfigStep WithFootParser(byte[] foot);
+
+        /// <summary>
+        /// 使用自定义分包器
+        /// </summary>
+        /// <param name="parser">分包器实例</param>
+        ITopM2MConfigStep WithParser(IParser parser);
+
+        /// <summary>
+        /// 不分包
+        /// </summary>
+        ITopM2MConfigStep WithNoParser();
+    }
+
+    /// <summary>
+    /// 顶层通讯口（UDP 多对多）- 配置步骤
+    /// </summary>
+    public interface ITopM2MConfigStep
+    {
+        /// <summary>
+        /// 发送后间隔时间（毫秒）
+        /// </summary>
+        /// <param name="ms">间隔毫秒数</param>
+        ITopM2MConfigStep SendInterval(int ms);
+
+        /// <summary>
+        /// 收到数据回调
+        /// </summary>
+        /// <param name="handler">处理函数，参数为 (对端ID, 数据)</param>
+        ITopM2MConfigStep OnReceived(Action<Guid, byte[]> handler);
+
+        /// <summary>
+        /// 收到数据回调（异步）
+        /// </summary>
+        /// <param name="handler">处理函数</param>
+        ITopM2MConfigStep OnReceived(Func<Guid, byte[], Task> handler);
+
+        /// <summary>
+        /// 对端首次出现（新消息来源）回调
+        /// </summary>
+        /// <param name="handler">处理函数，参数为对端ID</param>
+        ITopM2MConfigStep OnClientConnected(Action<Guid> handler);
+
+        /// <summary>
+        /// 对端首次出现（新消息来源）回调（异步）
+        /// </summary>
+        /// <param name="handler">处理函数</param>
+        ITopM2MConfigStep OnClientConnected(Func<Guid, Task> handler);
+
+        /// <summary>
+        /// 发送数据回调
+        /// </summary>
+        /// <param name="handler">处理函数，参数为 (数据, 对端ID)</param>
+        ITopM2MConfigStep OnSent(Action<byte[], Guid> handler);
+
+        /// <summary>
+        /// 创建顶层通讯口（UDP 多对多）
+        /// </summary>
+        /// <returns>ITopPort_M2M 实例</returns>
+        TopPortLib.Interfaces.ITopPort_M2M Build();
     }
 
     #endregion

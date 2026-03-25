@@ -36,7 +36,7 @@ class Program
 
         // 示例 4: 顶层服务端 - UDP
         Console.WriteLine("4. UDP (TopServer)");
-        var udp = Comm.TopServer()
+        var udp = Comm.TopM2M()
             .UseUdp("0.0.0.0", 9000)
             .WithTimeParser(50)
             .Build();

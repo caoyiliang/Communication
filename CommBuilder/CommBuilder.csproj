@@ -1,36 +1,39 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>10.0.3</Version>
-    <Description>新增无队列的顶层通讯口 (Top) 和服务端通讯口 (TopServer)</Description>
-    <PackageId>CSoft.Communication.Builder</PackageId>
-    <Authors>CSoft</Authors>
-    <Company>CSoft</Company>
-    <PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
-    <PackageIcon>logo.png</PackageIcon>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>default</LangVersion>
-    <DocumentationFile>bin\CommBuilder.xml</DocumentationFile>
-    <Nullable>enable</Nullable>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>10.0.4</Version>
+		<PackageReleaseNotes>
+			拆分顶层通讯口
+		</PackageReleaseNotes>
+		<Description>通讯库 Fluent Builder API - 简化通讯口创建</Description>
+		<PackageId>CSoft.Communication.Builder</PackageId>
+		<Authors>CSoft</Authors>
+		<Company>CSoft</Company>
+		<PackageProjectUrl>https://github.com/caoyiliang/Communication</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/caoyiliang/Communication</RepositoryUrl>
+		<PackageIcon>logo.png</PackageIcon>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>default</LangVersion>
+		<DocumentationFile>bin\CommBuilder.xml</DocumentationFile>
+		<Nullable>enable</Nullable>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\logo.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TopPortLib\TopPortLib.csproj" />
+	</ItemGroup>
 
 </Project>
