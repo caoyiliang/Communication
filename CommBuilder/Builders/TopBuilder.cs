@@ -1,5 +1,4 @@
 using CommBuilder.Interfaces;
-using Communication;
 using Communication.Bus;
 using Communication.Interfaces;
 using Parser;

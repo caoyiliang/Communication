@@ -43,7 +43,10 @@ namespace TopPortLib
             _topPortServer = topPortServer;
             _topPortServer.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _defaultTimeout = defaultTimeout;
-            _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
+
+            // 使用 instance 的类型来获取程序集
+            var assembly = instance.GetType().Assembly;
+            _typeList = [.. assembly.GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response"))];
         }
 
         private static void InitActivelyPush(object obj, Type type, object data, Guid clientId)

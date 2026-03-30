@@ -62,7 +62,8 @@ namespace TopPortLib
             _topPort.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _defaultTimeout = defaultTimeout;
             _timeDelayAfterSending = timeDelayAfterSending;
-            _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
+            var assembly = instance.GetType().Assembly;
+            _typeList = [.. assembly.GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response"))];
         }
 
         private static void InitActivelyPush(object obj, Type type, object data)

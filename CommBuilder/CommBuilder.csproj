@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>10.0.4</Version>
+		<Version>10.0.5</Version>
 		<PackageReleaseNotes>
-			拆分顶层通讯口
+			更新依赖
 		</PackageReleaseNotes>
 		<Description>通讯库 Fluent Builder API - 简化通讯口创建</Description>
 		<PackageId>CSoft.Communication.Builder</PackageId>
