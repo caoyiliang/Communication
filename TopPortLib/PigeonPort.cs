@@ -18,22 +18,40 @@ namespace TopPortLib
         private readonly int _timeDelayAfterSending;
         private readonly Type[] _typeList;
         private readonly List<ReqInfo> _reqInfos = [];
+        private readonly object _onSentLock = new();
+        private readonly Dictionary<RequestedLogEventHandler, SentDataEventHandler<byte[]>> _onSentDataHandlers = [];
         /// <inheritdoc/>
         public event RequestedLogEventHandler? OnSentData
         {
             add
             {
-                _topPort.OnSentData += async bytes =>
+                if (value == null) return;
+                SentDataEventHandler<byte[]> wrapped = async bytes =>
                 {
-                    if (value is not null) await value.Invoke(bytes);
+                    await value.Invoke(bytes);
                 };
+                lock (_onSentLock)
+                {
+                    _onSentDataHandlers[value] = wrapped;
+                }
+                _topPort.OnSentData += wrapped;
             }
             remove
             {
-                _topPort.OnSentData -= async bytes =>
+                if (value == null) return;
+                SentDataEventHandler<byte[]>? wrapped = null;
+                lock (_onSentLock)
                 {
-                    if (value is not null) await value.Invoke(bytes);
-                };
+                    if (_onSentDataHandlers.TryGetValue(value, out var handler))
+                    {
+                        wrapped = handler;
+                        _onSentDataHandlers.Remove(value);
+                    }
+                }
+                if (wrapped != null)
+                {
+                    _topPort.OnSentData -= wrapped;
+                }
             }
         }
         /// <inheritdoc/>
@@ -165,13 +183,14 @@ namespace TopPortLib
                 _reqInfos.Add(reqInfo);
             }
             var bytes = req.ToBytes();
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             var timeoutTask = Task.Delay(to, cts.Token);
             try
             {
                 var sendTask = _topPort.SendAsync(bytes, _timeDelayAfterSending);
                 if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
                     throw new TimeoutException($"send timeout={to}");
+                await sendTask;
                 if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
                     throw new TimeoutException($"timeout={to}");
                 cts.Cancel();

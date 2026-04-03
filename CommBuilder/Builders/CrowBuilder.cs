@@ -1,4 +1,4 @@
-using CommBuilder.Interfaces;
+﻿using CommBuilder.Interfaces;
 using Communication.Interfaces;
 using Parser;
 using Parser.Interfaces;
@@ -9,17 +9,17 @@ using TopPortLib.Interfaces;
 
 namespace CommBuilder.Builders
 {
-    /// <summary>
-    /// 乌鸦场景 Builder - RS485 主从队列通讯
-    /// </summary>
+    /// <inheritdoc/>
     public class CrowBuilder : ICrowPhysicalPortStep, ICrowParserStep, ICrowConfigureStep
     {
         private IPhysicalPort? _physicalPort;
         private IParser? _parser;
         private int _timeout = 5000;
         private int _sendInterval = 20;
-
-        #region ICrowPhysicalPortStep
+        private Action<byte[]>? _onReceived;
+        private Func<byte[], Task>? _onReceivedAsync;
+        private Func<Task>? _onConnectedAsync;
+        private Func<Task>? _onDisconnectedAsync;
 
         /// <inheritdoc/>
         public ICrowParserStep UseSerial(string portName, int baudRate, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
@@ -48,10 +48,6 @@ namespace CommBuilder.Builders
             _physicalPort = ConnectionStringParser.Parse(connectionString);
             return this;
         }
-
-        #endregion
-
-        #region ICrowParserStep
 
         /// <inheritdoc/>
         public ICrowConfigureStep WithHeadLengthParser(byte[] head, Func<byte[], int> lengthGetter)
@@ -92,10 +88,6 @@ namespace CommBuilder.Builders
             return this;
         }
 
-        #endregion
-
-        #region ICrowConfigureStep
-
         /// <inheritdoc/>
         public ICrowConfigureStep Timeout(int ms)
         {
@@ -113,25 +105,28 @@ namespace CommBuilder.Builders
         /// <inheritdoc/>
         public ICrowConfigureStep OnReceived(Func<byte[], Task> handler)
         {
-            // 事件订阅在 Build 后进行
+            _onReceivedAsync = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
         /// <inheritdoc/>
         public ICrowConfigureStep OnReceived(Action<byte[]> handler)
         {
+            _onReceived = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
         /// <inheritdoc/>
         public ICrowConfigureStep OnConnected(Func<Task> handler)
         {
+            _onConnectedAsync = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
         /// <inheritdoc/>
         public ICrowConfigureStep OnDisconnected(Func<Task> handler)
         {
+            _onDisconnectedAsync = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
@@ -144,9 +139,25 @@ namespace CommBuilder.Builders
             if (_parser == null)
                 throw new InvalidOperationException("必须选择分包器，请调用 WithHeadLengthParser/WithHeadFootParser/WithTimeParser/WithParser/WithNoParser");
 
-            return new CrowPort(_physicalPort, _parser, _timeout, _sendInterval);
-        }
+            var crowPort = new CrowPort(_physicalPort, _parser, _timeout, _sendInterval);
 
-        #endregion
+            if (_onReceived != null)
+                crowPort.OnReceivedData += data =>
+                {
+                    _onReceived(data);
+                    return Task.CompletedTask;
+                };
+
+            if (_onReceivedAsync != null)
+                crowPort.OnReceivedData += async data => await _onReceivedAsync(data);
+
+            if (_onConnectedAsync != null)
+                crowPort.OnConnect += async () => await _onConnectedAsync();
+
+            if (_onDisconnectedAsync != null)
+                crowPort.OnDisconnect += async () => await _onDisconnectedAsync();
+
+            return crowPort;
+        }
     }
 }

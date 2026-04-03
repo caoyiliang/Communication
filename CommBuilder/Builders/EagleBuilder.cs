@@ -1,4 +1,4 @@
-using CommBuilder.Interfaces;
+﻿using CommBuilder.Interfaces;
 using Parser;
 using Parser.Interfaces;
 using Parser.Parsers;
@@ -7,9 +7,7 @@ using TopPortLib.Interfaces;
 
 namespace CommBuilder.Builders
 {
-    /// <summary>
-    /// 老鹰场景 Builder - TCP Server 版鸽子
-    /// </summary>
+    /// <inheritdoc/>
     public class EagleBuilder : IEaglePhysicalPortStep, IEagleParserStep, IEagleConfigureStep
     {
         private readonly object _instance;
@@ -17,17 +15,14 @@ namespace CommBuilder.Builders
         private int _port;
         private Func<IParser>? _parserFactory;
         private int _timeout = 5000;
+        private Func<Guid, Task>? _onClientConnectedAsync;
+        private Func<Guid, Task>? _onClientDisconnectedAsync;
 
-        /// <summary>
-        /// 创建老鹰 Builder
-        /// </summary>
-        /// <param name="instance">主动推送事件所在实例（通常传 this）</param>
+        /// <inheritdoc/>
         public EagleBuilder(object instance)
         {
             _instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
-
-        #region IEaglePhysicalPortStep
 
         /// <inheritdoc/>
         public IEagleParserStep UseTcpServer(string host, int port)
@@ -36,10 +31,6 @@ namespace CommBuilder.Builders
             _port = port;
             return this;
         }
-
-        #endregion
-
-        #region IEagleParserStep
 
         /// <inheritdoc/>
         public IEagleConfigureStep WithParserFactory(Func<IParser> parserFactory)
@@ -73,10 +64,6 @@ namespace CommBuilder.Builders
             return this;
         }
 
-        #endregion
-
-        #region IEagleConfigureStep
-
         /// <inheritdoc/>
         public IEagleConfigureStep Timeout(int ms)
         {
@@ -87,12 +74,14 @@ namespace CommBuilder.Builders
         /// <inheritdoc/>
         public IEagleConfigureStep OnClientConnected(Func<Guid, Task> handler)
         {
+            _onClientConnectedAsync = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
         /// <inheritdoc/>
         public IEagleConfigureStep OnClientDisconnected(Func<Guid, Task> handler)
         {
+            _onClientDisconnectedAsync = handler ?? throw new ArgumentNullException(nameof(handler));
             return this;
         }
 
@@ -107,9 +96,15 @@ namespace CommBuilder.Builders
 
             var tcpServer = new Communication.Bus.TcpServer(_host!, _port);
             var topPortServer = new TopPort_Server(tcpServer, () => Task.FromResult(_parserFactory()));
-            return new CondorPort(_instance, topPortServer, _timeout);
-        }
+            var condorPort = new CondorPort(_instance, topPortServer, _timeout);
 
-        #endregion
+            if (_onClientConnectedAsync != null)
+                condorPort.OnClientConnect += async clientId => await _onClientConnectedAsync(clientId);
+
+            if (_onClientDisconnectedAsync != null)
+                condorPort.OnClientDisconnect += async clientId => await _onClientDisconnectedAsync(clientId);
+
+            return condorPort;
+        }
     }
 }

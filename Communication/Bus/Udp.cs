@@ -206,7 +206,14 @@ namespace Communication.Bus
                 {
                     _dicClients.TryRemove(clientId, out _);
                 }
-                await Task.Delay(10000); // 每10秒检查一次
+                try
+                {
+                    await Task.Delay(10000, _stopCts.Token); // 每10秒检查一次
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
             }
         }
 

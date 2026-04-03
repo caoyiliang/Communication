@@ -42,7 +42,7 @@ namespace TopPortLib
             _topPortM2M = topPortM2M;
             _topPortM2M.OnReceiveParsedData += TopPort_OnReceiveParsedData;
             _defaultTimeout = defaultTimeout;
-            _typeList = Assembly.GetCallingAssembly().GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
+            _typeList = instance.GetType().Assembly.GetTypes().Where(t => t.Namespace is not null && t.Namespace.EndsWith("Response")).ToArray();
         }
 
         private static void InitActivelyPush(object obj, Type type, object data, Guid clientId)
@@ -107,6 +107,7 @@ namespace TopPortLib
             }
 
             ReqInfo? reqInfo;
+            Channel<object>? responseChannel = null;
             lock (_reqInfos)
             {
                 if (rsp is IRspEnumerable rspEnumerable)
@@ -124,17 +125,14 @@ namespace TopPortLib
                 {
                     reqInfo = _reqInfos.Find(ri => ri.ClientId == clientId && ri.RspType.Contains(rspType) && ri.CheckBytes.ValueEqual(checkBytes));
                 }
+                if (reqInfo is not null)
+                {
+                    responseChannel = reqInfo.ResponseChannel;
+                }
             }
-            if (reqInfo != null)
+            if (responseChannel is not null)
             {
-                if (reqInfo.ResponseChannel != null)
-                {
-                    reqInfo.ResponseChannel.Writer.TryWrite(rsp);
-                }
-                else
-                {
-                    reqInfo.TaskCompletionSource.TrySetResult(rsp);
-                }
+                responseChannel.Writer.TryWrite(rsp);
                 return;
             }
             InitActivelyPush(_instance, rspType, rsp, clientId);
@@ -178,43 +176,104 @@ namespace TopPortLib
             }
         }
 
+        private void AddReqInfo(ReqInfo reqInfo)
+        {
+            lock (_reqInfos)
+            {
+                _reqInfos.Add(reqInfo);
+            }
+        }
+
+        private void RemoveReqInfo(ReqInfo reqInfo)
+        {
+            lock (_reqInfos)
+            {
+                _reqInfos.Remove(reqInfo);
+            }
+            reqInfo.ResponseChannel.Writer.TryComplete();
+        }
+
+        private async Task SendWithTimeoutAsync(Guid clientId, byte[] bytes, int timeout)
+        {
+            using var cts = new CancellationTokenSource();
+            var timeoutTask = Task.Delay(timeout, cts.Token);
+            var sendTask = _topPortM2M.SendAsync(clientId, bytes);
+            if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
+            {
+                throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={timeout}");
+            }
+            cts.Cancel();
+            await sendTask;
+        }
+
+        private async Task<TResponse> ReadResponseWithTimeoutAsync<TResponse>(
+            Guid clientId,
+            ChannelReader<object> reader,
+            int timeout,
+            string timeoutHint,
+            List<object>? pendingResponses = null)
+        {
+            pendingResponses ??= [];
+            for (int i = 0; i < pendingResponses.Count; i++)
+            {
+                if (pendingResponses[i] is TResponse pending)
+                {
+                    pendingResponses.RemoveAt(i);
+                    return pending;
+                }
+            }
+
+            while (true)
+            {
+                using var cts = new CancellationTokenSource(timeout);
+                object response;
+                try
+                {
+                    response = await reader.ReadAsync(cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} {timeoutHint} timeout={timeout}");
+                }
+                catch (ChannelClosedException ex) when (ex.InnerException is OperationCanceledException inner)
+                {
+                    throw inner;
+                }
+                catch (ChannelClosedException ex)
+                {
+                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} {timeoutHint} channel closed", ex);
+                }
+
+                if (response is TResponse matched)
+                {
+                    return matched;
+                }
+
+                pendingResponses.Add(response);
+            }
+        }
+
         /// <inheritdoc/>
         public async Task<TRsp> RequestAsync<TReq, TRsp>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp)],
-                TaskCompletionSource = tcs,
             };
-            lock (_reqInfos)
-            {
-                _reqInfos.Add(reqInfo);
-            }
+            AddReqInfo(reqInfo);
             var bytes = req.ToBytes();
-            var cts = new CancellationTokenSource();
-            var timeoutTask = Task.Delay(to, cts.Token);
             try
             {
-                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-                if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
-                await sendTask;
+                await SendWithTimeoutAsync(clientId, bytes, to);
                 await RequestDataAsync(clientId, bytes);
-                if (timeoutTask == await Task.WhenAny(timeoutTask, tcs.Task))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rec timeout={to}");
-                cts.Cancel();
-                return (TRsp)await tcs.Task;
+                return await ReadResponseWithTimeoutAsync<TRsp>(clientId, reqInfo.ResponseChannel.Reader, to, "rec");
             }
             finally
             {
-                lock (_reqInfos)
-                {
-                    _reqInfos.Remove(reqInfo);
-                }
+                RemoveReqInfo(reqInfo);
             }
         }
 
@@ -224,35 +283,24 @@ namespace TopPortLib
             where TRsp : IRspEnumerable
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp)],
-                TaskCompletionSource = tcs,
             };
-            lock (_reqInfos)
-            {
-                _reqInfos.Add(reqInfo);
-            }
+            AddReqInfo(reqInfo);
             var bytes = req.ToBytes();
             try
             {
-                CancellationTokenSource cts;
+                await SendWithTimeoutAsync(clientId, bytes, to);
+                await RequestDataAsync(clientId, bytes);
+
                 var rs = new List<TRsp>();
                 TRsp trs;
-                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
                 do
                 {
-                    cts = new CancellationTokenSource();
-                    var timeoutTask1 = Task.Delay(to, cts.Token);
-                    tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                    reqInfo.TaskCompletionSource = tcs;
-                    if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
-                        throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rspEnumerable time out={to}");
-                    cts.Cancel();
-                    trs = (TRsp)await tcs.Task;
+                    trs = await ReadResponseWithTimeoutAsync<TRsp>(clientId, reqInfo.ResponseChannel.Reader, to, "rspEnumerable");
                     rs.Add(trs);
                 } while (!await trs.IsFinish());
 
@@ -260,10 +308,7 @@ namespace TopPortLib
             }
             finally
             {
-                lock (_reqInfos)
-                {
-                    _reqInfos.Remove(reqInfo);
-                }
+                RemoveReqInfo(reqInfo);
             }
         }
 
@@ -276,60 +321,41 @@ namespace TopPortLib
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp)],
-                TaskCompletionSource = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously),
-                ResponseChannel = Channel.CreateUnbounded<object>()
             };
-            lock (_reqInfos)
-            {
-                _reqInfos.Add(reqInfo);
-            }
+            AddReqInfo(reqInfo);
             var bytes = req.ToBytes();
             var results = new List<TRsp>();
-            var cts = new CancellationTokenSource();
-
             try
             {
-                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-                var sendTimeoutTask = Task.Delay(to);
-                if (sendTimeoutTask == await Task.WhenAny(sendTimeoutTask, sendTask))
-                {
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
-                }
-                await sendTask;
+                await SendWithTimeoutAsync(clientId, bytes, to);
+                await RequestDataAsync(clientId, bytes);
 
                 while (true)
                 {
-                    var receiveTimeoutTask = Task.Delay(to, cts.Token);
-
-                    if (receiveTimeoutTask == await Task.WhenAny(receiveTimeoutTask, Task.Run(async () =>
+                    using var readCts = new CancellationTokenSource(to);
+                    object response;
+                    try
                     {
-                        try
-                        {
-                            while (await reqInfo.ResponseChannel.Reader.WaitToReadAsync(cts.Token))
-                            {
-                                if (reqInfo.ResponseChannel.Reader.TryRead(out var response))
-                                {
-                                    results.Add((TRsp)response);
-                                }
-                            }
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            // Suppress the cancellation exception
-                        }
-                    }, cts.Token)))
+                        response = await reqInfo.ResponseChannel.Reader.ReadAsync(readCts.Token);
+                    }
+                    catch (OperationCanceledException)
                     {
                         break;
                     }
+                    catch (ChannelClosedException ex) when (ex.InnerException is OperationCanceledException inner)
+                    {
+                        throw inner;
+                    }
+                    catch (ChannelClosedException)
+                    {
+                        break;
+                    }
+                    results.Add((TRsp)response);
                 }
             }
             finally
             {
-                cts.Cancel();
-                lock (_reqInfos)
-                {
-                    _reqInfos.Remove(reqInfo);
-                }
+                RemoveReqInfo(reqInfo);
             }
 
             return results;
@@ -339,48 +365,26 @@ namespace TopPortLib
         public async Task<(TRsp1 Rsp1, TRsp2 Rsp2)> RequestAsync<TReq, TRsp1, TRsp2>(Guid clientId, TReq req, int timeout = -1) where TReq : IAsyncRequest
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp1), typeof(TRsp2)],
-                TaskCompletionSource = tcs,
             };
-            lock (_reqInfos)
-            {
-                _reqInfos.Add(reqInfo);
-            }
+            AddReqInfo(reqInfo);
             var bytes = req.ToBytes();
             try
             {
-                var cts = new CancellationTokenSource();
-                var timeoutTask = Task.Delay(to, cts.Token);
-                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-                if (sendTask != await Task.WhenAny(timeoutTask, sendTask))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
-                await sendTask;
+                await SendWithTimeoutAsync(clientId, bytes, to);
                 await RequestDataAsync(clientId, bytes);
-                if (tcs.Task != await Task.WhenAny(timeoutTask, tcs.Task))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rec time out={to}");
-                cts.Cancel();
-                var rs1 = (TRsp1)await tcs.Task;
-                cts = new CancellationTokenSource();
-                var timeoutTask1 = Task.Delay(to, cts.Token);
-                tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                reqInfo.TaskCompletionSource = tcs;
-                if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} exe time out={to}");
-                cts.Cancel();
-                var rs2 = (TRsp2)await tcs.Task;
+                var pendingResponses = new List<object>();
+                var rs1 = await ReadResponseWithTimeoutAsync<TRsp1>(clientId, reqInfo.ResponseChannel.Reader, to, "rec", pendingResponses);
+                var rs2 = await ReadResponseWithTimeoutAsync<TRsp2>(clientId, reqInfo.ResponseChannel.Reader, to, "exe", pendingResponses);
                 return (rs1, rs2);
             }
             finally
             {
-                lock (_reqInfos)
-                {
-                    _reqInfos.Remove(reqInfo);
-                }
+                RemoveReqInfo(reqInfo);
             }
         }
 
@@ -390,62 +394,33 @@ namespace TopPortLib
             where TRsp2 : IRspEnumerable
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
             var reqInfo = new ReqInfo()
             {
                 ClientId = clientId,
                 CheckBytes = req.Check(),
                 RspType = [typeof(TRsp1), typeof(TRsp2), typeof(TRsp3)],
-                TaskCompletionSource = tcs,
             };
-            lock (_reqInfos)
-            {
-                _reqInfos.Add(reqInfo);
-            }
+            AddReqInfo(reqInfo);
             var bytes = req.ToBytes();
             try
             {
-                var cts = new CancellationTokenSource();
-                var timeoutTask = Task.Delay(to, cts.Token);
-                var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-                if (sendTask != await Task.WhenAny(timeoutTask, sendTask))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
-                await sendTask;
+                await SendWithTimeoutAsync(clientId, bytes, to);
                 await RequestDataAsync(clientId, bytes);
-                if (tcs.Task != await Task.WhenAny(timeoutTask, tcs.Task))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rec time out={to}");
-                cts.Cancel();
-                var rs1 = (TRsp1)await tcs.Task;
+                var pendingResponses = new List<object>();
+                var rs1 = await ReadResponseWithTimeoutAsync<TRsp1>(clientId, reqInfo.ResponseChannel.Reader, to, "rec", pendingResponses);
                 var rs2 = new List<TRsp2>();
                 TRsp2 trs2;
                 do
                 {
-                    cts = new CancellationTokenSource();
-                    var timeoutTask1 = Task.Delay(to, cts.Token);
-                    tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                    reqInfo.TaskCompletionSource = tcs;
-                    if (timeoutTask1 == await Task.WhenAny(timeoutTask1, tcs.Task))
-                        throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} rspEnumerable time out={to}");
-                    cts.Cancel();
-                    trs2 = (TRsp2)await tcs.Task;
+                    trs2 = await ReadResponseWithTimeoutAsync<TRsp2>(clientId, reqInfo.ResponseChannel.Reader, to, "rspEnumerable", pendingResponses);
                     rs2.Add(trs2);
                 } while (!await trs2.IsFinish());
-                cts = new CancellationTokenSource();
-                var timeoutTask2 = Task.Delay(to, cts.Token);
-                tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-                reqInfo.TaskCompletionSource = tcs;
-                if (timeoutTask2 == await Task.WhenAny(timeoutTask2, tcs.Task))
-                    throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} exe time out={to}");
-                cts.Cancel();
-                var rs3 = (TRsp3)await tcs.Task;
+                var rs3 = await ReadResponseWithTimeoutAsync<TRsp3>(clientId, reqInfo.ResponseChannel.Reader, to, "exe", pendingResponses);
                 return (rs1, rs2, rs3);
             }
             finally
             {
-                lock (_reqInfos)
-                {
-                    _reqInfos.Remove(reqInfo);
-                }
+                RemoveReqInfo(reqInfo);
             }
         }
 
@@ -453,14 +428,8 @@ namespace TopPortLib
         public async Task SendAsync<TReq>(Guid clientId, TReq req, int timeout = -1) where TReq : IByteStream
         {
             var to = timeout == -1 ? _defaultTimeout : timeout;
-            var cts = new CancellationTokenSource();
-            var timeoutTask = Task.Delay(to, cts.Token);
             var bytes = req.ToBytes();
-            var sendTask = _topPortM2M.SendAsync(clientId, bytes);
-            if (timeoutTask == await Task.WhenAny(timeoutTask, sendTask))
-                throw new TimeoutException($"{await _topPortM2M.PhysicalPort.GetClientInfos(clientId)} send timeout={to}");
-            cts.Cancel();
-            await sendTask;
+            await SendWithTimeoutAsync(clientId, bytes, to);
             await RequestDataAsync(clientId, bytes);
         }
 
@@ -473,11 +442,17 @@ namespace TopPortLib
         /// <inheritdoc/>
         public async Task StopAsync()
         {
-            await _topPortM2M.CloseAsync();
+            List<ReqInfo> pendingRequests;
             lock (_reqInfos)
             {
+                pendingRequests = [.. _reqInfos];
                 _reqInfos.Clear();
             }
+            foreach (var pendingRequest in pendingRequests)
+            {
+                pendingRequest.ResponseChannel.Writer.TryComplete(new OperationCanceledException("SparrowPort stopped"));
+            }
+            await _topPortM2M.CloseAsync();
         }
 
         /// <inheritdoc/>
@@ -503,8 +478,8 @@ namespace TopPortLib
             public Guid ClientId;
             public byte[]? CheckBytes { get; set; }
             public List<Type> RspType { get; set; } = [];
-            public TaskCompletionSource<object> TaskCompletionSource { get; set; } = null!;
-            public Channel<object> ResponseChannel { get; set; } = Channel.CreateUnbounded<object>(); // 替换为 Channel
+            public Channel<object> ResponseChannel { get; set; } = Channel.CreateUnbounded<object>();
         }
     }
 }
+

@@ -1,4 +1,4 @@
-using CommBuilder.Interfaces;
+﻿using CommBuilder.Interfaces;
 using Communication.Interfaces;
 using Parser;
 using Parser.Interfaces;
@@ -9,9 +9,7 @@ using TopPortLib.Interfaces;
 
 namespace CommBuilder.Builders
 {
-    /// <summary>
-    /// 鸽子场景 Builder - TCP 全双工通讯，支持主动推送
-    /// </summary>
+    /// <inheritdoc/>
     public class PigeonBuilder : IPigeonPhysicalPortStep, IPigeonParserStep, IPigeonConfigureStep
     {
         private readonly object _instance;
@@ -19,17 +17,13 @@ namespace CommBuilder.Builders
         private IParser? _parser;
         private int _timeout = 5000;
         private int _sendInterval = 20;
+        private CheckEventHandler? _checkEvent;
 
-        /// <summary>
-        /// 创建鸽子 Builder
-        /// </summary>
-        /// <param name="instance">主动推送事件所在实例（通常传 this）</param>
+        /// <inheritdoc/>
         public PigeonBuilder(object instance)
         {
             _instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
-
-        #region IPigeonPhysicalPortStep
 
         /// <inheritdoc/>
         public IPigeonParserStep UseSerial(string portName, int baudRate, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
@@ -58,10 +52,6 @@ namespace CommBuilder.Builders
             _physicalPort = ConnectionStringParser.Parse(connectionString);
             return this;
         }
-
-        #endregion
-
-        #region IPigeonParserStep
 
         /// <inheritdoc/>
         public IPigeonConfigureStep WithHeadLengthParser(byte[] head, Func<byte[], int> lengthGetter)
@@ -102,10 +92,6 @@ namespace CommBuilder.Builders
             return this;
         }
 
-        #endregion
-
-        #region IPigeonConfigureStep
-
         /// <inheritdoc/>
         public IPigeonConfigureStep Timeout(int ms)
         {
@@ -123,12 +109,16 @@ namespace CommBuilder.Builders
         /// <inheritdoc/>
         public IPigeonConfigureStep WithCheck(Func<byte[], Task<bool>> checkFunc)
         {
+            if (checkFunc == null) throw new ArgumentNullException(nameof(checkFunc));
+            _checkEvent = data => checkFunc(data);
             return this;
         }
 
         /// <inheritdoc/>
         public IPigeonConfigureStep WithCheck(Func<byte[], bool> checkFunc)
         {
+            if (checkFunc == null) throw new ArgumentNullException(nameof(checkFunc));
+            _checkEvent = data => Task.FromResult(checkFunc(data));
             return this;
         }
 
@@ -142,9 +132,12 @@ namespace CommBuilder.Builders
                 throw new InvalidOperationException("必须选择分包器，请调用 WithHeadLengthParser/WithHeadFootParser/WithTimeParser/WithParser/WithNoParser");
 
             var topPort = new TopPort(_physicalPort, _parser);
-            return new PigeonPort(_instance, topPort, _timeout, _sendInterval);
-        }
+            var pigeonPort = new PigeonPort(_instance, topPort, _timeout, _sendInterval)
+            {
+                CheckEvent = _checkEvent
+            };
 
-        #endregion
+            return pigeonPort;
+        }
     }
 }
